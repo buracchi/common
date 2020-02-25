@@ -21,18 +21,28 @@ binary_tree_t binary_tree_init(binary_tree_node_t root) {
 
 int binary_tree_destroy(binary_tree_t handle) {
 	struct binary_tree* binary_tree = (struct binary_tree*)handle;
-	struct binary_tree* binary_left_subtree = binary_tree_cut_left(binary_tree, binary_tree->root);
-	struct binary_tree* binary_right_subtree = binary_tree_cut_right(binary_tree, binary_tree->root);
+	struct binary_tree* binary_left_subtree;
+	struct binary_tree* binary_right_subtree;
+	binary_left_subtree = binary_tree_cut_left(binary_tree, binary_tree->root);
+	if (!binary_left_subtree) {
+		return 1;
+	}
+	binary_right_subtree = binary_tree_cut_right(binary_tree, binary_tree->root);
+	if (!binary_right_subtree) {
+		return 1;
+	}
 	if (binary_left_subtree->root) {
 		if (binary_tree_destroy(binary_left_subtree)) {
 			return 1;
 		}
 	}
+	free(binary_left_subtree);
 	if (binary_right_subtree->root) {
-		if (binary_tree_destroy(binary_right_subtree)) {
+		if (binary_right_subtree && binary_tree_destroy(binary_right_subtree)) {
 			return 1;
 		}
 	}
+	free(binary_right_subtree);
 	if (binary_tree_node_destroy(binary_tree->root)) {
 		return 1;
 	}
@@ -153,5 +163,6 @@ int subtree_nodes_number(binary_tree_node_t node) {
 			}
 		}
 	}
+	stack_destroy(stack);
 	return nodes_number;
 }
