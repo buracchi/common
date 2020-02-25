@@ -1,8 +1,8 @@
-#include "binary_tree.h"
+#include "./trees/binary_tree.h"
 
 #include <stdlib.h>
 
-#include "stack.h"
+#include "./abstract/stack/stack.h"
 
 struct binary_tree {
 	binary_tree_node_t root;
@@ -52,14 +52,14 @@ binary_tree_node_t binary_tree_get_root(binary_tree_t handle) {
 	return binary_tree->root;
 }
 
-int binary_tree_set_root(binary_tree_t handle, binary_tree_node_t node) {
+void binary_tree_set_root(binary_tree_t handle, binary_tree_node_t node) {
 	struct binary_tree* binary_tree = (struct binary_tree*)handle;
 
 	binary_tree->root = node;
 	binary_tree->n = subtree_nodes_number(node);
 }
 
-int binary_tree_insert_as_left_subtree(binary_tree_t handle, binary_tree_node_t node, binary_tree_t subtree) {
+void binary_tree_insert_as_left_subtree(binary_tree_t handle, binary_tree_node_t node, binary_tree_t subtree) {
 	struct binary_tree* binary_tree = (struct binary_tree*)handle;
 	struct binary_tree* binary_subtree = (struct binary_tree*)subtree;
 	if (binary_subtree->root) {
@@ -69,7 +69,7 @@ int binary_tree_insert_as_left_subtree(binary_tree_t handle, binary_tree_node_t 
 	binary_tree->n += subtree_nodes_number(node);
 }
 
-int binary_tree_insert_as_right_subtree(binary_tree_t handle, binary_tree_node_t node, binary_tree_t subtree) {
+void binary_tree_insert_as_right_subtree(binary_tree_t handle, binary_tree_node_t node, binary_tree_t subtree) {
 	struct binary_tree* binary_tree = (struct binary_tree*)handle;
 	struct binary_tree* binary_subtree = (struct binary_tree*)subtree;
 	if (binary_subtree->root) {
@@ -136,20 +136,20 @@ binary_tree_t binary_tree_cut_right(binary_tree_t handle, binary_tree_node_t nod
 }
 
 int subtree_nodes_number(binary_tree_node_t node) {
-	struct binary_node* binary_node = (struct binary_node*)node;
+	struct binary_tree_node* binary_tree_node = (struct binary_tree_node*)node;
 	int nodes_number = 0;
 	_stack_t stack = stack_init();
-	if (binary_node) {
-		stack_push(stack, binary_node);
+	if (binary_tree_node) {
+		stack_push(stack, binary_tree_node);
 		while (!stack_is_empty(stack)) {
-			struct binary_node* current_node;
+			struct binary_tree_node* current_node;
 			current_node = stack_pop(stack);
 			nodes_number++;
-			if (binary_node_get_left_son(current_node)) {
-				stack_push(stack, binary_node_get_left_son(current_node));
+			if (binary_tree_node_get_left_son(current_node)) {
+				stack_push(stack, binary_tree_node_get_left_son(current_node));
 			}
-			if (binary_node_get_right_son(current_node)) {
-				stack_push(stack, binary_node_get_right_son(current_node));
+			if (binary_tree_node_get_right_son(current_node)) {
+				stack_push(stack, binary_tree_node_get_right_son(current_node));
 			}
 		}
 	}

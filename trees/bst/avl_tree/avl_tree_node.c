@@ -1,17 +1,17 @@
-#include "avl_tree_node.h"
+#include "./trees/bst/avl_tree/avl_tree_node.h"
 
 #include <stdlib.h>
 
-#include "bst_node.h"
+#include "./trees/bst/bst_node.h"
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 
 struct avl_tree_node {
 	bst_node_t node;
 	int height;
 };
-
-static inline void* max(void* a, void* b) {
-	return a > b ? a : b;
-}
 
 avl_tree_node_t avl_tree_node_init(void* key, void* value) {
 	struct avl_tree_node* avl_tree_node;
@@ -59,11 +59,6 @@ static inline void* avl_tree_node_get_key(avl_tree_node_t handle) {
 static inline void* avl_tree_node_get_value(avl_tree_node_t handle) {
 	struct avl_tree_node* avl_tree_node = (struct avl_tree_node*)handle;
 	return bst_node_get_value(avl_tree_node->node);
-}
-
-int avl_tree_node_get_height(avl_tree_node_t handle) {
-	struct avl_tree_node* avl_tree_node = (struct avl_tree_node*)handle;
-	return avl_tree_node->height;
 }
 
 int avl_tree_node_get_height(avl_tree_node_t handle) {

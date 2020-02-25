@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bst_node.h"
+#include "./trees/bst/bst_node.h"
 
 /*
     Questo modulo contiene l'implementazione
@@ -16,7 +16,7 @@
 
 typedef void* bst_t;
 
-typedef int *bst_comparison_function(const void* key1, const void* key2);
+typedef int bst_comparison_function(const void* key1, const void* key2);
 
 bst_t bst_init(bst_node_t root, bst_comparison_function* comparison_function);
 
@@ -26,11 +26,11 @@ long bst_nodes_number(bst_t handle);
 
 bst_node_t bst_get_root(bst_t handle);
 
-int bst_set_root(bst_t handle, bst_node_t node);
+void bst_set_root(bst_t handle, bst_node_t node);
 
-int bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subtree);
+void bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subtree);
 
-int bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree);
+void bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree);
 
 bst_t bst_cut(bst_t handle, bst_node_t node);
 

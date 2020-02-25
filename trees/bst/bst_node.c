@@ -1,8 +1,8 @@
-#include "bst_node.h"
+#include "./trees/bst/bst_node.h"
 
 #include <stdlib.h>
 
-#include "binary_tree_node.h"
+#include "./trees/binary_tree_node.h"
 
 struct dictionary {
 	void* key;

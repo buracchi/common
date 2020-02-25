@@ -1,15 +1,15 @@
-#include "bst.h"
+#include "./trees/bst/bst.h"
 
 #include <stdlib.h>
 
-#include "binary_tree.h"
+#include "./trees/binary_tree.h"
 
 struct bst {
 	binary_tree_t tree;
 	bst_comparison_function* compare;
 };
 
-int defualt_comparison_function(void* key1, void* key2) {
+int defualt_comparison_function(const void* key1, const void* key2) {
 	if (key1 < key2) {
 		return -1;
 	}
@@ -65,21 +65,21 @@ static inline bst_node_t bst_get_root(bst_t handle) {
 	return binary_tree_get_root(bst->tree);
 }
 
-static inline int bst_set_root(bst_t handle, bst_node_t node) {
+static inline void bst_set_root(bst_t handle, bst_node_t node) {
 	struct bst* bst = (struct bst*)handle;
-	return binary_tree_set_root(bst->tree, node);
+	binary_tree_set_root(bst->tree, node);
 }
 
-static inline int bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subtree) {
+static inline void bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subtree) {
 	struct bst* bst = (struct bst*)handle;
 	struct bst* bst_subtree = (struct bst*)subtree;
-	return binary_tree_insert_as_left_subtree(bst->tree, node, bst_subtree->tree);
+	binary_tree_insert_as_left_subtree(bst->tree, node, bst_subtree->tree);
 }
 
-static inline int bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree) {
+static inline void bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree) {
 	struct bst* bst = (struct bst*)handle;
 	struct bst* bst_subtree = (struct bst*)subtree;
-	return binary_tree_insert_as_right_subtree(bst->tree, node, bst_subtree->tree);
+	binary_tree_insert_as_right_subtree(bst->tree, node, bst_subtree->tree);
 }
 
 static inline bst_t bst_cut(bst_t handle, bst_node_t node) {
@@ -110,9 +110,9 @@ bst_t bst_cut_one_son_node(bst_t handle, bst_node_t node) {
 	}
 	else {
 		bst_node_swap(node, son);
-		cutted_tree = bst_tree_cut(bst, son);
-		bst_insert_as_left_subtree(bst, node, bst_tree_cut(cutted_tree, bst_node_get_left_son(son)));
-		bst_insert_as_right_subtree(bst, node, bst_tree_cut(cutted_tree, bst_node_get_right_son(son)));
+		cutted_tree = bst_cut(bst, son);
+		bst_insert_as_left_subtree(bst, node, bst_cut(cutted_tree, bst_node_get_left_son(son)));
+		bst_insert_as_right_subtree(bst, node, bst_cut(cutted_tree, bst_node_get_right_son(son)));
 		//memory leack
 	}
 	return cutted_tree;

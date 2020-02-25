@@ -1,4 +1,4 @@
-#include "flag.h"
+#include "./arrays/bit_array/flag.h"
 #include <stdlib.h>
 
 #define byte unsigned char

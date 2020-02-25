@@ -1,4 +1,4 @@
-#include "binary_tree_node.h"
+#include "./trees/binary_tree_node.h"
 
 #include <stdlib.h>
 
@@ -59,6 +59,7 @@ void* binary_tree_node_get_info(binary_tree_node_t handle) {
 	if (binary_tree_node) {
 		return binary_tree_node->data;
 	}
+	return NULL;
 }
 
 binary_tree_node_t binary_tree_node_get_father(binary_tree_node_t handle) {
