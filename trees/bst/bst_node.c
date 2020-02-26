@@ -59,17 +59,17 @@ extern int bst_node_swap(bst_node_t handle1, bst_node_t handle2) {
 
 extern inline void* bst_node_get_key(bst_node_t handle){
 	struct bst_node* node = (struct bst_node*)handle;
-	return node->key;
+	return node? node->key : NULL;
 }
 
 extern inline void* bst_node_get_value(bst_node_t handle) {
 	struct bst_node* node = (struct bst_node*)handle;
-	return node->value;
+	return node? node->value : NULL;
 }
 
 extern inline bst_node_t bst_node_get_father(bst_node_t handle) {
 	struct bst_node* node = (struct bst_node*)handle;
-	return node->father;
+	return node ? node->father : NULL;
 }
 
 extern int bst_node_set_father(bst_node_t handle, bst_node_t father) {
@@ -83,7 +83,7 @@ extern int bst_node_set_father(bst_node_t handle, bst_node_t father) {
 
 extern inline bst_node_t bst_node_get_left_son(bst_node_t handle) {
 	struct bst_node* node = (struct bst_node*)handle;
-	return node->left_son;
+	return node ? node->left_son : NULL;
 }
 
 extern int bst_node_set_left_son(bst_node_t handle, bst_node_t left_son) {
@@ -97,7 +97,7 @@ extern int bst_node_set_left_son(bst_node_t handle, bst_node_t left_son) {
 
 extern inline bst_node_t bst_node_get_right_son(bst_node_t handle) {
 	struct bst_node* node = (struct bst_node*)handle;
-	return node->right_son;
+	return node ? node->right_son : NULL;
 }
 
 extern inline int bst_node_set_right_son(bst_node_t handle, bst_node_t right_son) {

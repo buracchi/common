@@ -55,17 +55,15 @@ extern int binary_tree_node_swap(binary_tree_node_t handle1, binary_tree_node_t 
 
 extern void* binary_tree_node_get_info(binary_tree_node_t handle) {
 	struct binary_tree_node* node = (struct binary_tree_node*)handle;
-	if (node) {
-		return node->data;
-	}
+	return node->data;
 }
 
-extern binary_tree_node_t binary_tree_node_get_father(binary_tree_node_t handle) {
+extern inline binary_tree_node_t binary_tree_node_get_father(binary_tree_node_t handle) {
 	struct binary_tree_node* node = (struct binary_tree_node*)handle;
-	return node->father;
+	return node ? node->father : NULL;
 }
 
-extern int binary_tree_node_set_father(binary_tree_node_t handle, binary_tree_node_t father) {
+extern inline int binary_tree_node_set_father(binary_tree_node_t handle, binary_tree_node_t father) {
 	struct binary_tree_node* node = (struct binary_tree_node*)handle;
 	if (node) {
 		node->father = father;
@@ -74,9 +72,9 @@ extern int binary_tree_node_set_father(binary_tree_node_t handle, binary_tree_no
 	return 1;
 }
 
-extern binary_tree_node_t binary_tree_node_get_left_son(binary_tree_node_t handle) {
+extern inline binary_tree_node_t binary_tree_node_get_left_son(binary_tree_node_t handle) {
 	struct binary_tree_node* node = (struct binary_tree_node*)handle;
-	return node->left_son;
+	return node? node->left_son : NULL;
 }
 
 extern int binary_tree_node_set_left_son(binary_tree_node_t handle, binary_tree_node_t left_son) {
@@ -90,7 +88,7 @@ extern int binary_tree_node_set_left_son(binary_tree_node_t handle, binary_tree_
 
 extern inline binary_tree_node_t binary_tree_node_get_right_son(binary_tree_node_t handle) {
 	struct binary_tree_node* node = (struct binary_tree_node*)handle;
-	return node->right_son;
+	return node ? node->right_son : NULL;
 }
 
 extern int binary_tree_node_set_right_son(binary_tree_node_t handle, binary_tree_node_t right_son) {

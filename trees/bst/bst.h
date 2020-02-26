@@ -18,7 +18,7 @@ typedef void* bst_t;
 
 typedef int bst_comparison_function(const void* key1, const void* key2);
 
-bst_t bst_init(bst_node_t root, bst_comparison_function* comparison_function);
+bst_t bst_init(bst_comparison_function* comparison_function);
 
 int bst_destroy(bst_t handle);
 

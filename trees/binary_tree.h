@@ -4,7 +4,7 @@
 
 typedef void* binary_tree_t;
 
-binary_tree_t binary_tree_init(binary_tree_node_t root);
+binary_tree_t binary_tree_init();
 
 int binary_tree_destroy(binary_tree_t handle);
 
