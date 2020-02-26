@@ -57,13 +57,11 @@ extern int binary_tree_destroy(binary_tree_t handle) {
 			return 1;
 		}
 	}
-	free(left_subtree);
 	if (right_subtree->root) {
 		if (binary_tree_destroy(right_subtree)) {
 			return 1;
 		}
 	}
-	free(right_subtree);
 	if (binary_tree_node_destroy(tree->root)) {
 		return 1;
 	}

@@ -19,11 +19,11 @@ static int subtree_nodes_number(bst_node_t node) {
 			struct binary_tree_node* current_node;
 			current_node = stack_pop(stack);
 			nodes_number++;
-			if (binary_tree_node_get_left_son(current_node)) {
-				stack_push(stack, binary_tree_node_get_left_son(current_node));
+			if (bst_node_get_left_son(current_node)) {
+				stack_push(stack, bst_node_get_left_son(current_node));
 			}
-			if (binary_tree_node_get_right_son(current_node)) {
-				stack_push(stack, binary_tree_node_get_right_son(current_node));
+			if (bst_node_get_right_son(current_node)) {
+				stack_push(stack, bst_node_get_right_son(current_node));
 			}
 		}
 	}
@@ -69,13 +69,11 @@ extern int bst_destroy(bst_t handle) {
 			return 1;
 		}
 	}
-	free(left_subtree);
 	if (right_subtree->root) {
 		if (bst_destroy(right_subtree)) {
 			return 1;
 		}
 	}
-	free(right_subtree);
 	if (bst_node_destroy(tree->root)) {
 		return 1;
 	}
@@ -106,7 +104,7 @@ extern void bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subt
 		bst_node_set_father(bst_subtree->root, node);
 	}
 	bst_node_set_left_son(node, bst_subtree->root);
-	tree->n += subtree_nodes_number(node);
+	tree->n += subtree_nodes_number(bst_subtree->root);
 }
 
 extern void bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree) {
@@ -220,7 +218,7 @@ extern void bst_insert_single_node_tree(bst_t handle, void* key, bst_t new_tree)
 				current = bst_node_get_right_son(current);
 			}
 		}
-		cmp = tree->compare(key, bst_node_get_key(current));
+		cmp = tree->compare(key, bst_node_get_key(prev));
 		if (cmp < 1) {
 			bst_insert_as_left_subtree(tree, prev, new_tree);
 		}
@@ -259,6 +257,7 @@ extern int bst_insert(bst_t handle, void* key, void* value) {
 	bst_t new_tree = bst_init(tree->compare);
 	bst_set_root(new_tree, bst_node_init(key, value));
 	bst_insert_single_node_tree(tree, key, new_tree);
+	//memory leack
 	return 0;
 }
 
