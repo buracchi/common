@@ -34,6 +34,33 @@ extern bst_t bst_init(bst_node_t root, bst_comparison_function* comparison_funct
 
 extern int bst_destroy(bst_t handle) {
 	struct bst* bst = (struct bst*)handle;
+	struct bst* left_subtree;
+	struct bst* right_subtree;
+	left_subtree = bst_cut_left(bst, bst_get_root(bst));
+	if (!left_subtree) {
+		return 1;
+	}
+	right_subtree = binary_tree_cut_right(bst, bst_get_root(bst));
+	if (!right_subtree) {
+		return 1;
+	}
+	if (bst_get_root(left_subtree)) {
+		if (binary_tree_destroy(left_subtree)) {
+			return 1;
+		}
+	}
+	free(left_subtree);
+	if (bst_get_root(right_subtree)) {
+		if (right_subtree && binary_tree_destroy(right_subtree)) {
+			return 1;
+		}
+	}
+	free(right_subtree);
+	if (binary_tree_node_destroy(bst_get_root(bst))) {
+		return 1;
+	}
+	free(bst);
+	/*
 	bst_t binary_left_subtree = bst_cut_left(bst, bst_get_root(bst));
 	bst_t binary_right_subtree = bst_cut_right(bst, bst_get_root(bst));
 	if (bst_destroy(binary_left_subtree)) {
@@ -48,6 +75,7 @@ extern int bst_destroy(bst_t handle) {
 	free(bst->tree);
 	free(bst);
 	return 0;
+	*/
 }
 
 extern inline long bst_nodes_number(bst_t handle) {
