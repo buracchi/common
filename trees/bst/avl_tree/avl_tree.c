@@ -372,7 +372,8 @@ extern inline void* avl_tree_search(avl_tree_t handle, void* key) {
 extern int avl_tree_insert(avl_tree_t handle, void* key, void* value) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_node_t node = avl_tree_node_init(key, value);
-	avl_tree_t new_tree = avl_tree_init(tree->compare);
+	avl_tree_t new_tree = node;
+	avl_tree_set_root(new_tree, avl_tree_node_init(key, value));
 	avl_tree_insert_single_node_tree(tree, key, new_tree);
 	balance_insert(tree, node);
 	avl_tree_set_root(new_tree, NULL);
@@ -381,7 +382,7 @@ extern int avl_tree_insert(avl_tree_t handle, void* key, void* value) {
 
 extern void avl_tree_delete(avl_tree_t handle, void* key) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
-	avl_tree_node_t node = avl_tree_search(tree, key);
+	avl_tree_node_t node = avl_tree_search_node(tree, key);
 	if (node) {
 		if (avl_tree_node_degree(node) < 2) {
 			cut_single_son(tree, node);
