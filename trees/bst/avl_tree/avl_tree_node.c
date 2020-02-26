@@ -46,11 +46,6 @@ extern inline int avl_tree_node_swap(avl_tree_node_t handle1, avl_tree_node_t ha
 	return bst_node_swap(avl_tree_node1->node, avl_tree_node2->node);
 }
 
-extern inline void* avl_tree_node_get_info(avl_tree_node_t handle) {
-	struct avl_tree_node* avl_tree_node = (struct avl_tree_node*)handle;
-	return bst_node_get_info(avl_tree_node->node);
-}
-
 extern inline void* avl_tree_node_get_key(avl_tree_node_t handle) {
 	struct avl_tree_node* avl_tree_node = (struct avl_tree_node*)handle;
 	return bst_node_get_key(avl_tree_node->node);

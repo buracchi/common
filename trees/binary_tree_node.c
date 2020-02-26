@@ -4,9 +4,9 @@
 
 struct binary_tree_node {
 	void* data;
-	struct binary_tree_node* father;
-	struct binary_tree_node* left_son;
-	struct binary_tree_node* right_son;
+	binary_tree_node_t father;
+	binary_tree_node_t left_son;
+	binary_tree_node_t right_son;
 };
 
 extern binary_tree_node_t binary_tree_node_init(void* info) {

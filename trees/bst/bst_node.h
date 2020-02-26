@@ -10,8 +10,6 @@ extern long bst_node_degree(bst_node_t handle);
 
 extern int bst_node_swap(bst_node_t handle1, bst_node_t handle2);
 
-extern void* bst_node_get_info(bst_node_t handle);
-
 extern void* bst_node_get_key(bst_node_t handle);
 
 extern void* bst_node_get_value(bst_node_t handle);

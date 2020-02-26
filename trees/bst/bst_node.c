@@ -4,64 +4,100 @@
 
 #include "./trees/binary_tree_node.h"
 
-struct dictionary {
+struct bst_node {
+	binary_tree_node_t node;
 	void* key;
-	void* value;
 };
 
 extern bst_node_t bst_node_init(void* key, void* value) {
-	bst_node_t bst_node;
-	struct dictionary* info;
-	if ((info = malloc(sizeof(struct dictionary))) == NULL) {
+	struct bst_node* bst_node;
+	if ((bst_node = malloc(sizeof(struct bst_node))) == NULL) {
 		return NULL;
 	}
-	info->key = key;
-	info->value = value;
-	if ((bst_node = binary_tree_node_init(info)) == NULL) {
-		free(info);
+	bst_node->key = key;
+	if ((bst_node->node = binary_tree_node_init(value)) == NULL) {
+		free(bst_node);
 		return NULL;
 	}
 	return bst_node;
 }
 
 extern int bst_node_destroy(bst_node_t handle) {
-	if (handle) {
-		free(bst_node_get_info(handle));
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	if (binary_tree_node_destroy(bst_node->node)) {
+		return 1;
 	}
-	return binary_tree_node_destroy(handle);
+	free(bst_node);
+	return 0;
 }
 
-extern inline long bst_node_degree(bst_node_t handle) { return binary_tree_node_degree(handle); }
+extern inline long bst_node_degree(bst_node_t handle) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_degree(bst_node->node);
+}
 
-extern inline int bst_node_swap(bst_node_t handle1, bst_node_t handle2) { return binary_tree_node_swap(handle1, handle2); }
-
-extern inline void* bst_node_get_info(bst_node_t handle) { return binary_tree_node_get_info(handle); }
+extern inline int bst_node_swap(bst_node_t handle1, bst_node_t handle2) {
+	struct bst_node* bst_node1 = (struct bst_node*)handle1;
+	struct bst_node* bst_node2 = (struct bst_node*)handle1;
+	if (binary_tree_node_swap(bst_node1, bst_node2)) {
+		return 1;
+	}
+	void* tmp_key;
+	tmp_key = bst_node1->key;
+	bst_node1->key = bst_node2->key;
+	bst_node2->key = tmp_key;
+	return 0;
+}
 
 extern void* bst_node_get_key(bst_node_t handle){
-	void* info = bst_node_get_info(handle);
-	return ((struct dictionary*)info)->key;
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return bst_node->key;
 }
 
 extern void* bst_node_get_value(bst_node_t handle) {
-	void* info = bst_node_get_info(handle);
-	return ((struct dictionary*)info)->value;
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_get_info(bst_node->node);
 }
 
-extern inline bst_node_t bst_node_get_father(bst_node_t handle) { return binary_tree_node_get_father(handle); }
+extern inline bst_node_t bst_node_get_father(bst_node_t handle) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_get_father(bst_node->node);
+}
 
-extern inline int bst_node_set_father(bst_node_t handle, bst_node_t father) { return binary_tree_node_set_father(handle, father); }
+extern inline int bst_node_set_father(bst_node_t handle, bst_node_t father) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_set_father(bst_node->node, father);
+}
 
-extern inline bst_node_t bst_node_get_left_son(bst_node_t handle) { return binary_tree_node_get_left_son(handle); }
+extern inline bst_node_t bst_node_get_left_son(bst_node_t handle) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_get_left_son(bst_node->node);
+}
 
-extern inline int bst_node_set_left_son(bst_node_t handle, bst_node_t left_son) { return binary_tree_node_set_left_son(handle, left_son); }
+extern inline int bst_node_set_left_son(bst_node_t handle, bst_node_t left_son) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_set_left_son(bst_node->node, left_son);
+}
 
-extern inline bst_node_t bst_node_get_right_son(bst_node_t handle) { return binary_tree_node_get_right_son(handle); }
+extern inline bst_node_t bst_node_get_right_son(bst_node_t handle) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_get_right_son(bst_node->node);
+}
 
-extern inline int bst_node_set_right_son(bst_node_t handle, bst_node_t right_son) {	return binary_tree_node_set_right_son(handle, right_son); }
+extern inline int bst_node_set_right_son(bst_node_t handle, bst_node_t right_son) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_set_right_son(bst_node->node, right_son);
+}
 
-extern inline int bst_node_is_left_son(bst_node_t handle) { return binary_tree_node_is_left_son(handle); }
+extern inline int bst_node_is_left_son(bst_node_t handle) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_is_left_son(bst_node->node);
+}
 
-extern inline int bst_node_is_right_son(bst_node_t handle) { return binary_tree_node_is_right_son(handle); }
+extern inline int bst_node_is_right_son(bst_node_t handle) {
+	struct bst_node* bst_node = (struct bst_node*)handle;
+	return binary_tree_node_is_right_son(bst_node->node);
+}
 
 extern bst_node_t bst_node_get_max(bst_node_t handle) {
 	bst_node_t current = handle;
