@@ -29,6 +29,15 @@ static void right_rotation(avl_tree_t handle, avl_tree_node_t node) {
 
 	avl_tree_node_update_height(avl_tree_node_get_right_son(node));
 	avl_tree_node_update_height(node);
+
+	avl_tree_set_root(l_tree, NULL);
+	avl_tree_set_root(r_tree, NULL);
+	avl_tree_set_root(l_tree_l, NULL);
+	avl_tree_set_root(l_tree_r, NULL);
+	avl_tree_destroy(l_tree);
+	avl_tree_destroy(r_tree);
+	avl_tree_destroy(l_tree_l);
+	avl_tree_destroy(l_tree_r);
 }
 
 static void left_rotation(avl_tree_t handle, avl_tree_node_t node) {
@@ -49,6 +58,15 @@ static void left_rotation(avl_tree_t handle, avl_tree_node_t node) {
 
 	avl_tree_node_update_height(avl_tree_node_get_left_son(node));
 	avl_tree_node_update_height(node);
+
+	avl_tree_set_root(r_tree, NULL);
+	avl_tree_set_root(l_tree, NULL);
+	avl_tree_set_root(r_tree_l, NULL);
+	avl_tree_set_root(r_tree_r, NULL);
+	avl_tree_destroy(r_tree);
+	avl_tree_destroy(l_tree);
+	avl_tree_destroy(r_tree_l);
+	avl_tree_destroy(r_tree_r);
 }
 
 static void rotate(avl_tree_t handle, avl_tree_node_t node) {
