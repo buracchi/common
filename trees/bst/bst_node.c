@@ -100,7 +100,7 @@ extern inline bst_node_t bst_node_get_right_son(bst_node_t handle) {
 	return node ? node->right_son : NULL;
 }
 
-extern inline int bst_node_set_right_son(bst_node_t handle, bst_node_t right_son) {
+extern int bst_node_set_right_son(bst_node_t handle, bst_node_t right_son) {
 	struct bst_node* node = (struct bst_node*)handle;
 	if (node) {
 		node->right_son = right_son;
@@ -109,7 +109,7 @@ extern inline int bst_node_set_right_son(bst_node_t handle, bst_node_t right_son
 	return 1;
 }
 
-extern inline int bst_node_is_left_son(bst_node_t handle) {
+extern int bst_node_is_left_son(bst_node_t handle) {
 	struct bst_node* node = (struct bst_node*)handle;
 	if (node) {
 		struct bst_node* father = node->father;
@@ -122,7 +122,7 @@ extern inline int bst_node_is_left_son(bst_node_t handle) {
 	return 0;
 }
 
-extern inline int bst_node_is_right_son(bst_node_t handle) {
+extern int bst_node_is_right_son(bst_node_t handle) {
 	struct bst_node* node = (struct bst_node*)handle;
 	if (node) {
 		struct bst_node* father = node->father;

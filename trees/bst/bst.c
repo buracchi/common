@@ -126,7 +126,7 @@ extern void bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t sub
 extern bst_t bst_cut(bst_t handle, bst_node_t node) {
 	struct bst* tree = (struct bst*)handle;
 	if (node) {
-		bst_t father = bst_node_get_father(node);
+		bst_node_t father = bst_node_get_father(node);
 
 		if (node == bst_get_root(tree)) {
 			tree->root = NULL;
@@ -160,8 +160,8 @@ extern bst_t bst_cut(bst_t handle, bst_node_t node) {
 
 extern bst_t bst_cut_left(bst_t handle, bst_node_t father) {
 	struct bst* tree = (struct bst*)handle;
-	struct bst* new_tree;
-	bst_t son = bst_node_get_left_son(father);
+	bst_t new_tree;
+	bst_node_t son = bst_node_get_left_son(father);
 	if ((new_tree = bst_init(tree->compare)) == NULL) {
 		return NULL;
 	}
@@ -173,8 +173,8 @@ extern bst_t bst_cut_left(bst_t handle, bst_node_t father) {
 
 extern bst_t bst_cut_right(bst_t handle, bst_node_t father) {
 	struct bst* tree = (struct bst*)handle;
-	struct bst* new_tree;
-	bst_t son = bst_node_get_right_son(father);
+	bst_t new_tree;
+	bst_node_t son = bst_node_get_right_son(father);
 	if ((new_tree = bst_init(tree->compare)) == NULL) {
 		return NULL;
 	}
@@ -256,7 +256,7 @@ extern bst_node_t bst_search_node(bst_t handle, void* key) {
 	return NULL;
 }
 
-extern void* bst_search(bst_t handle, void* key) {
+extern inline void* bst_search(bst_t handle, void* key) {
 	struct bst* tree = (struct bst*)handle;
 	return bst_node_get_value(bst_search_node(tree, key));
 }

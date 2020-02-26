@@ -6,7 +6,7 @@ typedef void* avl_tree_t;
 
 typedef int avl_tree_comparison_function(const void* key1, const void* key2);
 
-avl_tree_t avl_tree_init(avl_tree_node_t root, avl_tree_comparison_function* comparison_function);
+avl_tree_t avl_tree_init(avl_tree_comparison_function* comparison_function);
 
 int avl_tree_destroy(avl_tree_t handle);
 
