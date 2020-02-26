@@ -69,10 +69,16 @@ extern int bst_destroy(bst_t handle) {
 			return 1;
 		}
 	}
+	else {
+		free(left_subtree);
+	}
 	if (right_subtree->root) {
 		if (bst_destroy(right_subtree)) {
 			return 1;
 		}
+	}
+	else {
+		free(right_subtree);
 	}
 	if (bst_node_destroy(tree->root)) {
 		return 1;
@@ -152,47 +158,50 @@ extern bst_t bst_cut(bst_t handle, bst_node_t node) {
 	return cutted;
 }
 
-extern bst_t bst_cut_left(bst_t handle, bst_node_t node) {
+extern bst_t bst_cut_left(bst_t handle, bst_node_t father) {
 	struct bst* tree = (struct bst*)handle;
 	struct bst* new_tree;
-	bst_t left_son = bst_node_get_left_son(node);
+	bst_t son = bst_node_get_left_son(father);
 	if ((new_tree = bst_init(tree->compare)) == NULL) {
 		return NULL;
 	}
-	bst_set_root(new_tree, left_son);
-	tree->n -= subtree_nodes_number(left_son);
-	bst_node_set_left_son(node, NULL);
+	bst_set_root(new_tree, son);
+	tree->n -= subtree_nodes_number(son);
+	bst_node_set_left_son(father, NULL);
 	return new_tree;
 }
 
-extern bst_t bst_cut_right(bst_t handle, bst_node_t node) {
+extern bst_t bst_cut_right(bst_t handle, bst_node_t father) {
 	struct bst* tree = (struct bst*)handle;
 	struct bst* new_tree;
-	bst_t right_son = bst_node_get_right_son(node);
+	bst_t son = bst_node_get_right_son(father);
 	if ((new_tree = bst_init(tree->compare)) == NULL) {
 		return NULL;
 	}
-	bst_set_root(new_tree, right_son);
-	tree->n -= subtree_nodes_number(right_son);
-	bst_node_set_right_son(node, NULL);
+	bst_set_root(new_tree, son);
+	tree->n -= subtree_nodes_number(son);
+	bst_node_set_right_son(father, NULL);
 	return new_tree;
 }
 
 extern bst_t bst_cut_one_son_node(bst_t handle, bst_node_t node) {
 	struct bst* tree = (struct bst*)handle;
 	bst_t cutted_tree;
-	bst_node_t son;
-	if (!(son = bst_node_get_left_son(node))) {
+	bst_node_t son = NULL;
+	if (bst_node_get_left_son(node)) {
+		son = bst_node_get_left_son(node);
+	}
+	else if (bst_node_get_right_son(node)) {
 		son = bst_node_get_right_son(node);
 	}
-	if (!son) {
+	if (!son) {		//node is a leaf
 		cutted_tree = bst_cut(tree, node);
 	}
 	else {
 		bst_node_swap(node, son);
-		cutted_tree = bst_cut(tree, son);
-		bst_insert_as_left_subtree(tree, node, bst_cut(cutted_tree, bst_node_get_left_son(son)));
-		bst_insert_as_right_subtree(tree, node, bst_cut(cutted_tree, bst_node_get_right_son(son)));
+		cutted_tree = bst_cut(tree, node);
+		bst_insert_as_left_subtree(tree, node, bst_cut_left(cutted_tree, son));
+		bst_insert_as_right_subtree(tree, node, bst_cut_right(cutted_tree, son));
 		//memory leack
 	}
 	return cutted_tree;
@@ -257,14 +266,15 @@ extern int bst_insert(bst_t handle, void* key, void* value) {
 	bst_t new_tree = bst_init(tree->compare);
 	bst_set_root(new_tree, bst_node_init(key, value));
 	bst_insert_single_node_tree(tree, key, new_tree);
-	//memory leack
+	bst_set_root(new_tree, NULL);
+	bst_destroy(new_tree);
 	return 0;
 }
 
 extern void bst_delete(bst_t handle, void* key) {
 	struct bst* tree = (struct bst*)handle;
-	bst_node_t node;
-	if (node = bst_search_node(tree, key)) {
+	bst_node_t node = bst_search_node(tree, key);
+	if (node) {
 		if (bst_node_degree(node) < 2) {
 			bst_cut_one_son_node(tree, node);
 		}

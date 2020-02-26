@@ -46,7 +46,7 @@ extern long bst_node_degree(bst_node_t handle) {
 
 extern int bst_node_swap(bst_node_t handle1, bst_node_t handle2) {
 	struct bst_node* node1 = (struct bst_node*)handle1;
-	struct bst_node* node2 = (struct bst_node*)handle1;
+	struct bst_node* node2 = (struct bst_node*)handle2;
 	void* tmp;
 	tmp = node1->key;
 	node1->key = node2->key;
