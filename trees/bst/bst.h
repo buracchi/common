@@ -18,34 +18,34 @@ typedef void* bst_t;
 
 typedef int bst_comparison_function(const void* key1, const void* key2);
 
-extern bst_t bst_init(bst_node_t root, bst_comparison_function* comparison_function);
+bst_t bst_init(bst_node_t root, bst_comparison_function* comparison_function);
 
-extern int bst_destroy(bst_t handle);
+int bst_destroy(bst_t handle);
 
-extern long bst_nodes_number(bst_t handle);
+long bst_nodes_number(bst_t handle);
 
-extern bst_node_t bst_get_root(bst_t handle);
+bst_node_t bst_get_root(bst_t handle);
 
-extern void bst_set_root(bst_t handle, bst_node_t node);
+void bst_set_root(bst_t handle, bst_node_t node);
 
-extern void bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subtree);
+void bst_insert_as_left_subtree(bst_t handle, bst_node_t node, bst_t subtree);
 
-extern void bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree);
+void bst_insert_as_right_subtree(bst_t handle, bst_node_t node, bst_t subtree);
 
-extern bst_t bst_cut(bst_t handle, bst_node_t node);
+bst_t bst_cut(bst_t handle, bst_node_t node);
 
-extern bst_t bst_cut_left(bst_t handle, bst_node_t node);
+bst_t bst_cut_left(bst_t handle, bst_node_t node);
 
-extern bst_t bst_cut_right(bst_t handle, bst_node_t node);
+bst_t bst_cut_right(bst_t handle, bst_node_t node);
 
-extern bst_t bst_cut_one_son_node(bst_t handle, bst_node_t node);
+bst_t bst_cut_one_son_node(bst_t handle, bst_node_t node);
 
-extern void bst_insert_single_node_tree(bst_t handle, void* key, bst_t new_tree);
+void bst_insert_single_node_tree(bst_t handle, void* key, bst_t new_tree);
 
-extern bst_node_t bst_search_node(bst_t handle, void* key);
+bst_node_t bst_search_node(bst_t handle, void* key);
 
-extern void* bst_search(bst_t handle, void* key);
+void* bst_search(bst_t handle, void* key);
 
-extern int bst_insert(bst_t handle, void* key, void* value);
+int bst_insert(bst_t handle, void* key, void* value);
 
-extern void bst_delete(bst_t handle, void* key);
+void bst_delete(bst_t handle, void* key);

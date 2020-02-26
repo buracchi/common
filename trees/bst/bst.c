@@ -2,8 +2,6 @@
 
 #include <stdlib.h>
 
-#include "./trees/binary_tree.h"
-
 struct bst {
 	binary_tree_t tree;
 	bst_comparison_function* compare;
