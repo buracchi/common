@@ -8,7 +8,7 @@ struct queue {
 	_stack_t stack_out;
 };
 
-extern queue_t queue_init() {
+extern ds_queue_t queue_init() {
 	struct queue* queue;
 	if ((queue = malloc(sizeof(struct queue))) == NULL) {
 		return NULL;
@@ -24,24 +24,24 @@ extern queue_t queue_init() {
 	return queue;
 }
 
-extern void queue_destroy(const queue_t handle) {
+extern void queue_destroy(const ds_queue_t handle) {
 	struct queue* queue = (struct queue*)handle;
 	stack_destroy(queue->stack_in);
 	stack_destroy(queue->stack_out);
 	free(queue);
 }
 
-extern int queue_is_empty(const queue_t handle) {
+extern int queue_is_empty(const ds_queue_t handle) {
 	struct queue* queue = (struct queue*)handle;
 	return (stack_is_empty(queue->stack_in) && stack_is_empty(queue->stack_out));
 }
 
-extern int queue_enqueue(const queue_t handle, void* item) {
+extern int queue_enqueue(const ds_queue_t handle, void* item) {
 	struct queue* queue = (struct queue*)handle;
 	return stack_push(queue->stack_in, item);
 }
 
-extern void* queue_dequeue(const queue_t handle) {
+extern void* queue_dequeue(const ds_queue_t handle) {
 	struct queue* queue = (struct queue*)handle;
 	if (stack_is_empty(queue->stack_out)) {
 		while (!stack_is_empty(queue->stack_in)) {

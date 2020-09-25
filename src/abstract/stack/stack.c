@@ -6,7 +6,7 @@ struct stack_node {
 	struct stack_node* next;
 };
 
-extern _stack_t stack_init() {
+extern ds_stack_t stack_init() {
 	struct stack_node* stack;
 	if ((stack = malloc(sizeof(struct stack_node))) == NULL) {
 		return NULL;
@@ -16,7 +16,7 @@ extern _stack_t stack_init() {
 	return stack;
 }
 
-extern void stack_destroy(const _stack_t handle) {
+extern void stack_destroy(const ds_stack_t handle) {
 	struct stack_node* stack = (struct stack_node*)handle;
 	while (!stack_is_empty(stack)) {
 		stack_pop(stack);
@@ -24,12 +24,12 @@ extern void stack_destroy(const _stack_t handle) {
 	free(stack);
 }
 
-extern int stack_is_empty(const _stack_t handle) {
+extern int stack_is_empty(const ds_stack_t handle) {
 	struct stack_node* stack = (struct stack_node*)handle;
 	return !stack->next;
 }
 
-extern int stack_push(const _stack_t handle, void* item) {
+extern int stack_push(const ds_stack_t handle, void* item) {
 	struct stack_node* stack = (struct stack_node*)handle;
 	struct stack_node* node;
 	if ((node = malloc(sizeof(struct stack_node))) == NULL) {
@@ -42,7 +42,7 @@ extern int stack_push(const _stack_t handle, void* item) {
 	return 0;
 }
 
-extern void* stack_pop(const _stack_t handle) {
+extern void* stack_pop(const ds_stack_t handle) {
 	struct stack_node* stack = (struct stack_node*)handle;
 	struct stack_node* tmp = stack->next;
 	void* popped = stack->data;
@@ -54,7 +54,7 @@ extern void* stack_pop(const _stack_t handle) {
 	return popped;
 }
 
-extern void* stack_peek(const _stack_t handle) {
+extern void* stack_peek(const ds_stack_t handle) {
 	struct stack_node* stack = (struct stack_node*)handle;
 	return stack->data;
 }
