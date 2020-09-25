@@ -1,7 +1,7 @@
-#include "./abstract/queue/queue.h"
+#include "queue.h"
 #include <stdlib.h>
 
-#include "./abstract/stack/stack.h"
+#include "stack.h"
 
 struct queue {
 	_stack_t stack_in;
@@ -31,12 +31,12 @@ extern void queue_destroy(const queue_t handle) {
 	free(queue);
 }
 
-extern inline int queue_is_empty(const queue_t handle) {
+extern int queue_is_empty(const queue_t handle) {
 	struct queue* queue = (struct queue*)handle;
 	return (stack_is_empty(queue->stack_in) && stack_is_empty(queue->stack_out));
 }
 
-extern inline int queue_enqueue(const queue_t handle, void* item) {
+extern int queue_enqueue(const queue_t handle, void* item) {
 	struct queue* queue = (struct queue*)handle;
 	return stack_push(queue->stack_in, item);
 }

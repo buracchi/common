@@ -1,8 +1,8 @@
-#include "./trees/bst/avl_tree/avl_tree.h"
+#include <avl_tree.h>
 
 #include <stdlib.h>
 
-#include "./abstract/stack/stack.h"
+#include <stack.h>
 
 struct avl_tree {
 	avl_tree_node_t root;
@@ -10,163 +10,16 @@ struct avl_tree {
 	avl_tree_comparison_function* compare;
 };
 
-//	un sacco di memory leack
+static void right_rotation(const avl_tree_t handle, const avl_tree_node_t node);
+static void left_rotation(const avl_tree_t handle, const avl_tree_node_t node);
+static void rotate(const avl_tree_t handle, const avl_tree_node_t node);
+static void balance_insert(const avl_tree_t handle, const avl_tree_node_t node);
+static void balance_delete(const avl_tree_t handle, const avl_tree_node_t node);
+static int cut_single_son(const avl_tree_t handle, const avl_tree_node_t node);
+static int subtree_nodes_number(const avl_tree_t node);
+static int defualt_comparison_function(const void* key1, const void* key2);
 
-static void right_rotation(avl_tree_t handle, avl_tree_node_t node) {
-	struct avl_tree* tree = (struct avl_tree*)handle;
-	avl_tree_node_t left_son = avl_tree_node_get_left_son(node);
-	avl_tree_node_swap(node, left_son);
-
-	avl_tree_t l_tree = avl_tree_cut_left(tree, node);
-	avl_tree_t r_tree = avl_tree_cut_right(tree, node);
-	avl_tree_t l_tree_l = avl_tree_cut_left(l_tree, left_son);
-	avl_tree_t l_tree_r = avl_tree_cut_right(l_tree, left_son);
-
-	avl_tree_insert_as_right_subtree(l_tree, avl_tree_get_root(l_tree), r_tree);
-	avl_tree_insert_as_left_subtree(l_tree, avl_tree_get_root(l_tree), l_tree_r);
-	avl_tree_insert_as_right_subtree(tree, node, l_tree);
-	avl_tree_insert_as_left_subtree(tree, node, l_tree_l);
-
-	avl_tree_node_update_height(avl_tree_node_get_right_son(node));
-	avl_tree_node_update_height(node);
-
-	avl_tree_set_root(l_tree, NULL);
-	avl_tree_set_root(r_tree, NULL);
-	avl_tree_set_root(l_tree_l, NULL);
-	avl_tree_set_root(l_tree_r, NULL);
-	avl_tree_destroy(l_tree);
-	avl_tree_destroy(r_tree);
-	avl_tree_destroy(l_tree_l);
-	avl_tree_destroy(l_tree_r);
-}
-
-static void left_rotation(avl_tree_t handle, avl_tree_node_t node) {
-	struct avl_tree* tree = (struct avl_tree*)handle;
-
-	avl_tree_node_t right_son = avl_tree_node_get_right_son(node);
-	avl_tree_node_swap(node, right_son);
-
-	avl_tree_t r_tree = avl_tree_cut_right(tree, node);
-	avl_tree_t l_tree = avl_tree_cut_left(tree, node);
-	avl_tree_t r_tree_l = avl_tree_cut_left(r_tree, right_son);
-	avl_tree_t r_tree_r = avl_tree_cut_right(r_tree, right_son);
-
-	avl_tree_insert_as_left_subtree(r_tree, avl_tree_get_root(r_tree), l_tree);
-	avl_tree_insert_as_right_subtree(r_tree, avl_tree_get_root(r_tree), r_tree_l);
-	avl_tree_insert_as_left_subtree(tree, node, r_tree);
-	avl_tree_insert_as_right_subtree(tree, node, r_tree_r);
-
-	avl_tree_node_update_height(avl_tree_node_get_left_son(node));
-	avl_tree_node_update_height(node);
-
-	avl_tree_set_root(r_tree, NULL);
-	avl_tree_set_root(l_tree, NULL);
-	avl_tree_set_root(r_tree_l, NULL);
-	avl_tree_set_root(r_tree_r, NULL);
-	avl_tree_destroy(r_tree);
-	avl_tree_destroy(l_tree);
-	avl_tree_destroy(r_tree_l);
-	avl_tree_destroy(r_tree_r);
-}
-
-static void rotate(avl_tree_t handle, avl_tree_node_t node) {
-	struct avl_tree* tree = (struct avl_tree*)handle;
-
-	long balanced_factor = avl_tree_node_get_balance_factor(node);
-	if (balanced_factor == 2) {		//height of the node's left son is 2 times greater than the right one
-		if (avl_tree_node_get_balance_factor(avl_tree_node_get_left_son(node)) >= 0) {	//LL balancing
-			right_rotation(tree, node);
-		}
-		else {	//LR balancing
-			left_rotation(tree, avl_tree_node_get_left_son(node));
-			right_rotation(tree, node);
-		}
-	}
-	else if (balanced_factor == -2) {	//height of the node's right son is 2 times greater than the left one
-		if (avl_tree_node_get_balance_factor(avl_tree_node_get_left_son(node)) >= 0) {	//RR balancing
-			left_rotation(tree, node);
-		}
-		else {	//RL balancing
-			right_rotation(tree, avl_tree_node_get_right_son(node));
-			left_rotation(tree, node);
-		}
-	}
-}
-
-static void balance_insert(avl_tree_t handle, avl_tree_node_t node) {
-	struct avl_tree* tree = (struct avl_tree*)handle;
-
-	avl_tree_node_t current = avl_tree_node_get_father(node);
-	while (current) {
-		if (abs(avl_tree_node_get_balance_factor(current)) >= 2) {
-			break;
-		}
-		else {
-			avl_tree_node_update_height(current);
-			current = avl_tree_node_get_father(current);
-		}
-	}
-	if (current) {
-		rotate(tree, current);
-	}
-}
-
-static void balance_delete(avl_tree_t handle, avl_tree_node_t node) {
-	struct avl_tree* tree = (struct avl_tree*)handle;
-
-	avl_tree_node_t current = avl_tree_node_get_father(node);
-	while (current) {
-		if (abs(avl_tree_node_get_balance_factor(current)) == 2) {
-			rotate(tree, current);
-		}
-		else {
-			avl_tree_node_update_height(current);
-		}
-		current = avl_tree_node_get_father(current);
-	}
-}
-
-static void cut_single_son(avl_tree_t handle, avl_tree_node_t node) {
-	struct avl_tree* tree = (struct avl_tree*)handle;
-
-	avl_tree_cut_one_son_node(tree, node);
-	balance_delete(tree, node);
-}
-
-/*---------------------------------------------------------------*/
-
-static int subtree_nodes_number(avl_tree_t node) {
-	int nodes_number = 0;
-	_stack_t stack = stack_init();
-	if (node) {
-		stack_push(stack, node);
-		while (!stack_is_empty(stack)) {
-			struct binary_tree_node* current_node;
-			current_node = stack_pop(stack);
-			nodes_number++;
-			if (avl_tree_node_get_left_son(current_node)) {
-				stack_push(stack, avl_tree_node_get_left_son(current_node));
-			}
-			if (avl_tree_node_get_right_son(current_node)) {
-				stack_push(stack, avl_tree_node_get_right_son(current_node));
-			}
-		}
-	}
-	stack_destroy(stack);
-	return nodes_number;
-}
-
-static int defualt_comparison_function(const void* key1, const void* key2) {
-	if (key1 < key2) {
-		return -1;
-	}
-	else if (key1 > key2) {
-		return 1;
-	}
-	return 0;
-}
-
-extern avl_tree_t avl_tree_init(avl_tree_comparison_function* comparison_function) {
+avl_tree_t avl_tree_init(const avl_tree_comparison_function* comparison_function) {
 	struct avl_tree* tree;
 	if ((tree = malloc(sizeof(struct avl_tree))) == NULL) {
 		return NULL;
@@ -177,7 +30,7 @@ extern avl_tree_t avl_tree_init(avl_tree_comparison_function* comparison_functio
 	return tree;
 }
 
-extern int avl_tree_destroy(avl_tree_t handle) {
+int avl_tree_destroy(const avl_tree_t handle) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	struct avl_tree* left_subtree;
 	struct avl_tree* right_subtree;
@@ -210,28 +63,27 @@ extern int avl_tree_destroy(avl_tree_t handle) {
 	}
 	free(tree);
 	return 0;
-	return 0;
 }
 
-extern inline long avl_tree_nodes_number(avl_tree_t handle) {
+inline long avl_tree_nodes_number(const avl_tree_t handle) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	return tree->n;
 }
 
-extern inline avl_tree_node_t avl_tree_get_root(avl_tree_t handle) {
+inline avl_tree_node_t avl_tree_get_root(const avl_tree_t handle) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	return tree->root;
 }
 
-extern inline void avl_tree_set_root(avl_tree_t handle, avl_tree_node_t node) {
+inline void avl_tree_set_root(const avl_tree_t handle, const avl_tree_node_t node) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	tree->root = node;
 	tree->n = subtree_nodes_number(node);
 }
 
-extern void avl_tree_insert_as_left_subtree(avl_tree_t handle, avl_tree_node_t node, avl_tree_t subtree) {
+void avl_tree_insert_as_left_subtree(const avl_tree_t handle, const avl_tree_node_t node, const avl_tree_t subtree) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
-	struct avl_tree* avl_tree_subtree = (struct bavl_treest*)subtree;
+	struct avl_tree* avl_tree_subtree = (struct avl_tree*)subtree;
 	if (avl_tree_subtree->root) {
 		avl_tree_node_set_father(avl_tree_subtree->root, node);
 	}
@@ -239,9 +91,9 @@ extern void avl_tree_insert_as_left_subtree(avl_tree_t handle, avl_tree_node_t n
 	tree->n += subtree_nodes_number(avl_tree_subtree->root);
 }
 
-extern void avl_tree_insert_as_right_subtree(avl_tree_t handle, avl_tree_node_t node, avl_tree_t subtree) {
+void avl_tree_insert_as_right_subtree(const avl_tree_t handle, const avl_tree_node_t node, const avl_tree_t subtree) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
-	struct avl_tree* avl_tree_subtree = (struct bavl_treest*)subtree;
+	struct avl_tree* avl_tree_subtree = (struct avl_tree*)subtree;
 	if (avl_tree_subtree->root) {
 		avl_tree_node_set_father(avl_tree_subtree->root, node);
 	}
@@ -249,7 +101,7 @@ extern void avl_tree_insert_as_right_subtree(avl_tree_t handle, avl_tree_node_t 
 	tree->n += subtree_nodes_number(avl_tree_subtree->root);
 }
 
-extern avl_tree_t avl_tree_cut(avl_tree_t handle, avl_tree_node_t node) {
+avl_tree_t avl_tree_cut(const avl_tree_t handle, const avl_tree_node_t node) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	if (node) {
 		avl_tree_node_t father = avl_tree_node_get_father(node);
@@ -284,7 +136,7 @@ extern avl_tree_t avl_tree_cut(avl_tree_t handle, avl_tree_node_t node) {
 	return cutted;
 }
 
-extern avl_tree_t avl_tree_cut_left(avl_tree_t handle, avl_tree_node_t father) {
+avl_tree_t avl_tree_cut_left(const avl_tree_t handle, const avl_tree_node_t father) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_t new_tree;
 	avl_tree_node_t son = avl_tree_node_get_left_son(father);
@@ -297,7 +149,7 @@ extern avl_tree_t avl_tree_cut_left(avl_tree_t handle, avl_tree_node_t father) {
 	return new_tree;
 }
 
-extern avl_tree_t avl_tree_cut_right(avl_tree_t handle, avl_tree_node_t father) {
+avl_tree_t avl_tree_cut_right(const avl_tree_t handle, const avl_tree_node_t father) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_t new_tree;
 	avl_tree_node_t son = avl_tree_node_get_right_son(father);
@@ -310,7 +162,7 @@ extern avl_tree_t avl_tree_cut_right(avl_tree_t handle, avl_tree_node_t father) 
 	return new_tree;
 }
 
-extern avl_tree_t avl_tree_cut_one_son_node(avl_tree_t handle, avl_tree_node_t node) {
+avl_tree_t avl_tree_cut_one_son_node(const avl_tree_t handle, const avl_tree_node_t node) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_t cutted_tree;
 	avl_tree_node_t son = NULL;
@@ -333,7 +185,7 @@ extern avl_tree_t avl_tree_cut_one_son_node(avl_tree_t handle, avl_tree_node_t n
 	return cutted_tree;
 }
 
-extern void avl_tree_insert_single_node_tree(avl_tree_t handle, void* key, avl_tree_t new_tree) {
+void avl_tree_insert_single_node_tree(const avl_tree_t handle, const void* key, const avl_tree_t new_tree) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	int cmp;
 	if (avl_tree_get_root(tree) == NULL) {
@@ -363,7 +215,7 @@ extern void avl_tree_insert_single_node_tree(avl_tree_t handle, void* key, avl_t
 	}
 }
 
-extern avl_tree_node_t avl_tree_search_node(avl_tree_t handle, void* key) {
+avl_tree_node_t avl_tree_search_node(const avl_tree_t handle, const void* key) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_node_t current = avl_tree_get_root(tree);
 	int cmp;
@@ -382,12 +234,12 @@ extern avl_tree_node_t avl_tree_search_node(avl_tree_t handle, void* key) {
 	return NULL;
 }
 
-extern inline void* avl_tree_search(avl_tree_t handle, void* key) {
+inline void* avl_tree_search(const avl_tree_t handle, const void* key) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	return avl_tree_node_get_value(avl_tree_search_node(tree, key));
 }
 
-extern int avl_tree_insert(avl_tree_t handle, void* key, void* value) {
+int avl_tree_insert(const avl_tree_t handle, const void* key, const void* value) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_node_t node = avl_tree_node_init(key, value);
 	avl_tree_t new_tree = avl_tree_init(tree->compare);
@@ -396,14 +248,15 @@ extern int avl_tree_insert(avl_tree_t handle, void* key, void* value) {
 	balance_insert(tree, node);
 	avl_tree_set_root(new_tree, NULL);
 	avl_tree_destroy(new_tree);
+	return 0;
 }
 
-extern void avl_tree_delete(avl_tree_t handle, void* key) {
+int avl_tree_delete(const avl_tree_t handle, const void* key) {
 	struct avl_tree* tree = (struct avl_tree*)handle;
 	avl_tree_node_t node = avl_tree_search_node(tree, key);
 	if (node) {
 		if (avl_tree_node_degree(node) < 2) {
-			cut_single_son(tree, node);
+			return cut_single_son(tree, node);
 		}
 		else {
 			avl_tree_node_t pred = avl_tree_node_get_pred(node);
@@ -411,7 +264,179 @@ extern void avl_tree_delete(avl_tree_t handle, void* key) {
 			int tmp_h = avl_tree_node_get_height(node);
 			avl_tree_node_set_height(node, avl_tree_node_get_height(pred));
 			avl_tree_node_set_height(pred, tmp_h);
-			cut_single_son(tree, pred);
+			return cut_single_son(tree, pred);
 		}
 	}
+	return 0;
+}
+
+int avl_tree_delete_node(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+	if (node) {
+		if (avl_tree_node_degree(node) < 2) {
+			return cut_single_son(tree, node);
+		}
+		else {
+			avl_tree_node_t pred = avl_tree_node_get_pred(node);
+			avl_tree_node_swap(node, pred);
+			int tmp_h = avl_tree_node_get_height(node);
+			avl_tree_node_set_height(node, avl_tree_node_get_height(pred));
+			avl_tree_node_set_height(pred, tmp_h);
+			return cut_single_son(tree, pred);
+		}
+	}
+	return 0;
+}
+
+static void right_rotation(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+	avl_tree_node_t left_son = avl_tree_node_get_left_son(node);
+	avl_tree_node_swap(node, left_son);
+
+	avl_tree_t l_tree = avl_tree_cut_left(tree, node);
+	avl_tree_t r_tree = avl_tree_cut_right(tree, node);
+	avl_tree_t l_tree_l = avl_tree_cut_left(l_tree, left_son);
+	avl_tree_t l_tree_r = avl_tree_cut_right(l_tree, left_son);
+
+	avl_tree_insert_as_right_subtree(l_tree, avl_tree_get_root(l_tree), r_tree);
+	avl_tree_insert_as_left_subtree(l_tree, avl_tree_get_root(l_tree), l_tree_r);
+	avl_tree_insert_as_right_subtree(tree, node, l_tree);
+	avl_tree_insert_as_left_subtree(tree, node, l_tree_l);
+
+	avl_tree_node_update_height(avl_tree_node_get_right_son(node));
+	avl_tree_node_update_height(node);
+
+	avl_tree_set_root(l_tree, NULL);
+	avl_tree_set_root(r_tree, NULL);
+	avl_tree_set_root(l_tree_l, NULL);
+	avl_tree_set_root(l_tree_r, NULL);
+	avl_tree_destroy(l_tree);
+	avl_tree_destroy(r_tree);
+	avl_tree_destroy(l_tree_l);
+	avl_tree_destroy(l_tree_r);
+}
+
+static void left_rotation(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+
+	avl_tree_node_t right_son = avl_tree_node_get_right_son(node);
+	avl_tree_node_swap(node, right_son);
+
+	avl_tree_t r_tree = avl_tree_cut_right(tree, node);
+	avl_tree_t l_tree = avl_tree_cut_left(tree, node);
+	avl_tree_t r_tree_l = avl_tree_cut_left(r_tree, right_son);
+	avl_tree_t r_tree_r = avl_tree_cut_right(r_tree, right_son);
+
+	avl_tree_insert_as_left_subtree(r_tree, avl_tree_get_root(r_tree), l_tree);
+	avl_tree_insert_as_right_subtree(r_tree, avl_tree_get_root(r_tree), r_tree_l);
+	avl_tree_insert_as_left_subtree(tree, node, r_tree);
+	avl_tree_insert_as_right_subtree(tree, node, r_tree_r);
+
+	avl_tree_node_update_height(avl_tree_node_get_left_son(node));
+	avl_tree_node_update_height(node);
+
+	avl_tree_set_root(r_tree, NULL);
+	avl_tree_set_root(l_tree, NULL);
+	avl_tree_set_root(r_tree_l, NULL);
+	avl_tree_set_root(r_tree_r, NULL);
+	avl_tree_destroy(r_tree);
+	avl_tree_destroy(l_tree);
+	avl_tree_destroy(r_tree_l);
+	avl_tree_destroy(r_tree_r);
+}
+
+static void rotate(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+
+	long balanced_factor = avl_tree_node_get_balance_factor(node);
+	if (balanced_factor == 2) {		//height of the node's left son is 2 times greater than the right one
+		if (avl_tree_node_get_balance_factor(avl_tree_node_get_left_son(node)) >= 0) {	//LL balancing
+			right_rotation(tree, node);
+		}
+		else {	//LR balancing
+			left_rotation(tree, avl_tree_node_get_left_son(node));
+			right_rotation(tree, node);
+		}
+	}
+	else if (balanced_factor == -2) {	//height of the node's right son is 2 times greater than the left one
+		if (avl_tree_node_get_balance_factor(avl_tree_node_get_left_son(node)) >= 0) {	//RR balancing
+			left_rotation(tree, node);
+		}
+		else {	//RL balancing
+			right_rotation(tree, avl_tree_node_get_right_son(node));
+			left_rotation(tree, node);
+		}
+	}
+}
+
+static void balance_insert(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+
+	avl_tree_node_t current = avl_tree_node_get_father(node);
+	while (current) {
+		if (abs(avl_tree_node_get_balance_factor(current)) >= 2) {
+			break;
+		}
+		else {
+			avl_tree_node_update_height(current);
+			current = avl_tree_node_get_father(current);
+		}
+	}
+	if (current) {
+		rotate(tree, current);
+	}
+}
+
+static void balance_delete(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+
+	avl_tree_node_t current = avl_tree_node_get_father(node);
+	while (current) {
+		if (abs(avl_tree_node_get_balance_factor(current)) == 2) {
+			rotate(tree, current);
+		}
+		else {
+			avl_tree_node_update_height(current);
+		}
+		current = avl_tree_node_get_father(current);
+	}
+}
+
+static int cut_single_son(const avl_tree_t handle, const avl_tree_node_t node) {
+	struct avl_tree* tree = (struct avl_tree*)handle;
+	struct avl_tree* cutted = (struct avl_tree*)handle;
+	cutted = avl_tree_cut_one_son_node(tree, node);
+	balance_delete(tree, node);
+	return avl_tree_destroy(cutted);
+}
+
+static int subtree_nodes_number(const avl_tree_t node) {
+	int nodes_number = 0;
+	_stack_t stack = stack_init();
+	if (node) {
+		stack_push(stack, node);
+		while (!stack_is_empty(stack)) {
+			struct binary_tree_node* current_node;
+			current_node = stack_pop(stack);
+			nodes_number++;
+			if (avl_tree_node_get_left_son(current_node)) {
+				stack_push(stack, avl_tree_node_get_left_son(current_node));
+			}
+			if (avl_tree_node_get_right_son(current_node)) {
+				stack_push(stack, avl_tree_node_get_right_son(current_node));
+			}
+		}
+	}
+	stack_destroy(stack);
+	return nodes_number;
+}
+
+static int defualt_comparison_function(const void* key1, const void* key2) {
+	if (key1 < key2) {
+		return -1;
+	}
+	else if (key1 > key2) {
+		return 1;
+	}
+	return 0;
 }
