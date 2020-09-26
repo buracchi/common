@@ -30,29 +30,29 @@ extern int ds_stack_destroy(const ds_stack_t stack);
 extern int ds_stack_is_empty(const ds_stack_t stack, bool* is_empty);
 
 /*
-* Push an element onto a stack.
+* Push an item onto a stack.
 * 
-* @param stack - the stack to push the object onto.
-* @param object - the object to push onto the stack.
+* @param stack - the stack to push the item onto.
+* @param item - the item to push onto the stack.
 * @return 0 on success; non-zero otherwise.
 */
-extern int ds_stack_push(const ds_stack_t stack, const void* element);
+extern int ds_stack_push(const ds_stack_t stack, const void* item);
 
 /*
-* Pop the first element off a stack.
+* Pop the first item off a stack.
 * 
 * @param stack - the stack to remove the top item from.
-* @param element - the pointer that will reference the element, if the parameter
-* is NULL the element is ignored.
+* @param item - the pointer that will reference the item, if the parameter
+* is NULL the item is ignored.
 * @return 0 on success; non-zero otherwise.
 */
-extern int ds_stack_pop(const ds_stack_t stack, void** element);
+extern int ds_stack_pop(const ds_stack_t stack, void** item);
 
 /*
-* Return the element onto a stack.
+* Return the item onto a stack.
 * 
-* @param stack - the stack to return the top object from.
-* @param element - the pointer that will reference the element.
+* @param stack - the stack to return the top item from.
+* @param item - the pointer that will reference the item.
 * @return 0 on success; non-zero otherwise.
 */
-extern int ds_stack_top(const ds_stack_t stack, void** element);
+extern int ds_stack_top(const ds_stack_t stack, void** item);
