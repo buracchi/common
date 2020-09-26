@@ -1,60 +1,112 @@
-#include <stack.h>
+#include "stack.h"
+
 #include <stdlib.h>
 
-struct stack_node {
-	void* data;
+typedef struct stack_node {
+	const void* elem;
 	struct stack_node* next;
-};
+} *ds_stack_node_t;
 
-extern ds_stack_t stack_init() {
-	struct stack_node* stack;
-	if ((stack = malloc(sizeof(struct stack_node))) == NULL) {
-		return NULL;
+static inline ds_stack_node_t stack_node_init() {
+	ds_stack_node_t node;
+	node = malloc(sizeof(struct stack_node));
+	return node;
+}
+
+static inline ds_stack_node_t get_top_node(ds_stack_t stack) {
+	return (ds_stack_node_t)stack;
+}
+
+extern ds_stack_t ds_stack_init() {
+	ds_stack_t stack;
+	ds_stack_node_t node;
+	node = stack_node_init();
+	if (node) {
+		node->elem = NULL;
+		node->next = NULL;
 	}
-	stack->data = NULL;
-	stack->next = NULL;
+	stack = node;
 	return stack;
 }
 
-extern void stack_destroy(const ds_stack_t handle) {
-	struct stack_node* stack = (struct stack_node*)handle;
-	while (!stack_is_empty(stack)) {
-		stack_pop(stack);
-	}
-	free(stack);
-}
-
-extern int stack_is_empty(const ds_stack_t handle) {
-	struct stack_node* stack = (struct stack_node*)handle;
-	return !stack->next;
-}
-
-extern int stack_push(const ds_stack_t handle, void* item) {
-	struct stack_node* stack = (struct stack_node*)handle;
-	struct stack_node* node;
-	if ((node = malloc(sizeof(struct stack_node))) == NULL) {
+extern int ds_stack_destroy(const ds_stack_t stack) {
+	if (!stack) {
 		return 1;
 	}
-	node->data = stack->data;
-	node->next = stack->next;
-	stack->data = item;
-	stack->next = node;
+
+	bool empty;
+	while (true) {
+		if (ds_stack_is_empty(stack, &empty)) {
+			return 1;
+		}
+		if (empty) {
+			break;
+		}
+		ds_stack_pop(stack, NULL);
+	}
+	free(stack);
 	return 0;
 }
 
-extern void* stack_pop(const ds_stack_t handle) {
-	struct stack_node* stack = (struct stack_node*)handle;
-	struct stack_node* tmp = stack->next;
-	void* popped = stack->data;
-	if (!stack_is_empty(stack)) {
-		stack->data = stack->next->data;
-		stack->next = stack->next->next;
-		free(tmp);
+extern int ds_stack_is_empty(const ds_stack_t stack, bool* is_empty) {
+	if (!stack) {
+		return 1;
 	}
-	return popped;
+
+	*is_empty = (get_top_node(stack)->next == NULL);
+	return 0;
 }
 
-extern void* stack_peek(const ds_stack_t handle) {
-	struct stack_node* stack = (struct stack_node*)handle;
-	return stack->data;
+extern int ds_stack_push(const ds_stack_t stack, const void* element) {
+	if (!stack) {
+		return 1;
+	}
+
+	ds_stack_node_t node;
+	node = stack_node_init();
+	if (node) {
+		node->elem = get_top_node(stack)->elem;
+		node->next = get_top_node(stack)->next;
+		get_top_node(stack)->elem = element;
+		get_top_node(stack)->next = node;
+		return 0;
+	}
+	return 1;
+}
+
+extern int ds_stack_pop(const ds_stack_t stack, void** element) {
+	if (!stack) {
+		return 1;
+	}
+
+	const void* popped;
+	bool empty;
+	ds_stack_node_t tmp_node;
+
+	popped = get_top_node(stack)->elem;
+	tmp_node = get_top_node(stack)->next;
+	if (ds_stack_is_empty(stack, &empty)) {
+		return 1;
+	}
+
+	if (!empty) {
+		get_top_node(stack)->elem = get_top_node(stack)->next->elem;
+		get_top_node(stack)->next = get_top_node(stack)->next->next;
+		free(tmp_node);
+	}
+
+	if (element) {
+		*element = (void*)popped;
+	}
+	return 0;
+}
+
+extern int ds_stack_top(const ds_stack_t stack, void** element) {
+	if (!stack) {
+		return 1;
+	}
+	const void* popped;
+	popped = get_top_node(stack)->elem;
+	*element = (void*)popped;
+	return 0;
 }

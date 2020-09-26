@@ -9,8 +9,10 @@ ds_queue_t queue_init();
 
 /*
 * Destroy a queue object.
+* 
+* @return 0 on success; non-zero otherwise.
 */
-void queue_destroy(const ds_queue_t queue);
+int queue_destroy(const ds_queue_t queue);
 
 int queue_is_empty(const ds_queue_t queue);
 

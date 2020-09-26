@@ -1,55 +1,47 @@
 #pragma once
 
-/*
-* Dictionary data structure
-*/
-
 typedef void* ds_dictionary_t;
-
-struct kv_pair {
-	void* key;
-	void* value;
-};
 
 /*
 * Return an initialized dictionary object.
-* 
-* @return the initialized object or NULL on error.
+*
+* @return the initialized dictionary on success; NULL otherwise.
 */
-ds_dictionary_t dictionary_init();
+ds_dictionary_t ds_dictionary_init();
 
 /*
 * Destroy a dictionary object.
 *
-* @param dictionary - the dictionary object to destroy.
+* @param dictionary - the dictionary to destroy.
+* @return 0 on success; non-zero otherwise.
 */
-void dictionary_destroy(const ds_dictionary_t dictionary);
+int ds_dictionary_destroy(const ds_dictionary_t dictionary);
 
 /*
-* Add a new (key,value) pair to the collection,
+* Add a new (key, value) pair to the collection,
 * mapping the new key to its new value.
 * 
-* @param dictionary
-* @param key
-* @param value
-* @return a non negative value on succcess, 0 on error.
+* @param dictionary - the dictionary to insert the (key, element) pair into.
+* @param key - the key to insert into the dictionary.
+* @param value - the value to insert into the dictionary.
+* @return 0 on success; non-zero otherwise.
 */
-int dictionary_insert(const ds_dictionary_t dictionary, void* key, void* value);
+int ds_dictionary_insert(const ds_dictionary_t dictionary, void* value, void* key);
 
 /*
-* Remove a (key,value) pair from the collection,
-* unmapping a given key from its value.
+* Remove a (key,value) pair from the collection, unmapping a given key from
+* its value.
 * 
-* @param key
-* @return a non negative value on succcess, 0 on error.
+* @param key - the key that identify the (key, value) pair in the dictionary.
+* @return 0 on success; non-zero otherwise.
 */
-int dictionary_delete(const ds_dictionary_t dictionary, void* key);
+int ds_dictionary_delete(const ds_dictionary_t dictionary, void* key);
 
 /*
-* Find the value (if any) that is bound to a given key.
+* Return the value (if any) that is bound to a given key.
 *
-* @param key
-* @param value - the destination where insert the value.
-* @return a non negative value on succcess, 0 on error.
+* @param key - the key that identify the (key, value) pair in the dictionary.
+* @param value - the pointer that will reference the value.
+* @return 0 on success; non-zero otherwise.
 */
-int dictionary_search(const ds_dictionary_t dictionary, void*, key void** value);
+int ds_dictionary_search(const ds_dictionary_t dictionary, void* key, void** value);

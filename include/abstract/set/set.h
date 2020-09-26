@@ -11,8 +11,10 @@ extern ds_set_t set_init();
 
 /*
 * Destroy a set object.
+* 
+* @return 0 on success; non-zero otherwise.
 */
-extern void set_destroy(const ds_set_t S);
+extern int set_destroy(const ds_set_t S);
 
 /*
 * returns the union of sets S and T.
