@@ -3,14 +3,14 @@
 #include <stdbool.h>
 
 /*******************************************************************************
-*								  Member types								   *
+*                                 Member types                                 *
 *******************************************************************************/
 
 typedef void* ds_list_t;
 typedef void* ds_list_element_t;
 
 /*******************************************************************************
-*							    Member functions							   *
+*                               Member functions                               *
 *******************************************************************************/
 
 /*
@@ -32,12 +32,12 @@ extern ds_list_t ds_list_init(void (*destroy)(void*));
 extern int ds_list_destroy(const ds_list_t this);
 
 /*******************************************************************************
-*								 Element access								   *
+*                                Element access                                *
 *******************************************************************************/
 
 /*
 * Returns a reference to the first element in the list.
-* Calling ds_list_get_front on an empty list is undefined.
+* Calling ds_list_get_front on an empty list causes undefined behavior.
 *
 * @param	this	-	the list object.
 * @param	element	-	the pointer that will reference the first element.
@@ -49,7 +49,7 @@ extern int ds_list_get_front(const ds_list_t this,
 
 /*
 * Returns a reference to the last element in the list.
-* Calling ds_list_get_back on an empty list is undefined.
+* Calling ds_list_get_back on an empty list causes undefined behavior.
 *
 * @param	this	-	the list object.
 * @param	element -	the pointer that will reference the last element.
@@ -60,7 +60,7 @@ extern int ds_list_get_back(const ds_list_t this,
 	const ds_list_element_t* element);
 
 /*******************************************************************************
-*									Capacity								   *
+*                                   Capacity                                   *
 *******************************************************************************/
 
 /*
@@ -84,7 +84,7 @@ extern int ds_list_is_empty(const ds_list_t this, bool* is_empty);
 extern int ds_list_get_size(const ds_list_t this, int* size);
 
 /*******************************************************************************
-*									Modifiers								   *
+*                                   Modifiers                                  *
 *******************************************************************************/
 
 /*
@@ -180,7 +180,7 @@ extern int ds_list_swap(const ds_list_t this, const ds_list_t other);
 
 
 /*******************************************************************************
-*								   Operations								   *
+*                                  Operations                                  *
 *******************************************************************************/
 
 /*
