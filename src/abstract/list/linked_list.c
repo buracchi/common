@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #define THIS ((struct linked_list*)this)
+#define OTHER ((struct linked_list*)other)
 #define ELEMENT ((struct element*)element)
 
 /*******************************************************************************
@@ -63,13 +64,20 @@ extern int ds_list_destroy(const ds_list_t this) {
 /*
 * Return an initialized element object.
 
+* @param	data	-	the element data.
+* @param	next	-	the next element.
+*
 * @complexity	O(1).
-* 
+*
 * @return	the initialized element on success; NULL otherwise.
 */
-static inline struct element* element_init() {
+static inline struct element* element_init(void* data, struct element* next) {
 	struct element* element;
 	element = malloc(sizeof(struct linked_list));
+	if (element) {
+		element->data = data;
+		element->next = next;
+	}
 	return element;
 }
 
@@ -77,13 +85,13 @@ static inline struct element* element_init() {
 * Destroy a list object.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
-* 
+*
 * @complexity	O(1).
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
-static inline struct element* element_destroy(struct element* this) {
-	free(THIS);
+static inline struct element* element_destroy(struct element* element) {
+	free(element);
 	return 0;
 }
 
@@ -168,11 +176,20 @@ extern int ds_list_clear(const ds_list_t this) {
 */
 extern int ds_list_insert(const ds_list_t this, const ds_list_element_t element,
 	const void* value) {
-	struct element* new_element = element_init();
+	if (THIS->head == element) {
+		return ds_list_push_front(this, value);
+	}
+	struct element* new_element;
+	new_element = element_init(value, element);
 	if (new_element) {
-		new_element->data = value;
-		new_element->next = element;
-		//TODO
+		struct element** indirect;
+		indirect = &(THIS->head);
+		while ((*indirect)->next != element) {
+			indirect = &((*indirect)->next);
+		}
+		(*indirect)->next = new_element;
+		THIS->size++;
+		return 0;
 	}
 	return 1;
 }
@@ -182,24 +199,36 @@ extern int ds_list_insert(const ds_list_t this, const ds_list_element_t element,
 */
 extern int ds_list_erase(const ds_list_t this,
 	const ds_list_element_t element) {
-	struct element** indirect;
-	indirect = &THIS->head;
-	while ((*indirect) != element) {
-		indirect = &(*indirect)->next;
+	if (THIS->head == element) {
+		return ds_list_pop_front(this);
 	}
-	*indirect = ELEMENT->next;
+	struct element** pprev;
+	pprev = &(THIS->head);
+	while ((*pprev)->next != element) {
+		pprev = &((*pprev)->next);
+	}
+	(*pprev)->next = ELEMENT->next;
+	if (THIS->tail == element) {
+		THIS->tail = *pprev;
+	}
 	element_destroy(element);
+	THIS->size--;
+	return 0;
 }
 
 /*
 * @complexity	O(1).
 */
 extern int ds_list_push_front(const ds_list_t this, const void* value) {
-	struct element* new_element = element_init();
+	struct element* new_element;
+	new_element = element_init(value, THIS->head);
 	if (new_element) {
-		new_element->data = value;
-		new_element->next = THIS->head;
 		THIS->head = new_element;
+		if (THIS->tail == NULL) {
+			THIS->tail = new_element;
+		}
+		THIS->size++;
+		return 0;
 	}
 	return 1;
 }
@@ -212,28 +241,73 @@ extern int ds_list_pop_front(const ds_list_t this) {
 	new_head = THIS->head->next;
 	element_destroy(THIS->head);
 	THIS->head = new_head;
+	if (THIS->head == NULL) {
+		THIS->tail = NULL;
+	}
+	THIS->size--;
+	return 0;
 }
 
 /*
 * @complexity	O(1).
 */
 extern int ds_list_push_back(const ds_list_t this, const void* value) {
+	struct element* new_element;
+	new_element = element_init(value, NULL);
+	if (new_element) {
+		if (THIS->head == NULL) {
+			THIS->head = new_element;
+			THIS->tail = new_element;
+		}
+		else {
+			THIS->tail->next = new_element;
+			THIS->tail = new_element;
+		}
+		THIS->size++;
+		return 0;
+	}
+	return 1;
+}
 
+/*
+* @complexity	O(n).
+*/
+extern inline int ds_list_pop_back(const ds_list_t this) {
+	return ds_list_erase(this, THIS->tail);
+}
+
+/*
+* @complexity	O(n + size).
+*/
+extern int ds_list_resize(const ds_list_t this, const int count,
+	const void* value) {
+	if (THIS->size < count) {
+		for (int i = 0; i < count - THIS->size; i++) {
+			ds_list_push_back(this, value);
+		}
+		return 0;
+	}
+	if (THIS->size > count) {
+		for (int i = 0; i < THIS->size - count; i++) {
+			ds_list_pop_back(this);
+		}
+		return 0;
+	}
+	return 0;
 }
 
 /*
 * @complexity	O(1).
 */
-extern int ds_list_pop_back(const ds_list_t this) {
-
-}
-
-extern int ds_list_resize(const ds_list_t this, int size, void* value) {
-
-}
-
 extern int ds_list_swap(const ds_list_t this, const ds_list_t other) {
-
+	struct linked_list tmp = { THIS->head, THIS->size, THIS->tail };
+	THIS->head = OTHER->head;
+	THIS->size = OTHER->size;
+	THIS->tail = OTHER->tail;
+	OTHER->head = tmp.head;
+	OTHER->size = tmp.size;
+	OTHER->tail = tmp.tail;
+	return 0;
 }
 
 
@@ -241,12 +315,28 @@ extern int ds_list_swap(const ds_list_t this, const ds_list_t other) {
 *                                  Operations                                  *
 *******************************************************************************/
 
+/*
+* @complexity	O(log(n)).
+*/
 extern int ds_list_merge(const ds_list_t this, const ds_list_t other,
-	int (*comp)(const void* a, const void* b, bool* result));
+	int (*comp)(const void* a, const void* b, bool* result)) {
+	THIS->tail->next = OTHER->head;
+	THIS->size += OTHER->size;
+	OTHER->head = NULL;
+	OTHER->tail = NULL;
+	OTHER->size = 0;
+	return ds_list_sort(this, comp);
+}
 
+/*
+* @complexity	O(m).
+*/
 extern int ds_list_splice(const ds_list_t this, const ds_list_t other,
 	const ds_list_element_t element, const ds_list_element_t first,
-	const ds_list_element_t last);
+	const ds_list_element_t last) {
+
+	return 0;
+}
 
 extern int ds_list_remove_if(const ds_list_t this,
 	int (*p)(const void* a, bool* result));

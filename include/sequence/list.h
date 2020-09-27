@@ -17,7 +17,7 @@ typedef void* ds_list_element_t;
 * Return an initialized list object.
 *
 * @param	destroy	-	a destroy function, NULL is default.
-* 
+*
 * @return	the initialized list on success; NULL otherwise.
 */
 extern ds_list_t ds_list_init(void (*destroy)(void*));
@@ -26,7 +26,7 @@ extern ds_list_t ds_list_init(void (*destroy)(void*));
 * Destroy a list object.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_destroy(const ds_list_t this);
@@ -41,7 +41,7 @@ extern int ds_list_destroy(const ds_list_t this);
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	element	-	the pointer that will reference the first element.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_get_front(const ds_list_t this,
@@ -53,7 +53,7 @@ extern int ds_list_get_front(const ds_list_t this,
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	element -	the pointer that will reference the last element.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_get_back(const ds_list_t this,
@@ -93,7 +93,7 @@ extern int ds_list_get_element_value(const ds_list_element_t element,
 *
 * @param	this	 -	the list object, NULL causes undefined behavior.
 * @param	is_empty -	the pointer that will reference the status of the list.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_is_empty(const ds_list_t this, bool* is_empty);
@@ -103,7 +103,7 @@ extern int ds_list_is_empty(const ds_list_t this, bool* is_empty);
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	size	-	the pointer that will reference the length of the list.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_get_size(const ds_list_t this, int* size);
@@ -118,7 +118,7 @@ extern int ds_list_get_size(const ds_list_t this, int* size);
 * Invalidates any references to list elements.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_clear(const ds_list_t this);
@@ -130,7 +130,7 @@ extern int ds_list_clear(const ds_list_t this);
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	element	-	element before which the content will be inserted.
 * @param	value	-	element value to insert.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_insert(const ds_list_t this, const ds_list_element_t element,
@@ -141,7 +141,7 @@ extern int ds_list_insert(const ds_list_t this, const ds_list_element_t element,
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	element	-	the element to remove.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_erase(const ds_list_t this, const ds_list_element_t element);
@@ -160,7 +160,7 @@ extern int ds_list_push_front(const ds_list_t this, const void* value);
 * the behavior is undefined.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_pop_front(const ds_list_t this);
@@ -170,7 +170,7 @@ extern int ds_list_pop_front(const ds_list_t this);
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	value	-	the value of the element to append.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_push_back(const ds_list_t this, const void* value);
@@ -180,7 +180,7 @@ extern int ds_list_push_back(const ds_list_t this, const void* value);
 * the behavior is undefined.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_pop_back(const ds_list_t this);
@@ -188,17 +188,18 @@ extern int ds_list_pop_back(const ds_list_t this);
 /*
 * Resizes the list to contain count elements.
 * If the current size is greater than count, the list is reduced to its first
-* count elements. 
+* count elements.
 * If the current size is less than count, additional default-inserted elements
 * and additional copies of value are appended.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
-* @param	size	-	new size of the list.
+* @param	count	-	new size of the list.
 * @param	value	-	the value to initialize the new elements with.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
-extern int ds_list_resize(const ds_list_t this, int size, void* value);
+extern int ds_list_resize(const ds_list_t this, const int count,
+	const void* value);
 
 /*
 * Exchanges the contents of the list with those of other. Does not invoke any
@@ -206,7 +207,7 @@ extern int ds_list_resize(const ds_list_t this, int size, void* value);
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 * @param	other	-	the other list to exchange the contents with.
-* 
+*
 * @return	0 on success; non-zero otherwise.
 */
 extern int ds_list_swap(const ds_list_t this, const ds_list_t other);
@@ -221,7 +222,7 @@ extern int ds_list_swap(const ds_list_t this, const ds_list_t other);
 * order.
 * No elements are copied. The list other becomes empty after the operation.
 * The function does nothing if other refers to the same object as this.
-* This operation is stable: for equivalent elements in the two lists, the 
+* This operation is stable: for equivalent elements in the two lists, the
 * elements from this shall always precede the elements from other, and the order
 * of equivalent elements of this and other does not change.
 *
