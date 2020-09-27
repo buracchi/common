@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "abstract/stack.h"
 
 #include <stdlib.h>
 
@@ -17,7 +17,7 @@ static inline ds_stack_node_t get_top_node(ds_stack_t stack) {
 	return (ds_stack_node_t)stack;
 }
 
-extern ds_stack_t ds_stack_init() {
+extern ds_stack_t ds_stack_init(void (*destroy)(void*)) {
 	ds_stack_t stack;
 	ds_stack_node_t node;
 	node = stack_node_init();

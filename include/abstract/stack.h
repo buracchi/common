@@ -9,7 +9,7 @@ typedef void* ds_stack_t;
 * 
 * @return the initialized stack on success; NULL otherwise.
 */
-extern ds_stack_t ds_stack_init();
+extern ds_stack_t ds_stack_init(void (*destroy)(void*));
 
 /*
 * Destroy a stack object.

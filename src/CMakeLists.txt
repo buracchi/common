@@ -5,7 +5,7 @@
 add_executable (
 	example
 	"main.c"
-	)
+	 "trees/tree.c" "abstract/list/linked_list.c")
 
 target_include_directories(example PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 target_include_directories(example PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../src")
