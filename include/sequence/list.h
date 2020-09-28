@@ -202,7 +202,7 @@ extern int ds_list_resize(const ds_list_t this, const int count,
 	const void* value);
 
 /*
-* Exchanges the contents of the list with those of other. Does not invoke any
+* Exchanges the contents of the list with those of other. Does not invoke any 
 * move, copy, or swap operations on individual elements.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.

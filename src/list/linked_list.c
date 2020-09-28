@@ -334,6 +334,8 @@ extern int ds_list_swap(const ds_list_t this, const ds_list_t other) {
 *******************************************************************************/
 
 /*
+* TODO: implement ds_list_sort()
+* 
 * @complexity	O(log(n)).
 */
 extern int ds_list_merge(const ds_list_t this, const ds_list_t other,
@@ -369,7 +371,7 @@ extern int ds_list_splice(const ds_list_t this, const ds_list_t other,
 }
 
 /*
-*@complexity	O(n).
+* complexity	O(n).
 */
 extern int ds_list_remove_if(const ds_list_t this,
 	int (*p)(const void* a, bool* result)) {
@@ -392,7 +394,7 @@ extern int ds_list_remove_if(const ds_list_t this,
 }
 
 /*
-*@complexity	O(n).
+* complexity	O(n).
 */
 extern int ds_list_reverse(const ds_list_t this) {
 	struct element* walk;
@@ -415,7 +417,7 @@ static inline int default_compeq(const void* a, const void* b, bool* result) {
 }
 
 /*
-*@complexity	O(n^2).
+* complexity	O(n^2).
 */
 extern int ds_list_unique(const ds_list_t this,
 	int (*comp)(const void* a, const void* b, bool* result)) {
@@ -450,9 +452,9 @@ static inline int default_complt(const void* a, const void* b, bool* result) {
 }
 
 /*
-*
 * TODO: it needs an algorithm library
-*@complexity	O(n * log(n)).
+* 
+* @complexity	O(n * log(n)).
 */
 extern int ds_list_sort(const ds_list_t this,
 	int (*comp)(const void* a, const void* b, bool* result)) {
