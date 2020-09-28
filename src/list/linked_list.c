@@ -188,7 +188,6 @@ extern int ds_list_clear(const ds_list_t this) {
 	return 0;
 }
 
-
 /*
 * @complexity	O(n).
 */
@@ -327,7 +326,6 @@ extern int ds_list_swap(const ds_list_t this, const ds_list_t other) {
 	OTHER->tail = tmp.tail;
 	return 0;
 }
-
 
 /*******************************************************************************
 *                                  Operations                                  *

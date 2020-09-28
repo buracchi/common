@@ -212,7 +212,6 @@ extern int ds_list_resize(const ds_list_t this, const int count,
 */
 extern int ds_list_swap(const ds_list_t this, const ds_list_t other);
 
-
 /*******************************************************************************
 *                                  Operations                                  *
 *******************************************************************************/
