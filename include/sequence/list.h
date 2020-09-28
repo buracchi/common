@@ -240,7 +240,9 @@ extern int ds_list_merge(const ds_list_t this, const ds_list_t other,
 * No elements are copied or moved, only the internal pointers of the list nodes
 * are re-pointed.
 * The elements are inserted before the element pointed to by element.
-* The behavior is undefined if element is an element in the range [first,last).
+* The behavior is undefined if element is an element in the range [first,last),
+* if last doesn't follow first, or if parameters are not elements of their
+* respective lists.
 *
 * @param	this	-	  the list object, NULL causes undefined behavior.
 * @param	other	-	  another list to transfer the content from.
@@ -266,7 +268,7 @@ extern int ds_list_remove_if(const ds_list_t this,
 	int (*p)(const void* a, bool* result));
 
 /*
-* Reverses the order of the elements in the container.
+* Reverses the order of the elements in the list.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.
 *
@@ -275,7 +277,7 @@ extern int ds_list_remove_if(const ds_list_t this,
 extern int ds_list_reverse(const ds_list_t this);
 
 /*
-* Removes all consecutive duplicate elements from the container. Only the first
+* Removes all consecutive duplicate elements from the list. Only the first
 * element in each group of equal elements is left.
 *
 * @param	this	-	the list object, NULL causes undefined behavior.

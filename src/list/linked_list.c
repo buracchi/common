@@ -2,9 +2,14 @@
 
 #include <stdlib.h>
 
+/*
+* Casts defined as macros for shortness.
+*/
 #define THIS ((struct linked_list*)this)
 #define OTHER ((struct linked_list*)other)
 #define ELEMENT ((struct element*)element)
+#define FIRST ((struct element*)first)
+#define LAST ((struct element*)last)
 
 /*******************************************************************************
 *                                 Member types                                 *
@@ -135,6 +140,18 @@ extern inline int ds_list_get_element_value(const ds_list_element_t element,
 	return 0;
 }
 
+static inline struct element* get_previous_element(
+	const struct linked_list* this, const struct element* element) {
+	struct element* walk;
+	struct element* previous;
+	walk = this->head;
+	while (walk->next != element) {
+		walk = walk->next;
+	}
+	previous = walk;
+	return previous;
+}
+
 /*******************************************************************************
 *                                   Capacity                                   *
 *******************************************************************************/
@@ -152,6 +169,7 @@ extern int ds_list_is_empty(const ds_list_t this, bool* is_empty) {
 */
 extern int ds_list_get_size(const ds_list_t this, int* size) {
 	*size = THIS->size;
+	return 0;
 }
 
 /*******************************************************************************
@@ -300,7 +318,7 @@ extern int ds_list_resize(const ds_list_t this, const int count,
 * @complexity	O(1).
 */
 extern int ds_list_swap(const ds_list_t this, const ds_list_t other) {
-	struct linked_list tmp = { THIS->head, THIS->size, THIS->tail };
+	struct linked_list tmp = { THIS->size, THIS->head, THIS->tail };
 	THIS->head = OTHER->head;
 	THIS->size = OTHER->size;
 	THIS->tail = OTHER->tail;
@@ -329,22 +347,114 @@ extern int ds_list_merge(const ds_list_t this, const ds_list_t other,
 }
 
 /*
-* @complexity	O(m).
+* @complexity	O(n + m).
 */
 extern int ds_list_splice(const ds_list_t this, const ds_list_t other,
 	const ds_list_element_t element, const ds_list_element_t first,
 	const ds_list_element_t last) {
-
+	if (element == THIS->head) {
+		THIS->head = first;
+	}
+	else {
+		get_previous_element(this, element)->next = first;
+	}
+	if (first == OTHER->head) {
+		OTHER->head = last;
+	}
+	else {
+		get_previous_element(other, first)->next = last;
+	}
+	get_previous_element(other, last)->next = element;
 	return 0;
 }
 
+/*
+*@complexity	O(n).
+*/
 extern int ds_list_remove_if(const ds_list_t this,
-	int (*p)(const void* a, bool* result));
+	int (*p)(const void* a, bool* result)) {
+	struct element* walk;
+	struct element* tmp;
+	bool result;
 
-extern int ds_list_reverse(const ds_list_t this);
+	walk = THIS->head;
+	for (int i = 0; i < THIS->size; i++) {
+		tmp = walk;
+		walk = walk->next;
+		if (p(tmp->data, &result)) {
+			return 1;
+		}
+		if (result && ds_list_erase(this, tmp)) {
+			return 1;
+		}
+	}
+	return 0;
+}
 
+/*
+*@complexity	O(n).
+*/
+extern int ds_list_reverse(const ds_list_t this) {
+	struct element* walk;
+	struct element* new_head;
+
+	walk = THIS->head;
+	for (int i = 0; i < THIS->size - 1; i++) {
+		new_head = walk->next;
+		walk->next = new_head->next;
+		new_head->next = THIS->head;
+		THIS->head = new_head;
+	}
+	THIS->tail = walk;
+	return 0;
+}
+
+static inline int default_compeq(const void* a, const void* b, bool* result) {
+	*result = (a == b);
+	return 0;
+}
+
+/*
+*@complexity	O(n^2).
+*/
 extern int ds_list_unique(const ds_list_t this,
-	int (*comp)(const void* a, const void* b, bool* result));
+	int (*comp)(const void* a, const void* b, bool* result)) {
+	struct element* iterator1;
+	struct element* iterator2;
+	bool res;
+	if (!comp) {
+		comp = default_compeq;
+	}
+	iterator1 = THIS->head;
+	while (iterator1) {
+		iterator2 = iterator1->next;
+		while (iterator2) {
+			struct element* tmp;
+			tmp = iterator2->next;
+			if (comp(iterator1->data, iterator2->data, &res)) {
+				return 1;
+			}
+			if (res && ds_list_erase(this, iterator2)) {
+				return 1;
+			}
+			iterator2 = tmp;
+		}
+		iterator1 = iterator1->next;
+	}
+	return 0;
+}
 
+static inline int default_complt(const void* a, const void* b, bool* result) {
+	*result = (a < b);
+	return 0;
+}
+
+/*
+*
+* TODO: it needs an algorithm library
+*@complexity	O(n * log(n)).
+*/
 extern int ds_list_sort(const ds_list_t this,
-	int (*comp)(const void* a, const void* b, bool* result));
+	int (*comp)(const void* a, const void* b, bool* result)) {
+	return 1;
+}
