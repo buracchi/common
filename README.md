@@ -1,3 +1,3 @@
 # common
 
-Common modules in C.
+Common C modules.
