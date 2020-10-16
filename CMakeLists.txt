@@ -4,7 +4,7 @@ set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/.vcpkg/scripts/buildsystems
     CACHE STRING "Vcpkg toolchain file")
 
 project (
-	"data-structure"
+	"common"
 	VERSION 0.1
 	LANGUAGES C
 	)

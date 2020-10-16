@@ -1,3 +1,3 @@
-# data-structures
+# common
 
-Implementation of data structures in C.
+Common modules in C.

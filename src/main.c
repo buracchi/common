@@ -1,33 +1,32 @@
 #include <stdio.h>
 
-#include "sequence/list.h"
+#include "list.h"
+#include "linked_list.h"
+#include "iterator.h"
 
 int main(int argc, char** argv) {
 	ds_list_t list;
-	ds_list_element_t element;
-	int size;
-	void* n;
+	iterator_t iterator;
+	void* data;
 
-	list = ds_list_init(NULL);
+	list = ds_linked_list_init();
 	for (int i = 0; i < 10; i++) {
 		ds_list_push_front(list, i);
 	}
 	for (int i = 0; i < 10; i++) {
 		ds_list_push_front(list, i);
 	}
-	for (int i = 0; i < 10; i++) {
-		ds_list_push_front(list, i);
-	}
-	ds_list_unique(list, NULL);
 	ds_list_reverse(list);
-	ds_list_get_size(list, &size);
-	for (int i = 0; i < size; i++) {
-		ds_list_get_front(list, &element);
-		ds_list_get_element_value(element, &n);
-		ds_list_pop_front(list);
-		printf("%d ", (int)n);
+	ds_list_unique(list, NULL, NULL);
+	ds_list_reverse(list);
+	ds_list_remove(list, 7);
+	ds_list_resize(list, 5, NULL);
+	iterator = ds_list_begin(list);
+	while (!iterator_end(iterator)) {
+		data = iterator_data(iterator);
+		printf("%d \n", (int)data);
+		iterator_next(iterator);
 	}
-	printf("\n");
 	ds_list_destroy(list);
 	return 0;
 }
