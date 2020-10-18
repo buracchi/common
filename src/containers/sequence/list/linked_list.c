@@ -510,7 +510,7 @@ extern errno_t common_linked_list_remove_if(const common_linked_list_t this,
 	struct _iterator* iterator;
 	struct _iterator* tmp;
 	bool result;
-	int _removed = 0;
+	size_t _removed = 0;
 
 	iterator = common_linked_list_begin(_this);
 	while (!iterator_end(iterator)) {
@@ -560,14 +560,14 @@ static inline errno_t default_compeq(const void* a, const void* b,
 }
 
 extern errno_t common_linked_list_unique(const common_linked_list_t this,
-	errno_t(*comp)(const void* a, const void* b, bool* result), int* removed) {
+	errno_t(*comp)(const void* a, const void* b, bool* result), size_t* removed) {
 	struct _common_linked_list* _this = this;
 
 	struct _iterator* iterator1;
 	struct _iterator* iterator2;
 	struct _iterator* tmp;
 	bool result;
-	int _removed = 0;
+	size_t _removed = 0;
 
 	if (!comp) {
 		comp = default_compeq;

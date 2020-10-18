@@ -447,7 +447,7 @@ extern void common_linked_list_reverse(const common_linked_list_t this);
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
 extern errno_t common_linked_list_unique(const common_linked_list_t this,
-	errno_t(*comp)(const void* a, const void* b, bool* result), int* removed);
+	errno_t(*comp)(const void* a, const void* b, bool* result), size_t* removed);
 
 /*
 * Sorts the elements in ascending order. The order of equal elements is

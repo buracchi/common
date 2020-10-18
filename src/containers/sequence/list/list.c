@@ -28,12 +28,12 @@ extern inline void* common_list_back(const common_list_t this) {
 *                                   Iterators                                  *
 *******************************************************************************/
 
-extern common_iterator_t common_list_begin(const common_list_t this) {
+extern inline common_iterator_t common_list_begin(const common_list_t this) {
 	struct _common_list* _this = this;
 	return _this->_begin(_this);
 }
 
-extern common_iterator_t common_list_end(const common_list_t this) {
+extern inline common_iterator_t common_list_end(const common_list_t this) {
 	struct _common_list* _this = this;
 	return _this->_end(_this);
 }
@@ -139,7 +139,7 @@ extern inline void common_list_reverse(const common_list_t this) {
 }
 
 extern inline errno_t common_list_unique(const common_list_t this,
-	errno_t(*comp)(const void* a, const void* b, bool* result), int* removed) {
+	errno_t(*comp)(const void* a, const void* b, bool* result), size_t* removed) {
 	struct _common_list* _this = this;
 	return _this->_unique(_this, comp, removed);
 }
