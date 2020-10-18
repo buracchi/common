@@ -1,7 +1,5 @@
 #pragma once
 
-//TODO: Rewrite documentation!
-
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -9,26 +7,26 @@
 *                                 Member types                                 *
 *******************************************************************************/
 
-typedef void* iterator_t;
-typedef void* iterator_ops_t;
+typedef void* common_iterator_t;
+typedef void* common_iterator_ops_t;
 
-#ifdef IMPLEMENT_ITERATOR
+#ifdef IMPLEMENT_COMMON_ITERATOR
 
-struct _iterator {
-	struct _iterator_ops* ops;
+struct _common_iterator {
+	struct _common_iterator_ops* ops;
 };
 
-struct _iterator_ops {
+struct _common_iterator_ops {
 	// Member functions
-	void (*_destroy)(const iterator_t this);
+	void (*_destroy)(const common_iterator_t this);
 	// Element access
-	void* (*_data)(const iterator_t this);
-	iterator_t(*_next)(const iterator_t this);
-	iterator_t(*_prev)(const iterator_t this);
-	bool(*_begin)(const iterator_t this);
-	bool (*_end)(const iterator_t this);
+	void** (*_data)(const common_iterator_t this);
+	common_iterator_t(*_next)(const common_iterator_t this);
+	common_iterator_t(*_prev)(const common_iterator_t this);
+	bool(*_begin)(const common_iterator_t this);
+	bool (*_end)(const common_iterator_t this);
 };
-#endif // IMPLEMENT_ITERATOR
+#endif // IMPLEMENT_COMMON_ITERATOR
 
 /*******************************************************************************
 *                               Member functions                               *
@@ -43,7 +41,7 @@ struct _iterator_ops {
 *
 * @return	This function returns no value.
 */
-extern void iterator_destroy(const iterator_t this);
+extern void common_iterator_destroy(const common_iterator_t this);
 
 /*******************************************************************************
 *                                Element access                                *
@@ -62,7 +60,7 @@ extern void iterator_destroy(const iterator_t this);
 * @return	A reference to the data  associated to the container element
 *			pointed by the iterator.
 */
-extern void* iterator_data(const iterator_t this);
+extern void** common_iterator_data(const common_iterator_t this);
 
 /*
 * Increments iterator this by 1 element.
@@ -74,7 +72,7 @@ extern void* iterator_data(const iterator_t this);
 *
 * @return	A reference to this iterator.
 */
-extern iterator_t iterator_next(const iterator_t this);
+extern common_iterator_t common_iterator_next(const common_iterator_t this);
 
 /*
 * Decrements iterator this by 1 element.
@@ -86,7 +84,7 @@ extern iterator_t iterator_next(const iterator_t this);
 *
 * @return	A reference to this iterator.
 */
-extern iterator_t iterator_prev(const iterator_t this);
+extern common_iterator_t common_iterator_prev(const common_iterator_t this);
 
 /*
 * Returns true if the iterator is followed by an element.
@@ -98,7 +96,7 @@ extern iterator_t iterator_prev(const iterator_t this);
 *
 * @return	true if the iterator is followed by an element, false otherwise.
 */
-extern bool iterator_begin(const iterator_t this);
+extern bool common_iterator_begin(const common_iterator_t this);
 
 /*
 * Returns true if the iterator is preceded by an element.
@@ -110,7 +108,7 @@ extern bool iterator_begin(const iterator_t this);
 *
 * @return	true if the iterator is preceded by an element, false otherwise.
 */
-extern bool iterator_end(const iterator_t this);
+extern bool common_iterator_end(const common_iterator_t this);
 
 /*******************************************************************************
 *                                  Operations                                  *
@@ -127,12 +125,11 @@ extern bool iterator_end(const iterator_t this);
 *
 * @return	A reference to this iterator.
 */
-extern iterator_t iterator_advance(iterator_t this, int n);
+extern common_iterator_t common_iterator_advance(common_iterator_t this, int n);
 
 /*
-* Returns the number of hops from first to last. The behavior is undefined if
-* last is not reachable from first by (possibly repeatedly) incrementing first.
-*
+* Returns the number of hops from first to last.
+* 
 * If last is reachable from first this function never fails.
 * Otherwise, it causes undefined behavior.
 *
@@ -141,4 +138,5 @@ extern iterator_t iterator_advance(iterator_t this, int n);
 *
 * @return	The number of elements between first and last.
 */
-extern size_t iterator_distance(const iterator_t first, const iterator_t last);
+extern size_t common_iterator_distance(const common_iterator_t first,
+	const common_iterator_t last);

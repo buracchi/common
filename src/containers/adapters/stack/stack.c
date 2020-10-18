@@ -11,17 +11,17 @@
 /*
 * @complexity	O(1).
 */
-extern inline ds_stack_t ds_stack_init(void (*destroy)(void*)) {
-	ds_list_t list;
-	list = ds_list_init(destroy);
+extern inline common_stack_t common_stack_init(void (*destroy)(void*)) {
+	common_list_t list;
+	list = common_list_init(destroy);
 	return list;
 }
 
 /*
 * @complexity	O(n).
 */
-extern inline int ds_stack_destroy(const ds_stack_t stack) {
-	return ds_list_destroy(stack);
+extern inline int common_stack_destroy(const common_stack_t stack) {
+	return common_list_destroy(stack);
 }
 
 /*******************************************************************************
@@ -31,12 +31,12 @@ extern inline int ds_stack_destroy(const ds_stack_t stack) {
 /*
 * @complexity	O(1).
 */
-extern int ds_stack_top(const ds_stack_t this, void** value) {
-	ds_list_element_t top;
-	if (ds_list_get_front(this, &top)) {
+extern int common_stack_top(const common_stack_t this, void** value) {
+	common_list_element_t top;
+	if (common_list_get_front(this, &top)) {
 		return 1;
 	}
-	return ds_list_get_element_value(top, value);
+	return common_list_get_element_value(top, value);
 }
 
 /*******************************************************************************
@@ -46,15 +46,15 @@ extern int ds_stack_top(const ds_stack_t this, void** value) {
 /*
 * @complexity	O(1).
 */
-extern inline int ds_stack_is_empty(const ds_stack_t this, bool* is_empty) {
-	return ds_list_is_empty(this, is_empty);
+extern inline int common_stack_is_empty(const common_stack_t this, bool* is_empty) {
+	return common_list_is_empty(this, is_empty);
 }
 
 /*
 * @complexity	O(1).
 */
-extern inline int ds_stack_get_size(const ds_list_t this, int* size) {
-	return ds_list_get_size(this, size);
+extern inline int common_stack_get_size(const common_list_t this, int* size) {
+	return common_list_get_size(this, size);
 }
 
 /*******************************************************************************
@@ -64,19 +64,19 @@ extern inline int ds_stack_get_size(const ds_list_t this, int* size) {
 /*
 * @complexity	O(1).
 */
-extern inline int ds_stack_push(const ds_stack_t this, const void* value) {
-	return ds_list_push_front(this, value);
+extern inline int common_stack_push(const common_stack_t this, const void* value) {
+	return common_list_push_front(this, value);
 }
 
 /*
 * @complexity	O(1).
 */
-extern inline int ds_stack_pop(const ds_stack_t this, void** value) {
+extern inline int common_stack_pop(const common_stack_t this, void** value) {
 	void* popped;
-	if (ds_stack_top(this, &popped)) {
+	if (common_stack_top(this, &popped)) {
 		return 1;
 	}
-	if (ds_list_pop_front(this)) {
+	if (common_list_pop_front(this)) {
 		return 1;
 	}
 	*value = popped;
@@ -86,6 +86,6 @@ extern inline int ds_stack_pop(const ds_stack_t this, void** value) {
 /*
 * @complexity	O(1).
 */
-extern int ds_stack_swap(const ds_stack_t this, const ds_stack_t other) {
-	return ds_list_swap(this, other);
+extern int common_stack_swap(const common_stack_t this, const common_stack_t other) {
+	return common_list_swap(this, other);
 }

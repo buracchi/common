@@ -6,7 +6,7 @@
 *                                 Member types                                 *
 *******************************************************************************/
 
-typedef void* ds_stack_t;
+typedef void* common_stack_t;
 
 /*******************************************************************************
 *                               Member functions                               *
@@ -19,7 +19,7 @@ typedef void* ds_stack_t;
 * 
 * @return	the initialized stack on success; NULL otherwise.
 */
-extern ds_stack_t ds_stack_init(void (*destroy)(void*));
+extern common_stack_t common_stack_init(void (*destroy)(void*));
 
 /*
 * Destroy a stack object.
@@ -28,7 +28,7 @@ extern ds_stack_t ds_stack_init(void (*destroy)(void*));
 * 
 * @return	0 on success; non-zero otherwise.
 */
-extern int ds_stack_destroy(const ds_stack_t this);
+extern int common_stack_destroy(const common_stack_t this);
 
 /*******************************************************************************
 *                                Element access                                *
@@ -43,7 +43,7 @@ extern int ds_stack_destroy(const ds_stack_t this);
 * 
 * @return 0 on success; non-zero otherwise.
 */
-extern int ds_stack_top(const ds_stack_t this, void** value);
+extern int common_stack_top(const common_stack_t this, void** value);
 
 
 /*******************************************************************************
@@ -59,7 +59,7 @@ extern int ds_stack_top(const ds_stack_t this, void** value);
 * 
 * @return 0 on success; non-zero otherwise.
 */
-extern int ds_stack_is_empty(const ds_stack_t this, bool* is_empty);
+extern int common_stack_is_empty(const common_stack_t this, bool* is_empty);
 
 /*
 * Returns the number of elements in the stack.
@@ -69,7 +69,7 @@ extern int ds_stack_is_empty(const ds_stack_t this, bool* is_empty);
 *
 * @return	0 on success; non-zero otherwise.
 */
-extern int ds_stack_get_size(const ds_list_t this, int* size);
+extern int common_stack_get_size(const common_list_t this, int* size);
 
 
 /*******************************************************************************
@@ -84,7 +84,7 @@ extern int ds_stack_get_size(const ds_list_t this, int* size);
 * 
 * @return	0 on success; non-zero otherwise.
 */
-extern int ds_stack_push(const ds_stack_t this, const void* value);
+extern int common_stack_push(const common_stack_t this, const void* value);
 
 /*
 * Removes the top element from the stack.
@@ -95,7 +95,7 @@ extern int ds_stack_push(const ds_stack_t this, const void* value);
 * 
 * @return	0 on success; non-zero otherwise.
 */
-extern int ds_stack_pop(const ds_stack_t this, void** value);
+extern int common_stack_pop(const common_stack_t this, void** value);
 
 /*
 * Exchanges the contents of the stack with those of other.
@@ -104,4 +104,4 @@ extern int ds_stack_pop(const ds_stack_t this, void** value);
 * @param	other	-	the other stack to exchange the contents with.
 * @return	0 on success; non-zero otherwise.
 */
-extern int ds_stack_swap(const ds_stack_t this, const ds_stack_t other);
+extern int common_stack_swap(const common_stack_t this, const common_stack_t other);

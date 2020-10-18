@@ -1,8 +1,8 @@
-#define DS_IMPLEMENT_DOUBLE_LINKED_LIST
-#define IMPLEMENT_ITERATOR
+#define IMPLEMENT_COMMON_DOUBLE_LINKED_LIST
+#define IMPLEMENT_COMMON_ITERATOR
 #include "double_linked_list.h"
-#undef DS_IMPLEMENT_DOUBLE_LINKED_LIST
-#undef DS_IMPLEMENT_LINKED_LIST
+#undef IMPLEMENT_COMMON_DOUBLE_LINKED_LIST
+#undef IMPLEMENT_COMMON_ITERATOR
 
 #include <stdlib.h>
 
@@ -56,18 +56,18 @@ static inline struct _element* element_destroy(struct _element* element) {
 *                         Double linked list iterator                          *
 *******************************************************************************/
 
-struct __iterator {
-	struct _iterator;
-	struct _ds_double_linked_list* list;
+struct _iterator {
+	struct _common_iterator;
+	struct _common_double_linked_list* list;
 	struct _element* element;
 };
 
 /*
 * @complexity	O(1).
 */
-static struct __iterator* _iterator_init(
-	const struct _ds_double_linked_list* list, const struct _element* element) {
-	struct __iterator* iterator;
+static struct _iterator* iterator_init(
+	const struct _common_double_linked_list* list, const struct _element* element) {
+	struct _iterator* iterator;
 	iterator = malloc(sizeof * iterator);
 	if (iterator) {
 		iterator->ops = list->it_ops;
@@ -79,24 +79,24 @@ static struct __iterator* _iterator_init(
 /*
 * @complexity	O(1).
 */
-static inline void _iterator_destroy(const iterator_t this) {
-	struct __iterator* _this = this;
+static inline void iterator_destroy(const common_iterator_t this) {
+	struct _iterator* _this = this;
 	free(_this);
 }
 
 /*
 * @complexity	O(1).
 */
-static inline void* _iterator_data(const iterator_t this) {
-	struct __iterator* _this = this;
-	return _this->element->data;
+static inline void** iterator_data(const common_iterator_t this) {
+	struct _iterator* _this = this;
+	return &(_this->element->data);
 }
 
 /*
 * @complexity	O(1).
 */
-static inline iterator_t _iterator_next(iterator_t this) {
-	struct __iterator* _this = this;
+static inline common_iterator_t iterator_next(common_iterator_t this) {
+	struct _iterator* _this = this;
 	_this->element = _this->element->next;
 	return _this;
 }
@@ -104,8 +104,8 @@ static inline iterator_t _iterator_next(iterator_t this) {
 /*
 * @complexity	O(1).
 */
-static inline iterator_t _iterator_prev(iterator_t this) {
-	struct __iterator* _this = this;
+static inline common_iterator_t iterator_prev(common_iterator_t this) {
+	struct _iterator* _this = this;
 	_this->element = _this->element->prev;
 	return _this;
 }
@@ -113,30 +113,30 @@ static inline iterator_t _iterator_prev(iterator_t this) {
 /*
 * @complexity	O(1).
 */
-static inline bool _iterator_begin(const iterator_t this) {
-	struct __iterator* _this = this;
+static inline bool iterator_begin(const common_iterator_t this) {
+	struct _iterator* _this = this;
 	return _this->element == _this->list->head;
 }
 
 /*
 * @complexity	O(1).
 */
-static inline bool _iterator_end(const iterator_t this) {
-	struct __iterator* _this = this;
+static inline bool iterator_end(const common_iterator_t this) {
+	struct _iterator* _this = this;
 	return _this->element == NULL;
 }
 
 static inline void iterator_ops_init(
-	struct _ds_double_linked_list* list) {
-	struct _iterator_ops* it_ops;
+	struct _common_double_linked_list* list) {
+	struct _common_iterator_ops* it_ops;
 	it_ops = malloc(sizeof * it_ops);
 	if (it_ops) {
-		it_ops->_destroy = _iterator_destroy;
-		it_ops->_data = _iterator_data;
-		it_ops->_next = _iterator_next;
-		it_ops->_prev = _iterator_prev;
-		it_ops->_begin = _iterator_begin;
-		it_ops->_end = _iterator_end;
+		it_ops->_destroy = iterator_destroy;
+		it_ops->_data = iterator_data;
+		it_ops->_next = iterator_next;
+		it_ops->_prev = iterator_prev;
+		it_ops->_begin = iterator_begin;
+		it_ops->_end = iterator_end;
 	}
 	list->it_ops = it_ops;
 }
@@ -145,10 +145,10 @@ static inline void iterator_ops_init(
 *                               Member functions                               *
 *******************************************************************************/
 
-static inline void list_ops_init(struct _ds_double_linked_list* list);
+static inline void list_ops_init(struct _common_double_linked_list* list);
 
-extern ds_double_linked_list_t ds_double_linked_list_init(void) {
-	struct _ds_double_linked_list* list;
+extern common_double_linked_list_t common_double_linked_list_init(void) {
+	struct _common_double_linked_list* list;
 	list = malloc(sizeof * list);
 	if (list) {
 		list_ops_init(list);
@@ -164,60 +164,60 @@ extern ds_double_linked_list_t ds_double_linked_list_init(void) {
 	return list;
 }
 
-extern void ds_double_linked_list_destroy(const ds_double_linked_list_t* this) {
-	struct _ds_double_linked_list* _this = this;
+extern void common_double_linked_list_destroy(const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 	while (_this->size > 0) {
-		ds_double_linked_list_pop_front(this);
+		common_double_linked_list_pop_front(this);
 	}
 	free(_this->it_ops);
 	free(_this);
 }
 
-static inline void list_ops_init(struct _ds_double_linked_list* list) {
+static inline void list_ops_init(struct _common_double_linked_list* list) {
 	// Member functions
-	list->_destroy = ds_double_linked_list_destroy;
+	list->_destroy = common_double_linked_list_destroy;
 	// Element access
-	list->_front = ds_double_linked_list_front;
-	list->_back = ds_double_linked_list_back;
+	list->_front = common_double_linked_list_front;
+	list->_back = common_double_linked_list_back;
 	// Iterators
-	list->_begin = ds_double_linked_list_begin;
-	list->_end = ds_double_linked_list_end;
+	list->_begin = common_double_linked_list_begin;
+	list->_end = common_double_linked_list_end;
 	// Capacity
-	list->_empty = ds_double_linked_list_empty;
-	list->_size = ds_double_linked_list_size;
+	list->_empty = common_double_linked_list_empty;
+	list->_size = common_double_linked_list_size;
 	// Modifiers
-	list->_clear = ds_double_linked_list_clear;
-	list->_insert = ds_double_linked_list_insert;
-	list->_erase = ds_double_linked_list_erase;
-	list->_push_front = ds_double_linked_list_push_front;
-	list->_pop_front = ds_double_linked_list_pop_front;
-	list->_push_back = ds_double_linked_list_push_back;
-	list->_pop_back = ds_double_linked_list_pop_back;
-	list->_resize = ds_double_linked_list_resize;
-	list->_swap = ds_double_linked_list_swap;
+	list->_clear = common_double_linked_list_clear;
+	list->_insert = common_double_linked_list_insert;
+	list->_erase = common_double_linked_list_erase;
+	list->_push_front = common_double_linked_list_push_front;
+	list->_pop_front = common_double_linked_list_pop_front;
+	list->_push_back = common_double_linked_list_push_back;
+	list->_pop_back = common_double_linked_list_pop_back;
+	list->_resize = common_double_linked_list_resize;
+	list->_swap = common_double_linked_list_swap;
 	// Operations
-	list->_merge = ds_double_linked_list_merge;
-	list->_splice = ds_double_linked_list_splice;
-	list->_remove = ds_double_linked_list_remove;
-	list->_remove_if = ds_double_linked_list_remove_if;
-	list->_reverse = ds_double_linked_list_reverse;
-	list->_unique = ds_double_linked_list_unique;
-	list->_sort = ds_double_linked_list_sort;
+	list->_merge = common_double_linked_list_merge;
+	list->_splice = common_double_linked_list_splice;
+	list->_remove = common_double_linked_list_remove;
+	list->_remove_if = common_double_linked_list_remove_if;
+	list->_reverse = common_double_linked_list_reverse;
+	list->_unique = common_double_linked_list_unique;
+	list->_sort = common_double_linked_list_sort;
 }
 
 /*******************************************************************************
 *                                Element access                                *
 *******************************************************************************/
 
-extern inline void* ds_double_linked_list_front(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern inline void* common_double_linked_list_front(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 	return ((struct _element*)_this->head)->data;
 }
 
-extern inline void* ds_double_linked_list_back(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern inline void* common_double_linked_list_back(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 	return ((struct _element*)_this->tail)->data;
 }
 
@@ -225,31 +225,31 @@ extern inline void* ds_double_linked_list_back(
 *                                   Iterators                                  *
 *******************************************************************************/
 
-extern inline iterator_t ds_double_linked_list_begin(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
-	return _iterator_init(_this, _this->head);
+extern inline common_iterator_t common_double_linked_list_begin(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
+	return iterator_init(_this, _this->head);
 }
 
-extern inline iterator_t ds_double_linked_list_end(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
-	return _iterator_init(_this, NULL);
+extern inline common_iterator_t common_double_linked_list_end(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
+	return iterator_init(_this, NULL);
 }
 
 /*******************************************************************************
 *                                   Capacity                                   *
 *******************************************************************************/
 
-extern inline bool ds_double_linked_list_empty(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern inline bool common_double_linked_list_empty(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 	return _this->size == 0;
 }
 
-extern inline size_t ds_double_linked_list_size(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern inline size_t common_double_linked_list_size(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 	return _this->size;
 }
 
@@ -257,19 +257,19 @@ extern inline size_t ds_double_linked_list_size(
 *                                   Modifiers                                  *
 *******************************************************************************/
 
-extern inline void ds_double_linked_list_clear(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern inline void common_double_linked_list_clear(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 	while (_this->size > 0) {
-		ds_double_linked_list_pop_front(_this);
+		common_double_linked_list_pop_front(_this);
 	}
 }
 
-extern iterator_t ds_double_linked_list_insert(
-	const ds_double_linked_list_t this, const iterator_t position,
+extern common_iterator_t common_double_linked_list_insert(
+	const common_double_linked_list_t this, const common_iterator_t position,
 	const void* value) {
-	struct _ds_double_linked_list* _this = this;
-	struct __iterator* _position = position;
+	struct _common_double_linked_list* _this = this;
+	struct _iterator* _position = position;
 
 	struct _element* new_element;
 	new_element = element_init(
@@ -292,15 +292,15 @@ extern iterator_t ds_double_linked_list_insert(
 			_position->element->prev = new_element;
 		}
 		_this->size++;
-		return _iterator_init(_this, new_element);
+		return iterator_init(_this, new_element);
 	}
 	return NULL;
 }
 
-extern iterator_t ds_double_linked_list_erase(
-	const ds_double_linked_list_t this, const iterator_t position) {
-	struct _ds_double_linked_list* _this = this;
-	struct __iterator* _position = position;
+extern common_iterator_t common_double_linked_list_erase(
+	const common_double_linked_list_t this, const common_iterator_t position) {
+	struct _common_double_linked_list* _this = this;
+	struct _iterator* _position = position;
 
 	struct _element* follower;
 	follower = _position->element->next;
@@ -328,12 +328,12 @@ extern iterator_t ds_double_linked_list_erase(
 		element_destroy(_position->element);
 	}
 	_this->size--;
-	return _iterator_init(_this, follower);
+	return iterator_init(_this, follower);
 }
 
-extern errno_t ds_double_linked_list_push_front(
-	const ds_double_linked_list_t this, const void* value) {
-	struct _ds_double_linked_list* _this = this;
+extern errno_t common_double_linked_list_push_front(
+	const common_double_linked_list_t this, const void* value) {
+	struct _common_double_linked_list* _this = this;
 
 	struct _element* new_element;
 	new_element = element_init(value, _this->head, NULL);
@@ -351,9 +351,9 @@ extern errno_t ds_double_linked_list_push_front(
 	return ENOMEM;
 }
 
-extern errno_t ds_double_linked_list_push_back(
-	const ds_double_linked_list_t this, const void* value) {
-	struct _ds_double_linked_list* _this = this;
+extern errno_t common_double_linked_list_push_back(
+	const common_double_linked_list_t this, const void* value) {
+	struct _common_double_linked_list* _this = this;
 
 	struct _element* new_element;
 	new_element = element_init(value, NULL, _this->tail);
@@ -371,9 +371,9 @@ extern errno_t ds_double_linked_list_push_back(
 	return ENOMEM;
 }
 
-extern void ds_double_linked_list_pop_front(
-	const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern void common_double_linked_list_pop_front(
+	const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 
 	if (_this->size == 1) {
 		element_destroy(_this->head);
@@ -390,8 +390,8 @@ extern void ds_double_linked_list_pop_front(
 	_this->size--;
 }
 
-extern void ds_double_linked_list_pop_back(const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern void common_double_linked_list_pop_back(const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 
 	if (_this->size == 1) {
 		element_destroy(_this->head);
@@ -406,15 +406,15 @@ extern void ds_double_linked_list_pop_back(const ds_double_linked_list_t this) {
 	_this->size--;
 }
 
-extern errno_t ds_double_linked_list_resize(const ds_double_linked_list_t this,
+extern errno_t common_double_linked_list_resize(const common_double_linked_list_t this,
 	const size_t s, const void* value) {
-	struct _ds_double_linked_list* _this = this;
+	struct _common_double_linked_list* _this = this;
 
 	errno_t ret = 0;
 	while (_this->size != s) {
 		(_this->size > s) ?
-			(ds_double_linked_list_pop_back(_this)) :
-			(ret = ds_double_linked_list_push_back(_this, value));
+			(common_double_linked_list_pop_back(_this)) :
+			(ret = common_double_linked_list_push_back(_this, value));
 		if (ret) {
 			return ret;
 		}
@@ -422,12 +422,12 @@ extern errno_t ds_double_linked_list_resize(const ds_double_linked_list_t this,
 	return 0;
 }
 
-extern void ds_double_linked_list_swap(const ds_double_linked_list_t this,
-	const ds_double_linked_list_t other) {
-	struct _ds_double_linked_list* _this = this;
-	struct _ds_double_linked_list* _other = other;
+extern void common_double_linked_list_swap(const common_double_linked_list_t this,
+	const common_double_linked_list_t other) {
+	struct _common_double_linked_list* _this = this;
+	struct _common_double_linked_list* _other = other;
 
-	struct _ds_double_linked_list tmp;
+	struct _common_double_linked_list tmp;
 	tmp.size = _this->size;
 	tmp.head = _this->head;
 	tmp.tail = _this->tail;
@@ -445,30 +445,30 @@ extern void ds_double_linked_list_swap(const ds_double_linked_list_t this,
 *******************************************************************************/
 
 /*
-* TODO: implement ds_double_linked_list_sort()
+* TODO: implement common_double_linked_list_sort()
 */
-extern errno_t ds_double_linked_list_merge(const ds_double_linked_list_t this,
-	const ds_double_linked_list_t other,
+extern errno_t common_double_linked_list_merge(const common_double_linked_list_t this,
+	const common_double_linked_list_t other,
 	errno_t(*comp)(const void* a, const void* b, bool* result)) {
-	struct _ds_double_linked_list* _this = this;
-	struct _ds_double_linked_list* _other = other;
+	struct _common_double_linked_list* _this = this;
+	struct _common_double_linked_list* _other = other;
 
 	((struct _element*)_this->tail)->next = _other->head;
 	_this->size += _other->size;
 	_other->head = NULL;
 	_other->tail = NULL;
 	_other->size = 0;
-	return ds_double_linked_list_sort(_this, comp);
+	return common_double_linked_list_sort(_this, comp);
 }
 
-extern void ds_double_linked_list_splice(const ds_double_linked_list_t this,
-	const ds_double_linked_list_t other, const iterator_t position,
-	const iterator_t first, const iterator_t last) {
-	struct _ds_double_linked_list* _this = this;
-	struct _ds_double_linked_list* _other = other;
-	struct __iterator* _position = position;
-	struct __iterator* _first = first;
-	struct __iterator* _last = last;
+extern void common_double_linked_list_splice(const common_double_linked_list_t this,
+	const common_double_linked_list_t other, const common_iterator_t position,
+	const common_iterator_t first, const common_iterator_t last) {
+	struct _common_double_linked_list* _this = this;
+	struct _common_double_linked_list* _other = other;
+	struct _iterator* _position = position;
+	struct _iterator* _first = first;
+	struct _iterator* _last = last;
 
 	struct _element* first_prev = _first->element->prev;
 	struct _element* last_prev = _last->element->prev;
@@ -492,64 +492,64 @@ extern void ds_double_linked_list_splice(const ds_double_linked_list_t this,
 	_position->element->prev = last_prev;
 }
 
-extern size_t ds_double_linked_list_remove(const ds_double_linked_list_t this,
+extern size_t common_double_linked_list_remove(const common_double_linked_list_t this,
 	void* value) {
-	struct _ds_double_linked_list* _this = this;
+	struct _common_double_linked_list* _this = this;
 
-	struct __iterator* iterator;
-	struct __iterator* tmp;
+	struct _iterator* iterator;
+	struct _iterator* tmp;
 	int _removed = 0;
 
-	iterator = ds_double_linked_list_begin(_this);
-	while (!_iterator_end(iterator)) {
+	iterator = common_double_linked_list_begin(_this);
+	while (!iterator_end(iterator)) {
 		if (iterator->element->data == value) {
 			tmp = iterator;
-			iterator = ds_double_linked_list_erase(_this, iterator);
-			_iterator_destroy(tmp);
+			iterator = common_double_linked_list_erase(_this, iterator);
+			iterator_destroy(tmp);
 			_removed++;
 		}
 		else {
-			_iterator_next(iterator);
+			iterator_next(iterator);
 		}
 	}
-	_iterator_destroy(iterator);
+	iterator_destroy(iterator);
 	return _removed;
 }
 
-extern errno_t ds_double_linked_list_remove_if(
-	const ds_double_linked_list_t this,
+extern errno_t common_double_linked_list_remove_if(
+	const common_double_linked_list_t this,
 	errno_t(*pred)(const void* a, bool* result), size_t* removed) {
-	struct _ds_double_linked_list* _this = this;
+	struct _common_double_linked_list* _this = this;
 
-	struct __iterator* iterator;
-	struct __iterator* tmp;
+	struct _iterator* iterator;
+	struct _iterator* tmp;
 	bool result;
 	int _removed = 0;
 
-	iterator = ds_double_linked_list_begin(_this);
-	while (!_iterator_end(iterator)) {
+	iterator = common_double_linked_list_begin(_this);
+	while (!iterator_end(iterator)) {
 		if (pred(iterator->element->data, &result)) {
 			return 1;
 		}
 		if (result) {
 			tmp = iterator;
-			iterator = ds_double_linked_list_erase(_this, iterator);
-			_iterator_destroy(tmp);
+			iterator = common_double_linked_list_erase(_this, iterator);
+			iterator_destroy(tmp);
 			_removed++;
 		}
 		else {
-			_iterator_next(iterator);
+			iterator_next(iterator);
 		}
 	}
-	_iterator_destroy(iterator);
+	iterator_destroy(iterator);
 	if (removed) {
 		*removed = _removed;
 	}
 	return 0;
 }
 
-extern void ds_double_linked_list_reverse(const ds_double_linked_list_t this) {
-	struct _ds_double_linked_list* _this = this;
+extern void common_double_linked_list_reverse(const common_double_linked_list_t this) {
+	struct _common_double_linked_list* _this = this;
 
 	if (_this->size == 0) {
 		return;
@@ -578,45 +578,45 @@ static inline errno_t default_compeq(const void* a, const void* b,
 	return 0;
 }
 
-extern errno_t ds_double_linked_list_unique(const ds_double_linked_list_t this,
+extern errno_t common_double_linked_list_unique(const common_double_linked_list_t this,
 	errno_t(*comp)(const void* a, const void* b, bool* result), int* removed) {
-	struct _ds_double_linked_list* _this = this;
+	struct _common_double_linked_list* _this = this;
 
-	struct __iterator* iterator1;
-	struct __iterator* iterator2;
-	struct __iterator* tmp;
+	struct _iterator* iterator1;
+	struct _iterator* iterator2;
+	struct _iterator* tmp;
 	bool result;
 	int _removed = 0;
 
 	if (!comp) {
 		comp = default_compeq;
 	}
-	iterator1 = ds_double_linked_list_begin(_this);
-	iterator2 = _iterator_init(_this, NULL);
-	while (!_iterator_end(iterator1)) {
+	iterator1 = common_double_linked_list_begin(_this);
+	iterator2 = iterator_init(_this, NULL);
+	while (!iterator_end(iterator1)) {
 		iterator2->element = iterator1->element->next;
-		while (!_iterator_end(iterator2)) {
+		while (!iterator_end(iterator2)) {
 			errno_t ret;
-			void* e1 = _iterator_data(iterator1);
-			void* e2 = _iterator_data(iterator2);
+			void* e1 = *iterator_data(iterator1);
+			void* e2 = *iterator_data(iterator2);
 			ret = comp(e1, e2, &result);
 			if (ret) {
 				return ret;
 			}
 			if (result) {
 				tmp = iterator2;
-				iterator2 = ds_double_linked_list_erase(_this, iterator2);
-				_iterator_destroy(tmp);
+				iterator2 = common_double_linked_list_erase(_this, iterator2);
+				iterator_destroy(tmp);
 				_removed++;
 			}
 			else {
-				_iterator_next(iterator2);
+				iterator_next(iterator2);
 			}
 		}
-		_iterator_next(iterator1);
+		iterator_next(iterator1);
 	}
-	_iterator_destroy(iterator1);
-	_iterator_destroy(iterator2);
+	iterator_destroy(iterator1);
+	iterator_destroy(iterator2);
 
 	if (removed) {
 		*removed = _removed;
@@ -633,9 +633,9 @@ static inline errno_t default_complt(const void* a, const void* b,
 /*
 * TODO: it needs an algorithm library
 */
-extern int ds_double_linked_list_sort(const ds_double_linked_list_t this,
+extern int common_double_linked_list_sort(const common_double_linked_list_t this,
 	int (*comp)(const void* a, const void* b, bool* result)) {
-	struct _ds_double_linked_list* _this = this;
+	struct _common_double_linked_list* _this = this;
 
 	return 1;
 }

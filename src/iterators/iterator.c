@@ -1,13 +1,13 @@
-#define IMPLEMENT_ITERATOR
+#define IMPLEMENT_COMMON_ITERATOR
 #include "iterator.h"
-#undef IMPLEMENT_ITERATOR
+#undef IMPLEMENT_COMMON_ITERATOR
 
 /*******************************************************************************
 *                               Member functions                               *
 *******************************************************************************/
 
-extern inline void iterator_destroy(const iterator_t this) {
-	struct _iterator* _this = this;
+extern inline void common_iterator_destroy(const common_iterator_t this) {
+	struct _common_iterator* _this = this;
 	_this->ops->_destroy(_this);
 }
 
@@ -15,28 +15,28 @@ extern inline void iterator_destroy(const iterator_t this) {
 *                                Element access                                *
 *******************************************************************************/
 
-extern inline void* iterator_data(const iterator_t this) {
-	struct _iterator* _this = this;
+extern inline void** common_iterator_data(const common_iterator_t this) {
+	struct _common_iterator* _this = this;
 	return _this->ops->_data(_this);
 }
 
-extern inline iterator_t iterator_next(const iterator_t this) {
-	struct _iterator* _this = this;
+extern inline common_iterator_t common_iterator_next(const common_iterator_t this) {
+	struct _common_iterator* _this = this;
 	return _this->ops->_next(_this);
 }
 
-extern inline iterator_t iterator_prev(const iterator_t this) {
-	struct _iterator* _this = this;
+extern inline common_iterator_t common_iterator_prev(const common_iterator_t this) {
+	struct _common_iterator* _this = this;
 	return _this->ops->_prev(_this);
 }
 
-extern inline bool iterator_begin(const iterator_t this) {
-	struct _iterator* _this = this;
+extern inline bool common_iterator_begin(const common_iterator_t this) {
+	struct _common_iterator* _this = this;
 	return _this->ops->_begin(_this);
 }
 
-extern inline bool iterator_end(const iterator_t this) {
-	struct _iterator* _this = this;
+extern inline bool common_iterator_end(const common_iterator_t this) {
+	struct _common_iterator* _this = this;
 	return _this->ops->_end(_this);
 }
 
@@ -44,8 +44,9 @@ extern inline bool iterator_end(const iterator_t this) {
 *                                  Operations                                  *
 *******************************************************************************/
 
-extern iterator_t iterator_advance(const iterator_t this, int n) {
-	struct _iterator* _this = this;
+extern common_iterator_t common_iterator_advance(const common_iterator_t this,
+	int n) {
+	struct _common_iterator* _this = this;
 
 	for (int i = n; i != 0; n ? i++ : i--) {
 		n ? _this->ops->_next(_this) : _this->ops->_prev(_this);
@@ -53,16 +54,17 @@ extern iterator_t iterator_advance(const iterator_t this, int n) {
 	return _this;
 }
 
-extern size_t iterator_distance(const iterator_t first, const iterator_t last) {
-	struct _iterator* _first = first;
-	struct _iterator* _last = last;
+extern size_t common_iterator_distance(const common_iterator_t first,
+	const common_iterator_t last) {
+	struct _common_iterator* _first = first;
+	struct _common_iterator* _last = last;
 
 	size_t dist = 0;
 	while (_first != _last) {
 		_first->ops->_next(_first);
 		dist++;
 	}
-	for (int i = 0; i < dist; i++) {
+	for (size_t i = 0; i < dist; i++) {
 		_first->ops->_prev(_first);		//Not very smart duh
 	}
 	return dist;

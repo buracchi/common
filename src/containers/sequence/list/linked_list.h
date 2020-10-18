@@ -1,10 +1,10 @@
 #pragma once
 
-#ifdef DS_IMPLEMENT_LINKED_LIST
-#define DS_IMPLEMENT_LIST
+#ifdef IMPLEMENT_COMMON_LINKED_LIST
+#define IMPLEMENT_COMMON_LIST
 #include "list.h"
-#undef DS_IMPLEMENT_LIST
-#endif // DS_IMPLEMENT_LINKED_LIST
+#undef IMPLEMENT_COMMON_LIST
+#endif // IMPLEMENT_COMMON_LINKED_LIST
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -16,17 +16,17 @@
 *                                 Member types                                 *
 *******************************************************************************/
 
-typedef void* ds_linked_list_t;
+typedef void* common_linked_list_t;
 
-#ifdef DS_IMPLEMENT_LINKED_LIST
-struct _ds_linked_list {
-	struct _ds_list;
+#ifdef IMPLEMENT_COMMON_LINKED_LIST
+struct _common_linked_list {
+	struct _common_list;
 	size_t size;
 	void* head;
 	void* tail;
-	iterator_ops_t it_ops;
+	common_iterator_ops_t it_ops;
 };
-#endif // DS_IMPLEMENT_LINKED_LIST
+#endif // IMPLEMENT_COMMON_LINKED_LIST
 
 /*******************************************************************************
 *                               Member functions                               *
@@ -39,7 +39,7 @@ struct _ds_linked_list {
 *
 * @return	the initialized list on success; NULL otherwise.
 */
-extern ds_linked_list_t ds_linked_list_init(void);
+extern common_linked_list_t common_linked_list_init(void);
 
 /*
 * Destroys the container object. The contained elements are not destroyed.
@@ -54,7 +54,7 @@ extern ds_linked_list_t ds_linked_list_init(void);
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_destroy(const ds_linked_list_t this);
+extern void common_linked_list_destroy(const common_linked_list_t this);
 
 /*******************************************************************************
 *                                Element access                                *
@@ -72,7 +72,7 @@ extern void ds_linked_list_destroy(const ds_linked_list_t this);
 *
 * @return	A reference to the first element in the list container.
 */
-extern void* ds_linked_list_front(const ds_linked_list_t this);
+extern void* common_linked_list_front(const common_linked_list_t this);
 
 /*
 * Returns a direct reference to the last element in the list container.
@@ -86,7 +86,7 @@ extern void* ds_linked_list_front(const ds_linked_list_t this);
 *
 * @return	A reference to the last element in the list container.
 */
-extern void* ds_linked_list_back(const ds_linked_list_t this);
+extern void* common_linked_list_back(const common_linked_list_t this);
 
 /*******************************************************************************
 *                                   Iterators                                  *
@@ -94,7 +94,7 @@ extern void* ds_linked_list_back(const ds_linked_list_t this);
 
 /*
 * Returns an iterator to the first element of the list container.
-* If the list is empty, the returned iterator will be equal to ds_list_end().
+* If the list is empty, the returned iterator will be equal to common_list_end().
 *
 * This function never fails.
 *
@@ -104,7 +104,7 @@ extern void* ds_linked_list_back(const ds_linked_list_t this);
 *
 * @return	An iterator to the beginning of the list container.
 */
-extern iterator_t ds_linked_list_begin(const ds_linked_list_t this);
+extern common_iterator_t common_linked_list_begin(const common_linked_list_t this);
 
 /*
 * Returns an iterator to the element following the last element of the list.
@@ -119,7 +119,7 @@ extern iterator_t ds_linked_list_begin(const ds_linked_list_t this);
 *
 * @return	An iterator to the element past the end of the list container.
 */
-extern iterator_t ds_linked_list_end(const ds_linked_list_t this);
+extern common_iterator_t common_linked_list_end(const common_linked_list_t this);
 
 /*******************************************************************************
 *                                   Capacity                                   *
@@ -136,7 +136,7 @@ extern iterator_t ds_linked_list_end(const ds_linked_list_t this);
 *
 * @return	true if the container size is 0, false otherwise.
 */
-extern bool ds_linked_list_empty(const ds_linked_list_t this);
+extern bool common_linked_list_empty(const common_linked_list_t this);
 
 /*
 * Returns the number of elements in the list container.
@@ -149,7 +149,7 @@ extern bool ds_linked_list_empty(const ds_linked_list_t this);
 *
 * @return	The number of elements in the container.
 */
-extern size_t ds_linked_list_size(const ds_linked_list_t this);
+extern size_t common_linked_list_size(const common_linked_list_t this);
 
 /*******************************************************************************
 *                                   Modifiers                                  *
@@ -170,7 +170,7 @@ extern size_t ds_linked_list_size(const ds_linked_list_t this);
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_clear(const ds_linked_list_t this);
+extern void common_linked_list_clear(const common_linked_list_t this);
 
 /*
 * Inserts an element before the specified position in the list.
@@ -188,8 +188,8 @@ extern void ds_linked_list_clear(const ds_linked_list_t this);
 * @return	An iterator that points to the inserted element. On error,
 *			these function returns NULL.
 */
-extern iterator_t ds_linked_list_insert(const ds_linked_list_t this,
-	const iterator_t position, const void* value);
+extern common_iterator_t common_linked_list_insert(const common_linked_list_t this,
+	const common_iterator_t position, const void* value);
 
 /*
 * Removes from the list container the element at the specified position.
@@ -210,8 +210,8 @@ extern iterator_t ds_linked_list_insert(const ds_linked_list_t this,
 *
 * @return	An iterator pointing to the element that followed the erased one.
 */
-extern iterator_t ds_linked_list_erase(const ds_linked_list_t this,
-	const iterator_t position);
+extern common_iterator_t common_linked_list_erase(const common_linked_list_t this,
+	const common_iterator_t position);
 
 /*
 * Prepends a new element to the beginning of the list.
@@ -225,7 +225,7 @@ extern iterator_t ds_linked_list_erase(const ds_linked_list_t this,
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_push_front(const ds_linked_list_t this,
+extern errno_t common_linked_list_push_front(const common_linked_list_t this,
 	const void* value);
 
 /*
@@ -240,7 +240,7 @@ extern errno_t ds_linked_list_push_front(const ds_linked_list_t this,
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_push_back(const ds_linked_list_t this,
+extern errno_t common_linked_list_push_back(const common_linked_list_t this,
 	const void* value);
 
 /*
@@ -258,7 +258,7 @@ extern errno_t ds_linked_list_push_back(const ds_linked_list_t this,
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_pop_front(const ds_linked_list_t this);
+extern void common_linked_list_pop_front(const common_linked_list_t this);
 
 /*
 * Removes the last element of the list.
@@ -275,7 +275,7 @@ extern void ds_linked_list_pop_front(const ds_linked_list_t this);
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_pop_back(const ds_linked_list_t this);
+extern void common_linked_list_pop_back(const common_linked_list_t this);
 
 /*
 * Resizes the list to contain n elements.
@@ -294,7 +294,7 @@ extern void ds_linked_list_pop_back(const ds_linked_list_t this);
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_resize(const ds_linked_list_t this,
+extern errno_t common_linked_list_resize(const common_linked_list_t this,
 	const size_t s, const void* value);
 
 /*
@@ -314,8 +314,8 @@ extern errno_t ds_linked_list_resize(const ds_linked_list_t this,
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_swap(const ds_linked_list_t this,
-	const ds_linked_list_t other);
+extern void common_linked_list_swap(const common_linked_list_t this,
+	const common_linked_list_t other);
 
 /*******************************************************************************
 *                                  Operations                                  *
@@ -343,8 +343,8 @@ extern void ds_linked_list_swap(const ds_linked_list_t this,
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_merge(const ds_linked_list_t this,
-	const ds_linked_list_t other,
+extern errno_t common_linked_list_merge(const common_linked_list_t this,
+	const common_linked_list_t other,
 	errno_t(*comp)(const void* a, const void* b, bool* result));
 
 /*
@@ -368,9 +368,9 @@ extern errno_t ds_linked_list_merge(const ds_linked_list_t this,
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_splice(const ds_linked_list_t this,
-	const ds_linked_list_t other, const iterator_t position,
-	const iterator_t first, const iterator_t last);
+extern void common_linked_list_splice(const common_linked_list_t this,
+	const common_linked_list_t other, const common_iterator_t position,
+	const common_iterator_t first, const common_iterator_t last);
 
 /*
 * Removes from the container all elements that are equal to value.
@@ -385,7 +385,7 @@ extern void ds_linked_list_splice(const ds_linked_list_t this,
 *
 * @return	The number of elements removed.
 */
-extern size_t ds_linked_list_remove(const ds_linked_list_t this, void* value);
+extern size_t common_linked_list_remove(const common_linked_list_t this, void* value);
 
 /*
 * Removes all elements for which predicate pred returns true.
@@ -408,7 +408,7 @@ extern size_t ds_linked_list_remove(const ds_linked_list_t this, void* value);
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_remove_if(const ds_linked_list_t this,
+extern errno_t common_linked_list_remove_if(const common_linked_list_t this,
 	errno_t(*pred)(const void* a, bool* result), size_t* removed);
 
 /*
@@ -424,7 +424,7 @@ extern errno_t ds_linked_list_remove_if(const ds_linked_list_t this,
 *
 * @return	This function returns no value.
 */
-extern void ds_linked_list_reverse(const ds_linked_list_t this);
+extern void common_linked_list_reverse(const common_linked_list_t this);
 
 /*
 * Removes all consecutive duplicate elements from the list. Only the first
@@ -446,7 +446,7 @@ extern void ds_linked_list_reverse(const ds_linked_list_t this);
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_unique(const ds_linked_list_t this,
+extern errno_t common_linked_list_unique(const common_linked_list_t this,
 	errno_t(*comp)(const void* a, const void* b, bool* result), int* removed);
 
 /*
@@ -464,5 +464,5 @@ extern errno_t ds_linked_list_unique(const ds_linked_list_t this,
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t ds_linked_list_sort(const ds_linked_list_t this,
+extern errno_t common_linked_list_sort(const common_linked_list_t this,
 	errno_t(*comp)(const void* a, const void* b, bool* result));

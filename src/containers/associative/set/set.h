@@ -2,66 +2,66 @@
 
 #include <stdbool.h>
 
-typedef void* ds_set_t;
+typedef void* common_set_t;
 
 /*
 * Return an initialized set object.
 */
-extern ds_set_t set_init();
+extern common_set_t set_init();
 
 /*
 * Destroy a set object.
 * 
 * @return 0 on success; non-zero otherwise.
 */
-extern int set_destroy(const ds_set_t S);
+extern int set_destroy(const common_set_t S);
 
 /*
 * returns the union of sets S and T.
 */
-extern ds_set_t set_union(const ds_set_t S, const ds_set_t T);
+extern common_set_t set_union(const common_set_t S, const common_set_t T);
 
 /*
 * returns the intersection of sets S and T.
 */
-extern ds_set_t set_intersection(const ds_set_t S, const ds_set_t T);
+extern common_set_t set_intersection(const common_set_t S, const common_set_t T);
 
 /*
 * returns the difference of sets S and T.
 */
-extern ds_set_t set_difference(const ds_set_t S, const ds_set_t T);
+extern common_set_t set_difference(const common_set_t S, const common_set_t T);
 
 /*
 * a predicate that tests whether the set S is a subset of set T.
 */
-extern bool set_subset(const ds_set_t S, const ds_set_t T);
+extern bool set_subset(const common_set_t S, const common_set_t T);
 
 /*
 * adds the element elem to S, if it is not present already.
 */
-extern int set_add(const ds_set_t S, const void* elem);
+extern int set_add(const common_set_t S, const void* elem);
 
 /*
 * removes the element elem from S, if it is present.
 */
-extern int set_remove(const ds_set_t S, const void* elem);
+extern int set_remove(const common_set_t S, const void* elem);
 
 /*
 * checks whether the value elem is in the set S.
 */
-extern bool set_is_element_of(const ds_set_t S, const void* elem);
+extern bool set_is_element_of(const common_set_t S, const void* elem);
 
 /*
 * checks whether the set S is empty.
 */
-extern bool set_is_empty(const ds_set_t S);
+extern bool set_is_empty(const common_set_t S);
 
 /*
 * returns a function that returns one more value of S at each call, in some arbitrary order.
 */
-extern void* set_iterate(const ds_set_t S);
+extern void* set_iterate(const common_set_t S);
 
 /*
 * returns a list containing the elements of S in some arbitrary order.
 */
-extern void* set_enumerate(const ds_set_t S);
+extern void* set_enumerate(const common_set_t S);

@@ -9,4 +9,5 @@ add_executable (
 	)
 
 target_link_libraries(example PRIVATE "linked_list")
+target_link_libraries(example PRIVATE "double_linked_list")
 target_link_libraries(example PRIVATE "iterators")
