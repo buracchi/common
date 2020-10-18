@@ -19,29 +19,39 @@ struct _common_map {
 	// Element access
 	errno_t (*_at)(const common_map_t this, const void* key, void** value);
 	// Iterators
-	iterator_t (*_begin)(const common_map_t this);
-	iterator_t (*_end)(const common_map_t this);
+	common_iterator_t (*_begin)(const common_map_t this);
+	common_iterator_t (*_end)(const common_map_t this);
 	// Capacity
 	bool (*_empty)(const common_map_t this);
 	size_t (*_size)(const common_map_t this);
 	// Modifiers
 	void (*_clear)(const common_map_t this);
-	iterator_t (*_insert)(const common_map_t this, const void* key,
-		const void* value)
-	int (*_insert_or_assign)(const common_map_t this, const void* key,
+	common_iterator_t (*_insert)(const common_map_t this, const void* key,
 		const void* value);
-	int (*_erase)(const common_map_t this, const void* key, void** value);
-	int (*_swap)(const common_map_t this, const common_map_t other);
-	int (*_extract)(const common_map_t this, const common_map_t other);
-	int (*_merge)(const common_map_t this, const common_map_t other,
-		int (*comp)(const void* key_a, const void* key_b, bool* result));
+	common_iterator_t (*_insert_or_assign)(const common_map_t this,
+		const void* key, const void* value);
+	common_iterator_t (*_erase)(const common_map_t this,
+		const common_iterator_t position);
+	void (*_swap)(const common_map_t this, const common_map_t other);
+	// <T> (_*extract)(const common_map_t this, ...)
+	errno_t(*_merge)(const common_map_t this, const common_map_t source,
+		errno_t(*comp)(const void* key_a, const void* key_b, bool* result));
 	// Operations
-	int (*_erase_if)(const common_map_t this,
-		int (*p)(const void* a, bool* result));
+	errno_t(*_remove)(const common_map_t this, const void* key,
+		errno_t(*comp)(const void* a, const void* b, bool* result),
+		size_t* removed);
+	errno_t(*_remove_if)(const common_map_t this, 
+		errno_t (*p)(const void* a, bool* result), size_t* removed);
 	// Lookup
-	int (*_count)(const common_map_t this);
-	int (*_find)(const common_map_t this);
-	int (*_contains)(const common_map_t this);
+	errno_t (*_count)(const common_map_t this, const void* key,
+		errno_t(*comp)(const void* a, const void* b, bool* result),
+		size_t* count);
+	errno_t (*_find)(const common_map_t this, const void* key,
+		errno_t(*comp)(const void* a, const void* b, bool* result),
+		common_iterator_t* iterator);
+	errno_t (*_contains)(const common_map_t this, const void* key,
+		errno_t(*comp)(const void* a, const void* b, bool* result),
+		bool* exists);
 };
 #endif // IMPLEMENT_COMMON_MAP
 
@@ -80,7 +90,8 @@ extern void common_map_destroy(const common_map_t this);
 *
 * @return	On success, this function returns zero.  On error, an errno ERANGE.
 */
-extern errno_t common_map_at(const common_map_t this, const void* key, void** value);
+extern errno_t common_map_at(const common_map_t this, const void* key,
+	void** value);
 
 /*******************************************************************************
 *                                   Iterators                                  *
@@ -96,7 +107,7 @@ extern errno_t common_map_at(const common_map_t this, const void* key, void** va
 *
 * @return	An iterator to the beginning of the container.
 */
-extern iterator_t common_map_begin(const common_map_t this);
+extern common_iterator_t common_map_begin(const common_map_t this);
 
 /*
 * Returns an iterator to the element following the last element of the map.
@@ -109,7 +120,7 @@ extern iterator_t common_map_begin(const common_map_t this);
 *
 * @return	An iterator to the element past the end of the container.
 */
-extern iterator_t common_map_end(const common_map_t this);
+extern common_iterator_t common_map_end(const common_map_t this);
 
 /*******************************************************************************
 *                                   Capacity                                   *
@@ -171,11 +182,30 @@ extern void common_map_clear(const common_map_t this);
 * @return	returns an iterator to the inserted element, or to the element that 
 *			prevented the insertion. On error, this function returns NULL.
 */
-extern iterator_t common_map_insert(const common_map_t this,
+extern common_iterator_t common_map_insert(const common_map_t this,
 	const void* key, const void* value);
 
 /*
-* Removes from the list container the element at the specified position.
+* Inserts an element into the container, if a key equivalent to key already 
+* exists in the container, assigns value to the mapped_type corresponding to the 
+* key. If the key does not exist, inserts the new value as if by insert.
+*
+* No iterators or references are invalidated.
+*
+* The behavior is undefined if the element is not in the list.
+*
+* @param	this	-	the map object.
+* @param	key		-	the key used both to look up and to insert if not found.
+* @param	value	-	element value to insert.
+*
+* @return	returns an iterator to the inserted element. On error, this function 
+*			returns NULL.
+*/
+extern common_iterator_t common_map_insert_or_assign(const common_map_t this,
+	const void* key, const void* value);
+
+/*
+* Removes from the container the element at the specified position.
 * The iterator position must be valid and dereferenceable. Thus the end()
 * iterator (which is valid, but is not dereferenceable) cannot be used as a
 * value for position.
@@ -191,84 +221,12 @@ extern iterator_t common_map_insert(const common_map_t this,
 *
 * @return	An iterator pointing to the element that followed the erased one.
 */
-extern iterator_t common_map_erase(const common_map_t this,
-	const iterator_t position);
+extern common_iterator_t common_map_erase(const common_map_t this,
+	const common_iterator_t position);
 
 /*
-* Prepends a new element to the beginning of the list.
-*
-* No iterators or references are invalidated.
-*
-* @param	this	-	the map object.
-* @param	value	-	the value of the element to prepend.
-*
-* @return	On success, this function returns zero.  On error, an errno [...].
-*/
-extern errno_t common_map_push_front(const common_map_t this, const void* value);
-
-/*
-* Appends the given element value to the end of the list.
-*
-* No iterators or references are invalidated.
-*
-* @param	this	-	the map object.
-* @param	value	-	the value of the element to append.
-*
-* @return	On success, this function returns zero.  On error, an errno [...].
-*/
-extern errno_t common_map_push_back(const common_map_t this, const void* value);
-
-/*
-* Removes the first element of the list.
-*
-* References and iterators to the erased element are invalidated. Other
-* references and iterators are not affected.
-*
-* If the container is not empty, the function never fails.
-* Otherwise, it causes undefined behavior.
-*
-* @param	this	-	the map object.
-*
-* @return	This function returns no value.
-*/
-extern void common_map_pop_front(const common_map_t this);
-
-/*
-* Removes the last element of the list.
-*
-* References and iterators to the erased element are invalidated. Other
-* references and iterators are not affected.
-*
-* If the container is not empty, the function never fails.
-* Otherwise, it causes undefined behavior.
-*
-* @param	this	-	the map object.
-*
-* @return	This function returns no value.
-*/
-extern void common_map_pop_back(const common_map_t this);
-
-/*
-* Resizes the list to contain n elements.
-* If the current size is greater than n, the list is reduced to its first s
-* elements.
-* If the current size is less than s, additional copies of value are appended.
-*
-* References and iterators to the erased element are invalidated. Other
-* references and iterators are not affected.
-*
-* @param	this	-	the map object.
-* @param	s		-	new size of the list, expressed in number of elements.
-* @param	value	-	the value to initialize the new elements with.
-*
-* @return	On success, this function returns zero.  On error, an errno [...].
-*/
-extern errno_t common_map_resize(const common_map_t this, const size_t s,
-	const void* value);
-
-/*
-* Exchanges the contents of the list with those of other. Does not invoke any
-* move, copy, or swap operations on individual elements.
+* Exchanges the contents of the container  with those of other. Does not invoke
+* any move, copy, or swap operations on individual elements.
 *
 * All iterators and references remain valid. It is unspecified whether an
 * iterator holding the past-the-end value in this container will refer to this
@@ -283,67 +241,57 @@ extern errno_t common_map_resize(const common_map_t this, const size_t s,
 */
 extern void common_map_swap(const common_map_t this, const common_map_t other);
 
-/*******************************************************************************
-*                                  Operations                                  *
-*******************************************************************************/
-
 /*
-* Merges two sorted lists into one. The lists should be sorted into ascending
-* order.
-* No elements are copied. The list other becomes empty after the operation.
-* This operation is stable: for equivalent elements in the two lists, the
-* elements from this shall always precede the elements from other, and the order
-* of equivalent elements of this and other does not change.
-*
-* All iterators and references remain valid.
+* Attempts to extract ("splice") each element in source and insert it into this 
+* using the comparison function comp. If there is an element in this with key 
+* equivalent to the key of an element from source, then that element is not 
+* extracted from source. 
+* No elements are copied or moved, only the internal pointers of the container 
+* nodes are repointed. 
+* 
+* All pointers and references to the transferred elements remain valid, 
+* but now refer into this, not into source.
 *
 * If the comparison function is guaranteed to never fails, the function
 * never fails.
 *
 * @param	this	-	the map object.
-* @param	other	-	another list to merge.
+* @param	source	-	compatible container to transfer the nodes from.
 * @param	comp	-	binary function which set a boolean as true if the first
 *						argument is less than the second.
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t common_map_merge(const common_map_t this, const common_map_t other,
+extern errno_t common_map_merge(const common_map_t this,
+	const common_map_t source,
 	errno_t(*comp)(const void* a, const void* b, bool* result));
 
-/*
-* Transfers the elements in the range [first, last) from another list into this.
-* The element is inserted before the element pointed to by position.
-* No elements are copied or moved, only the internal pointers of the list nodes
-* are re-pointed.
-* The behavior is undefined if position is an iterator in the range [first,last).
-*
-* If any of the iterators or ranges specified is not valid, or if position is
-* in the range [first,last) it causes undefined behavior.
-* Otherwise, the function never fails.
-*
-* @param	this		-	the map object.
-* @param	other		-	another list to transfer the content from.
-* @parma	position	-	element before which the content will be inserted.
-* @param	first, last -	the range of elements to transfer from other to
-							this.
-*
-* @return	This function returns no value.
-*/
-extern void common_map_splice(const common_map_t this, const common_map_t other,
-	const iterator_t position, const iterator_t first, const iterator_t last);
+/*******************************************************************************
+*                                  Operations                                  *
+*******************************************************************************/
 
 /*
-* Removes from the container all elements that are equal to value.
+* Removes from the list container the element (if one exists) with the key
+* equivalent to key.
 *
 * References and iterators to the erased elements are invalidated. Other
 * references and iterators are not affected.
 *
-* @param	this	-	the map object.
-* @param	value	-	value of the elements to be removed.
+* If the comparison function is guaranteed to never fails, the function
+* never fails.
 *
-* @return	The number of elements removed.
+* @param	this	-	the map object.
+* @param	key		-	key value of the elements to remove.
+* @param	comp	-	binary function which set a boolean as true if the first
+*						argument is equal to the second.
+* @param	removed	-	the pointer that will reference the number of elements
+*						removed.
+*
+* @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern size_t common_map_remove(const common_map_t this, void* value);
+extern errno_t common_map_remove(const common_map_t this, const void* key,
+	errno_t(*comp)(const void* a, const void* b, bool* result),
+	size_t* removed);
 
 /*
 * Removes all elements for which predicate pred returns true.
@@ -367,52 +315,58 @@ extern size_t common_map_remove(const common_map_t this, void* value);
 extern errno_t common_map_remove_if(const common_map_t this,
 	errno_t(*pred)(const void* a, bool* result), size_t* removed);
 
-/*
-* Reverses the order of the elements in the list.
-*
-* No references or iterators become invalidated.
-*
-* The function never fails.
-*
-* @param	this	-	the map object.
-*
-* @return	This function returns no value.
-*/
-extern void common_map_reverse(const common_map_t this);
+/*******************************************************************************
+*                                   Lookup                                     *
+*******************************************************************************/
 
 /*
-* Removes all consecutive duplicate elements from the list. Only the first
-* element in each group of equal elements is left.
-*
-* References and iterators to the erased elements are invalidated. Other
-* references and iterators are not affected.
-*
-* If the comparison function is guaranteed to never fails, the function
-* never fails.
-*
+* Returns the number of elements with key that compares equivalent to the 
+* specified argument, which is either 1 or 0 since this container does not 
+* allow duplicates.
+* 
 * @param	this	-	the map object.
+* @param	key		-	key value of the elements to count.
 * @param	comp	-	binary function which set a boolean as true if the first
 *						argument is equal to the second.
-* @param	removed	-	the pointer that will reference the number of elements
-*						removed.
-*
+* @param	count	-	the pointer that will reference the number of elements 
+*						with key that compares equivalent to key, which is 
+*						either 1 or 0.
+* 
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t common_map_unique(const common_map_t this,
-	errno_t(*comp)(const void* a, const void* b, bool* result), int* removed);
+extern errno_t common_map_count(const common_map_t this, const void* key,
+	errno_t(*comp)(const void* a, const void* b, bool* result),
+	size_t* count);
 
 /*
-* Sorts the elements in ascending order. The order of equal elements is
-* preserved.
-* If an error occurs, the order of elements in the list is unspecified.
+* Finds an element with key equivalent to key.
 *
-* No references or iterators become invalidated.
-*
-* @param	this	-	the map object.
-* @param	comp	-	binary function which set a boolean as true if the first
-*						argument is less than the second.
+* @param	this	 -	the map object.
+* @param	key		 -	key value of the element to search for.
+* @param	comp	 -	binary function which set a boolean as true if the first
+*						argument is equal to the second.
+* @param	iterator -	the pointer that will reference the iterator to an 
+*						element with key equivalent to key. If no such element 
+*						is found, the end iterator is returned.
 *
 * @return	On success, this function returns zero.  On error, an errno [...].
 */
-extern errno_t common_map_sort(const common_map_t this,
-	errno_t(*comp)(const void* a, const void* b, bool* result));
+extern errno_t common_map_find(const common_map_t this, const void* key,
+	errno_t(*comp)(const void* a, const void* b, bool* result),
+	common_iterator_t* iterator);
+
+/*
+* Checks if there is an element with key equivalent to key in the container.
+*
+* @param	this	-	the map object.
+* @param	key		-	key value of the element to search for.
+* @param	comp	-	binary function which set a boolean as true if the first
+*						argument is equal to the second.
+* @param	exists	-	Iterator to a boolean set to true if there is such an 
+*						element, otherwise false.
+*
+* @return	On success, this function returns zero.  On error, an errno [...].
+*/
+extern errno_t common_map_contains(const common_map_t this, const void* key,
+	errno_t(*comp)(const void* a, const void* b, bool* result),
+	bool* exists);
