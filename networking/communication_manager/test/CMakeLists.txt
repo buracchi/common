@@ -6,5 +6,6 @@ target_link_libraries(test_communication_manager PRIVATE GTest::GTest GTest::Mai
 target_link_libraries(test_communication_manager PRIVATE networking-communication-manager)
 target_link_libraries(test_communication_manager PRIVATE nproto-ipv4)
 target_link_libraries(test_communication_manager PRIVATE tproto-tcp)
-target_link_libraries(test_communication_manager PRIVATE utilities)
+target_link_libraries(test_communication_manager PRIVATE utilities-misc)
+target_link_libraries(test_communication_manager PRIVATE utilities-try)
 gtest_add_tests(TARGET test_communication_manager)
