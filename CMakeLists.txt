@@ -55,10 +55,13 @@ endif ()
 
 # Subprojects
 
-add_subdirectory("concurrency")
+if (${UNIX})
+    add_subdirectory("concurrency")
+endif(${UNIX})
 add_subdirectory("containers")
 add_subdirectory("iterators")
-add_subdirectory("ftcp")
-add_subdirectory("networking")
+if (${UNIX})
+    add_subdirectory("networking")
+endif(${UNIX})
 add_subdirectory("statemachine")
 add_subdirectory("utilities")

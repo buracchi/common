@@ -131,7 +131,6 @@ static inline int get_positionals_description(struct cmn_argparser_argument *arg
 }
 
 static char *get_positional_args_string(struct cmn_argparser_argument *arg) {
-    char *result;
     char *vararg;
     bool is_positional = arg->name;
     if (is_positional) {
@@ -148,20 +147,15 @@ static char *get_positional_args_string(struct cmn_argparser_argument *arg) {
     }
     switch (arg->action_nargs) {
         case CMN_ARGPARSER_ACTION_NARGS_SINGLE:
-            result = vararg;
-            break;
+            return vararg;
         case CMN_ARGPARSER_ACTION_NARGS_OPTIONAL:
-            result = get_narg_optional(vararg);
-            break;
+            return get_narg_optional(vararg);
         case CMN_ARGPARSER_ACTION_NARGS_LIST_OF_N:
-            result = get_narg_list_n(vararg, arg->nargs_list_size);
-            break;
+            return get_narg_list_n(vararg, arg->nargs_list_size);
         case CMN_ARGPARSER_ACTION_NARGS_LIST:
-            result = get_narg_list(vararg);
-            break;
+            return get_narg_list(vararg);
         case CMN_ARGPARSER_ACTION_NARGS_LIST_OPTIONAL:
-            result = get_narg_list_optional(vararg);
-            break;
+            return get_narg_list_optional(vararg);
         default:
             return NULL;
     }

@@ -36,7 +36,7 @@ extern inline size_t cmn_map_size(cmn_map_t map) {
 }
 
 extern void cmn_map_set_key_comparer(cmn_map_t map, int (*comp)(void *, void *, bool *)) {
-    return map->__ops_vptr->set_key_comparer(map, comp);
+    map->__ops_vptr->set_key_comparer(map, comp);
 }
 
 extern inline void cmn_map_clear(cmn_map_t map) {
