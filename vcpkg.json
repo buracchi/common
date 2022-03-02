@@ -1,8 +1,9 @@
 {
-  "name": "common-library",
+  "name": "libcommon",
+  "description": "Collection of common libraries.",
   "version": "0.1",
   "dependencies": [
-      "libevent"
+    "libevent"
   ],
   "features": {
     "tests": {
