@@ -1,18 +1,27 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.16)
 
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/.vcpkg/scripts/buildsystems/vcpkg.cmake
-    CACHE STRING "Vcpkg toolchain file")
+include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/vcpkg.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/gtest.cmake")
 
-project (
-	"common"
-	VERSION 0.1
-	LANGUAGES C
-	)
-
+project ("common" VERSION 0.1)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Debug configuration
+
+if (CMAKE_BUILD_TYPE MATCHES DEBUG)
+    if (MSVC)
+        add_compile_options(/Wall /Wx /fsanitize=address)
+    else ()
+        add_compile_options(-Wall -Wextra -pedantic -fms-extensions -fsanitize=address)
+        add_link_options(-fsanitize=address)
+    endif (MSVC)
+endif (CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 # Guards
 
@@ -23,40 +32,33 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     )
 endif()
 
+# Test
+
+if (BUILD_TESTING)
+    enable_testing()
+    find_package(GTest REQUIRED)
+    # Notice that GTest::GTest and GTest::Main are deprecated since CMake 3.20 
+    # and should be replaced with GTest::gtest and GTest::gtest_main but this
+    # will make CMake 3.16.3 fails.
+endif ()
+
 # Code Coverage Configuration
+
+option(ENABLE_TEST_COVERAGE "Enable coverage reporting" OFF)
 
 add_library(coverage_config INTERFACE)
 
-option(CODE_COVERAGE "Enable coverage reporting" OFF)
+if (ENABLE_TEST_COVERAGE)
+    target_compile_options(coverage_config INTERFACE -O0 -g --coverage)
+    target_link_options(coverage_config INTERFACE --coverage)
+endif ()
 
-if(CODE_COVERAGE AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    # Add required flags (GCC & LLVM/Clang)
-    target_compile_options(
-        coverage_config INTERFACE
-        -O0        # no optimization
-        -g         # generate debug info
-        --coverage # sets all required flags
-    )
-    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
-        target_link_options(coverage_config INTERFACE --coverage)
-    else()
-        target_link_libraries(coverage_config INTERFACE --coverage)
-    endif()
-endif()
+# Subprojects
 
-# External library
-
-# Resource
-
-# Source
-
-add_subdirectory(src)
-
-# Test
-
-option (BUILD_TESTING "Build the testing tree." ON)
-
-if (BUILD_TESTING AND (PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR))
-    enable_testing()
-    add_subdirectory("test")
-endif()
+add_subdirectory("concurrency")
+add_subdirectory("containers")
+add_subdirectory("iterators")
+add_subdirectory("ftcp")
+add_subdirectory("networking")
+add_subdirectory("statemachine")
+add_subdirectory("utilities")

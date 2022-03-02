@@ -1,0 +1,13 @@
+{
+  "name": "common-library",
+  "version": "0.1",
+  "dependencies": [
+      "libevent"
+  ],
+  "features": {
+    "tests": {
+      "description": "Build Tests",
+      "dependencies": [ "gtest" ]
+    }
+  }
+}
