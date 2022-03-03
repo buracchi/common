@@ -10,6 +10,6 @@ target_link_libraries(concurrency-tpool PRIVATE utilities-misc)
 target_link_libraries(concurrency-tpool PRIVATE utilities-try)
 target_link_libraries(concurrency-tpool INTERFACE coverage_config)
 
-if (BUILD_TESTING)
+if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")
 endif ()

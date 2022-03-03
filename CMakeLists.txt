@@ -1,9 +1,13 @@
 ﻿cmake_minimum_required (VERSION 3.16)
 
+option(LIBCOMMON_BUILD_TESTS "Build test programs" ON)
+option(LIBCOMMON_INSTALL "Generate installation target" ON)
+
 include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/vcpkg.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/gtest.cmake")
+include(GNUInstallDirs)
 
-project ("common" VERSION 0.1)
+project ("libcommon" VERSION 0.1)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -34,7 +38,7 @@ endif()
 
 # Test
 
-if (BUILD_TESTING)
+if (LIBCOMMON_BUILD_TESTS)
     enable_testing()
     find_package(GTest REQUIRED)
     # Notice that GTest::GTest and GTest::Main are deprecated since CMake 3.20 

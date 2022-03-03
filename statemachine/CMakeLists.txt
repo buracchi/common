@@ -8,6 +8,6 @@ target_include_directories(statemachine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/incl
 target_link_libraries(statemachine PRIVATE utilities-try)
 target_link_libraries(statemachine INTERFACE coverage_config)
 
-if (BUILD_TESTING)
+if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")
 endif ()

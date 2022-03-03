@@ -82,6 +82,6 @@ target_link_libraries(containers-linked-list-map PRIVATE utilities-misc)
 target_link_libraries(containers-linked-list-map PRIVATE utilities-try)
 target_link_libraries(containers-linked-list-map INTERFACE coverage_config)
 
-if (BUILD_TESTING)
+if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")
 endif ()

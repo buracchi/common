@@ -1,6 +1,4 @@
-option(BUILD_TESTING "Build test" ON)
-
-if (BUILD_TESTING)
+if (LIBCOMMON_BUILD_TESTS)
     list(APPEND VCPKG_MANIFEST_FEATURES "tests")
     include(GoogleTest)
 endif ()
