@@ -2,10 +2,12 @@
 
 option(LIBCOMMON_BUILD_TESTS "Build test programs" ON)
 option(LIBCOMMON_INSTALL "Generate installation target" ON)
+option(LIBCOMMON_ENABLE_TEST_COVERAGE "Enable coverage reporting" OFF)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/vcpkg.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/gtest.cmake")
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 project ("libcommon" VERSION 0.1)
 
@@ -48,14 +50,17 @@ endif ()
 
 # Code Coverage Configuration
 
-option(ENABLE_TEST_COVERAGE "Enable coverage reporting" OFF)
-
 add_library(coverage_config INTERFACE)
 
-if (ENABLE_TEST_COVERAGE)
+if (LIBCOMMON_ENABLE_TEST_COVERAGE)
     target_compile_options(coverage_config INTERFACE -O0 -g --coverage)
     target_link_options(coverage_config INTERFACE --coverage)
 endif ()
+
+if(LIBCOMMON_INSTALL)
+    install(TARGETS coverage_config EXPORT coverage_configTargets)
+    install(EXPORT coverage_configTargets DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/")
+endif()
 
 # Subprojects
 
@@ -69,3 +74,17 @@ if (${UNIX})
 endif(${UNIX})
 add_subdirectory("statemachine")
 add_subdirectory("utilities")
+
+# Configure CMake find_package() config files
+
+if(LIBCOMMON_INSTALL)
+    configure_package_config_file(
+        "${PROJECT_SOURCE_DIR}/.cmake/${PROJECT_NAME}Config.cmake.in"
+        "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        INSTALL_DESTINATION
+        "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}")
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        DESTINATION
+        "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}")
+endif()

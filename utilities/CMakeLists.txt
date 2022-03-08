@@ -11,3 +11,14 @@ if (${UNIX})
 endif(${UNIX})
 target_link_libraries(utilities INTERFACE utilities-misc)
 target_link_libraries(utilities INTERFACE utilities-try)
+
+if(LIBCOMMON_INSTALL)
+    install(EXPORT utilities-tryTargets
+        FILE utilities-tryTargets.cmake
+        NAMESPACE buracchi::${PROJECT_NAME}::utilities::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/")
+    install(EXPORT utilities-miscTargets
+        FILE utilities-miscTargets.cmake
+        NAMESPACE buracchi::${PROJECT_NAME}::utilities::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/")
+endif()

@@ -10,11 +10,3 @@ target_link_libraries(iterators INTERFACE coverage_config)
 if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")
 endif ()
-
-if (LIBCOMMON_INSTALL)
-    install(DIRECTORY "include/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/{$PROJECT_NAME}"
-            FILES_MATCHING PATTERN *.h)
-    install(TARGETS iterators
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-endif()
