@@ -1,6 +1,6 @@
 add_library(iterators "src/iterator.c")
 
-add_library(buracchi::${PROJECT_NAME}::iterators ALIAS iterators)
+add_library(${PROJECT_NAMESPACE}::iterators ALIAS iterators)
 
 target_compile_definitions(iterators PRIVATE ITERATORS_VERSION=1)
 
@@ -16,7 +16,7 @@ endif ()
 
 if(LIBCOMMON_INSTALL)
     install(TARGETS iterators
-        EXPORT iteratorsTargets
+        EXPORT iterators-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -26,8 +26,8 @@ if(LIBCOMMON_INSTALL)
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/iterators"
         FILES_MATCHING PATTERN "*.h*")
     
-    install(EXPORT iteratorsTargets
-        FILE ${PROJECT_NAME}_iteratorsTargets.cmake
-        NAMESPACE buracchi::${PROJECT_NAME}::
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}")
+    install(EXPORT iterators-targets
+        FILE ${PROJECT_EXPORT_NAME}-iterators-targets.cmake
+        NAMESPACE ${PROJECT_NAMESPACE}::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
 endif()

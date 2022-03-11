@@ -1,12 +1,9 @@
-add_library(
-        utilities-argparser
-        STATIC
-        "src/argparser.c"
-        "src/parser.c"
-        "src/usage.c"
-)
+add_library(utilities-argparser
+    "src/argparser.c"
+    "src/parser.c"
+    "src/usage.c")
 
-add_library(buracchi::${PROJECT_NAME}::utilities::argparser ALIAS utilities-argparser)
+add_library(${PROJECT_NAMESPACE}::utilities::argparser ALIAS utilities-argparser)
 
 target_include_directories(utilities-argparser PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -25,7 +22,7 @@ endif ()
 
 if(LIBCOMMON_INSTALL)
     install(TARGETS utilities-argparser
-        EXPORT utilities-argparserTargets
+        EXPORT utilities-argparser-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -35,8 +32,8 @@ if(LIBCOMMON_INSTALL)
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/utilities"
         FILES_MATCHING PATTERN "*.h*")
     
-    install(EXPORT utilities-argparserTargets
-        FILE ${PROJECT_NAME}_utilities-argparserTargets.cmake
-        NAMESPACE buracchi::${PROJECT_NAME}::utilities::
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}/utilities")
+    install(EXPORT utilities-argparser-targets
+        FILE ${PROJECT_EXPORT_NAME}-utilities-argparser-targets.cmake
+        NAMESPACE ${PROJECT_NAMESPACE}::utilities::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}/utilities")
 endif()

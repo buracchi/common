@@ -1,6 +1,6 @@
 add_library(utilities-misc "src/utilities.c")
 
-add_library(buracchi::${PROJECT_NAME}::utilities::misc ALIAS utilities-misc)
+add_library(${PROJECT_NAMESPACE}::utilities::misc ALIAS utilities-misc)
 
 target_include_directories(utilities-misc PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -10,7 +10,7 @@ target_link_libraries(utilities-misc INTERFACE coverage_config)
 
 if(LIBCOMMON_INSTALL)
     install(TARGETS utilities-misc
-        EXPORT utilities-miscTargets
+        EXPORT utilities-misc-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -20,8 +20,8 @@ if(LIBCOMMON_INSTALL)
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/utilities"
         FILES_MATCHING PATTERN "*.h*")
     
-    install(EXPORT utilities-miscTargets
-        FILE ${PROJECT_NAME}_utilities-miscTargets.cmake
-        NAMESPACE buracchi::${PROJECT_NAME}::utilities::
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}/utilities")
+    install(EXPORT utilities-misc-targets
+        FILE ${PROJECT_EXPORT_NAME}-utilities-misc-targets.cmake
+        NAMESPACE ${PROJECT_NAMESPACE}::utilities::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}/utilities")
 endif()

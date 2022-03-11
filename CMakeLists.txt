@@ -11,6 +11,9 @@ include(CMakePackageConfigHelpers)
 
 project ("libcommon" VERSION 0.1)
 
+set(PROJECT_EXPORT_NAME "buracchi-${PROJECT_NAME}")
+set(PROJECT_NAMESPACE "buracchi::${PROJECT_NAME}")
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
@@ -46,8 +49,9 @@ if (LIBCOMMON_ENABLE_TEST_COVERAGE)
     target_link_options(coverage_config INTERFACE --coverage)
 endif ()
 if(LIBCOMMON_INSTALL)
-    install(TARGETS coverage_config EXPORT coverage_configTargets)
-    install(EXPORT coverage_configTargets DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/")
+    install(TARGETS coverage_config EXPORT coverage_config-targets)
+    install(EXPORT coverage_config-targets
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
 endif()
 
 # Subprojects
@@ -67,13 +71,13 @@ add_subdirectory("utilities")
 
 if(LIBCOMMON_INSTALL)
     configure_package_config_file(
-        "${PROJECT_SOURCE_DIR}/.cmake/${PROJECT_NAME}Config.cmake.in"
-        "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${PROJECT_SOURCE_DIR}/.cmake/config.cmake.in"
+        "${PROJECT_BINARY_DIR}/${PROJECT_EXPORT_NAME}-config.cmake"
         INSTALL_DESTINATION
-        "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}")
+        "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
     
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_EXPORT_NAME}-config.cmake"
         DESTINATION
-        "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}")
+        "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
 endif()

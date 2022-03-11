@@ -1,6 +1,6 @@
 add_library(utilities-try INTERFACE)
 
-add_library(buracchi::${PROJECT_NAME}::utilities::try ALIAS utilities-try)
+add_library(${PROJECT_NAMESPACE}::utilities::try ALIAS utilities-try)
 
 target_include_directories(utilities-try INTERFACE 
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -10,7 +10,7 @@ target_link_libraries(utilities-try INTERFACE coverage_config)
 
 if(LIBCOMMON_INSTALL)
     install(TARGETS utilities-try
-        EXPORT utilities-tryTargets
+        EXPORT utilities-try-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -20,8 +20,8 @@ if(LIBCOMMON_INSTALL)
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/utilities"
         FILES_MATCHING PATTERN "*.h*")
     
-    install(EXPORT utilities-tryTargets
-        FILE ${PROJECT_NAME}_utilities-tryTargets.cmake
-        NAMESPACE buracchi::${PROJECT_NAME}::utilities::
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}/utilities")
+    install(EXPORT utilities-try-targets
+        FILE ${PROJECT_EXPORT_NAME}-utilities-try-targets.cmake
+        NAMESPACE ${PROJECT_NAMESPACE}::utilities::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}/utilities")
 endif()
