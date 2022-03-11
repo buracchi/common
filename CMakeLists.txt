@@ -18,23 +18,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Debug configuration
-
-if (CMAKE_BUILD_TYPE MATCHES DEBUG)
-    if (MSVC)
-        add_compile_options(/Wall /Wx /fsanitize=address)
-    else ()
-        add_compile_options(-Wall -Wextra -pedantic -fms-extensions -fsanitize=address)
-        add_link_options(-fsanitize=address)
-    endif (MSVC)
-endif (CMAKE_BUILD_TYPE MATCHES DEBUG)
-
 # Guards
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(
-    FATAL_ERROR
-    "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
+        FATAL_ERROR
+        "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
     )
 endif()
 
@@ -56,7 +45,6 @@ if (LIBCOMMON_ENABLE_TEST_COVERAGE)
     target_compile_options(coverage_config INTERFACE -O0 -g --coverage)
     target_link_options(coverage_config INTERFACE --coverage)
 endif ()
-
 if(LIBCOMMON_INSTALL)
     install(TARGETS coverage_config EXPORT coverage_configTargets)
     install(EXPORT coverage_configTargets DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/")
@@ -83,6 +71,7 @@ if(LIBCOMMON_INSTALL)
         "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         INSTALL_DESTINATION
         "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}")
+    
     install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         DESTINATION
