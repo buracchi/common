@@ -9,7 +9,7 @@
 #include "types/queue/double_linked_list_stack_queue.h"
 #include "try.h"
 
-static struct cmn_queue_vtbl *get_queue_vtbl();
+static struct cmn_queue_vtbl *get_queue_vtbl(void);
 
 static int destroy(cmn_queue_t queue);
 
@@ -19,7 +19,7 @@ static int enqueue(cmn_queue_t queue, void *item);
 
 static void *dequeue(cmn_queue_t queue);
 
-extern cmn_double_linked_list_stack_queue_t cmn_double_linked_list_stack_queue_init() {
+extern cmn_double_linked_list_stack_queue_t cmn_double_linked_list_stack_queue_init(void) {
     cmn_double_linked_list_stack_queue_t queue;
     try(queue = malloc(sizeof *queue), NULL, fail);
     try(cmn_double_linked_list_stack_queue_ctor(queue), 1, fail2);
@@ -42,7 +42,7 @@ fail:
     return 1;
 }
 
-static struct cmn_queue_vtbl *get_queue_vtbl() {
+static struct cmn_queue_vtbl *get_queue_vtbl(void) {
     struct cmn_queue_vtbl vtbl_zero = {0};
     if (!memcmp(&vtbl_zero, &__cmn_queue_ops_vtbl, sizeof vtbl_zero)) {
         __cmn_queue_ops_vtbl.destroy = destroy;

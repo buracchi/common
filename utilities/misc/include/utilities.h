@@ -7,21 +7,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
-#ifdef _WIN32
-int asprintf(LPTSTR* str, LPCTSTR format, ...);
-#elif __unix__
-
-int asprintf(char **str, const char *format, ...);
-
+#ifdef __unix__
 #define max(a, b) ({    \
     typeof(a) _a = (a); \
     typeof(b) _b = (b); \
     _a > _b ? _a : _b; })
-
 #endif
 
 #define __tostr(statement) #statement
@@ -32,12 +22,14 @@ typedef struct cmn_pair {
     void *second;
 } *cmn_pair_t;
 
-int strtoi(const char *str, int *result);
+extern int asprintf(char** str, const char* format, ...);
 
-int str_to_uint16(const char *str, uint16_t *result);
+extern int strtoi(const char *str, int *result);
 
-static inline bool streq(const char *str1, const char *str2) {
+extern int str_to_uint16(const char *str, uint16_t *result);
+
+extern bool is_directory(const char *pathname);
+
+static inline bool streq(const char* str1, const char* str2) {
     return (strlen(str1) == strlen(str2)) && (!strcmp(str1, str2));
 }
-
-bool is_directory(const char *pathname);

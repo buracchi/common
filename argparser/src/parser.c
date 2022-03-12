@@ -133,7 +133,7 @@ static int handle_unrecognized_elements(cmn_argparser_t this, int argc, const ch
 
 static int handle_required_missing_elements(cmn_argparser_t this, int argc, const char **argv,
                                             struct cmn_argparser_argument **used_argv_array) {
-    cmn_iterator_t i;
+    cmn_iterator_t iterator;
     cmn_list_t missing_required_arg_list = (cmn_list_t) cmn_linked_list_init();
     cmn_list_t required_arg_list = (cmn_list_t) cmn_linked_list_init();
     for (struct cmn_argparser_argument **arg = this->args; *arg; arg++) {
@@ -142,8 +142,8 @@ static int handle_required_missing_elements(cmn_argparser_t this, int argc, cons
             cmn_list_push_back(required_arg_list, (void *) *arg);
         }
     }
-    for (i = cmn_list_begin(required_arg_list); !cmn_iterator_end(i); cmn_iterator_next(i)) {
-        struct cmn_argparser_argument *element = cmn_iterator_data(i);
+    for (iterator = cmn_list_begin(required_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
+        struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
         bool is_present = false;
         for (int i = 1; i < argc; i++) {
             if (used_argv_array[i] == element) {
@@ -155,13 +155,13 @@ static int handle_required_missing_elements(cmn_argparser_t this, int argc, cons
             cmn_list_push_back(missing_required_arg_list, (void *) element);
         }
     }
-    cmn_iterator_destroy(i);
+    cmn_iterator_destroy(iterator);
     cmn_list_destroy(required_arg_list);
     if (!cmn_list_is_empty(missing_required_arg_list)) {
         fprintf(stderr, "%s\n", this->usage);
         fprintf(stderr, "%s: %s", this->program_name, "error: the following arguments are required: ");
-        for (i = cmn_list_begin(missing_required_arg_list); !cmn_iterator_end(i); cmn_iterator_next(i)) {
-            struct cmn_argparser_argument *element = cmn_iterator_data(i);
+        for (iterator = cmn_list_begin(missing_required_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
+            struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
             if (element->name) {
                 fprintf(stderr, "%s ", element->name);
             }
@@ -186,7 +186,7 @@ static int handle_required_missing_elements(cmn_argparser_t this, int argc, cons
 
 static int handle_optional_missing_elements(cmn_argparser_t this, int argc, const char **argv,
                                             struct cmn_argparser_argument **used_argv_array) {
-    cmn_iterator_t i;
+    cmn_iterator_t iterator;
     cmn_list_t missing_optional_arg_list = (cmn_list_t) cmn_linked_list_init();
     cmn_list_t optional_arg_list = (cmn_list_t) cmn_linked_list_init();
     for (struct cmn_argparser_argument **arg = this->args; *arg; arg++) {
@@ -194,8 +194,8 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
             cmn_list_push_back(optional_arg_list, (void *) *arg);
         }
     }
-    for (i = cmn_list_begin(optional_arg_list); !cmn_iterator_end(i); cmn_iterator_next(i)) {
-        struct cmn_argparser_argument *element = cmn_iterator_data(i);
+    for (iterator = cmn_list_begin(optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
+        struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
         bool is_present = false;
         for (int i = 1; i < argc; i++) {
             if (used_argv_array[i] == element) {
@@ -207,11 +207,11 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
             cmn_list_push_back(missing_optional_arg_list, (void *) element);
         }
     }
-    cmn_iterator_destroy(i);
+    cmn_iterator_destroy(iterator);
     cmn_list_destroy(optional_arg_list);
     if (!cmn_list_is_empty(missing_optional_arg_list)) {
-        for (i = cmn_list_begin(missing_optional_arg_list); !cmn_iterator_end(i); cmn_iterator_next(i)) {
-            struct cmn_argparser_argument *element = cmn_iterator_data(i);
+        for (iterator = cmn_list_begin(missing_optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
+            struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
             bool is_positional = element->name;
             bool have_flag = element->flag;
             cmn_map_insert(
@@ -226,6 +226,6 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
             );
         }
     }
-    cmn_iterator_destroy(i);
+    cmn_iterator_destroy(iterator);
     cmn_list_destroy(missing_optional_arg_list);
 }

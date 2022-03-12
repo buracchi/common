@@ -9,7 +9,7 @@
 #include "types/stack/linked_list_stack.h"
 #include "try.h"
 
-static struct cmn_stack_vtbl *get_stack_vtbl();
+static struct cmn_stack_vtbl *get_stack_vtbl(void);
 
 static int destroy(cmn_stack_t stack);
 
@@ -23,7 +23,7 @@ static int push(cmn_stack_t stack, void *item);
 
 static void *pop(cmn_stack_t stack);
 
-extern cmn_linked_list_stack_t cmn_linked_list_stack_init() {
+extern cmn_linked_list_stack_t cmn_linked_list_stack_init(void) {
     cmn_linked_list_stack_t stack;
     try(stack = malloc(sizeof *stack), NULL, fail);
     try(cmn_linked_list_stack_ctor(stack), 1, fail2);
@@ -43,7 +43,7 @@ fail:
     return 1;
 }
 
-static struct cmn_stack_vtbl *get_stack_vtbl() {
+static struct cmn_stack_vtbl *get_stack_vtbl(void) {
     struct cmn_stack_vtbl vtbl_zero = {0};
     if (!memcmp(&vtbl_zero, &__cmn_stack_ops_vtbl, sizeof vtbl_zero)) {
         __cmn_stack_ops_vtbl.destroy = destroy;

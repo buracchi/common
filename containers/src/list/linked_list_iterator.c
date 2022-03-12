@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-static struct cmn_iterator_vtbl *get_iterator_vtbl();
+static struct cmn_iterator_vtbl *get_iterator_vtbl(void);
 
-int destroy(struct cmn_iterator *iterator);
+static int destroy(struct cmn_iterator *iterator);
 
 static void *data(struct cmn_iterator *iterator);
 
@@ -29,7 +29,7 @@ linked_list_iterator_init(struct cmn_linked_list *list, struct list_element *ele
     return iterator;
 }
 
-static struct cmn_iterator_vtbl *get_iterator_vtbl() {
+static struct cmn_iterator_vtbl *get_iterator_vtbl(void) {
     struct cmn_iterator_vtbl vtbl_zero = {0};
     if (!memcmp(&vtbl_zero, &__cmn_iterator_ops_vtbl, sizeof vtbl_zero)) {
         __cmn_iterator_ops_vtbl.destroy = destroy;
@@ -42,7 +42,7 @@ static struct cmn_iterator_vtbl *get_iterator_vtbl() {
     return &__cmn_iterator_ops_vtbl;
 }
 
-int destroy(struct cmn_iterator *iterator) {
+static int destroy(struct cmn_iterator* iterator) {
     return 0;
 }
 

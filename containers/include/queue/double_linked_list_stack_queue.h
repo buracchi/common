@@ -17,4 +17,4 @@ typedef struct cmn_double_linked_list_stack_queue *cmn_double_linked_list_stack_
  * 
  * @return cmn_double_linked_list_stack_queue_t 
  */
-extern cmn_double_linked_list_stack_queue_t cmn_double_linked_list_stack_queue_init();
+extern cmn_double_linked_list_stack_queue_t cmn_double_linked_list_stack_queue_init(void);

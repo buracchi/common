@@ -17,4 +17,4 @@ typedef struct cmn_linked_list_stack *cmn_linked_list_stack_t;
  * 
  * @return cmn_linked_list_stack_t 
  */
-extern cmn_linked_list_stack_t cmn_linked_list_stack_init();
+extern cmn_linked_list_stack_t cmn_linked_list_stack_init(void);

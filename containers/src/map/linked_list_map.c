@@ -14,7 +14,7 @@
 #define KEY first
 #define VALUE second
 
-static struct cmn_map_vtbl *get_map_vtbl();
+static struct cmn_map_vtbl *get_map_vtbl(void);
 
 static int _destroy(cmn_map_t map);
 
@@ -51,7 +51,7 @@ static inline int dflt_cmp(void *arg1, void *arg2, bool *result) {
     return 0;
 }
 
-extern cmn_linked_list_map_t cmn_linked_list_map_init() {
+extern cmn_linked_list_map_t cmn_linked_list_map_init(void) {
     cmn_linked_list_map_t map;
     try(map = malloc(sizeof *map), NULL, fail);
     try(cmn_linked_list_map_ctor(map), 1, fail2);
@@ -72,7 +72,7 @@ fail:
     return 1;
 }
 
-static struct cmn_map_vtbl *get_map_vtbl() {
+static struct cmn_map_vtbl *get_map_vtbl(void) {
     struct cmn_map_vtbl vtbl_zero = {0};
     if (!memcmp(&vtbl_zero, &__cmn_map_ops_vtbl, sizeof vtbl_zero)) {
         __cmn_map_ops_vtbl.destroy = _destroy;

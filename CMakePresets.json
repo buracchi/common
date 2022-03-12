@@ -26,8 +26,8 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-        //"CMAKE_C_FLAGS": "/Wall /WX /fsanitize=address"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS": "/Wall /fsanitize=address"
       }
     },
     {

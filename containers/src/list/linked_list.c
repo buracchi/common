@@ -10,7 +10,7 @@
 #include "linked_list_iterator.h"
 #include "try.h"
 
-static struct cmn_list_vtbl *get_list_vtbl();
+static struct cmn_list_vtbl *get_list_vtbl(void);
 
 static int _destroy(cmn_list_t list);
 
@@ -62,7 +62,7 @@ static int _sort(cmn_list_t list, int(*comp)(void *a, void *b, bool *result));
 *                               Member functions                               *
 *******************************************************************************/
 
-extern cmn_linked_list_t cmn_linked_list_init() {
+extern cmn_linked_list_t cmn_linked_list_init(void) {
     cmn_linked_list_t list;
     try(list = malloc(sizeof *list), NULL, fail);
     try(cmn_linked_list_ctor(list), 1, fail2);
@@ -82,7 +82,7 @@ extern int cmn_linked_list_ctor(cmn_linked_list_t list) {
     return 0;
 }
 
-static struct cmn_list_vtbl *get_list_vtbl() {
+static struct cmn_list_vtbl *get_list_vtbl(void) {
     struct cmn_list_vtbl vtbl_zero = {0};
     if (!memcmp(&vtbl_zero, &__cmn_list_ops_vtbl, sizeof vtbl_zero)) {
         __cmn_list_ops_vtbl.destroy = _destroy;
@@ -304,7 +304,7 @@ static int _resize(cmn_list_t list, size_t s, void *value) {
         if (_this->size > s) {
             _pop_back(list);
         }
-        else if ((ret = _push_back(list, value))) {
+        else if ((ret = _push_back(list, value)) != 0) {
             return ret;
         }
     }

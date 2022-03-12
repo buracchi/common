@@ -57,13 +57,12 @@ endif()
 # Subprojects
 
 if (${UNIX})
+    add_subdirectory("argparser")
     add_subdirectory("concurrency")
+    add_subdirectory("networking")
 endif(${UNIX})
 add_subdirectory("containers")
 add_subdirectory("iterators")
-if (${UNIX})
-    add_subdirectory("networking")
-endif(${UNIX})
 add_subdirectory("statemachine")
 add_subdirectory("utilities")
 

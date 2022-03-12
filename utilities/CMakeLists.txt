@@ -1,6 +1,3 @@
-if (${UNIX})
-add_subdirectory(argparser)
-endif(${UNIX})
 add_subdirectory(misc)
 add_subdirectory(try)
 
@@ -10,9 +7,6 @@ add_library(${PROJECT_NAMESPACE}::utilities ALIAS utilities)
 
 target_compile_definitions(utilities INTERFACE UTILITIES_VERSION=1)
 
-if (${UNIX})
-	target_link_libraries(utilities INTERFACE utilities-argparser)
-endif(${UNIX})
 target_link_libraries(utilities INTERFACE utilities-misc)
 target_link_libraries(utilities INTERFACE utilities-try)
 

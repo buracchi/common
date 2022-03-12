@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(disable:4996)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +9,43 @@
 #define GET_MACRO_3(ARG1, ARG2, ARG3, NAME, ...) NAME
 #define try(...) GET_MACRO_3(__VA_ARGS__, try_routine, try_default)(__VA_ARGS__)
 
+/**
+ * @brief
+ *
+ */
+#define try_routine(predicate, error_value, routine) \
+    do { \
+        errno = 0; \
+        if ((predicate) == (error_value)) { \
+            log_error_on_debug \
+            goto routine; \
+        } \
+    } while (0)
+
+#ifdef _DEBUG
+    #ifdef _WIN32
+    #define log_error_on_debug fprintf( \
+                    stderr, \
+                    "%s was generated in %s on line %d, in %s\n", \
+                    strerror(errno), \
+                    __FILE__, \
+                    __LINE__, \
+                    __FUNCTION__ \
+                );
+    #elif __unix__
+    #define log_error_on_debug fprintf( \
+                    stderr, \
+                    "%m was generated in %s on line %d, in %s\n", \
+                    __FILE__, \
+                    __LINE__, \
+                    __FUNCTION__ \
+                );
+    #endif
+#else
+    #define log_error_on_debug
+#endif
+
+#ifdef __unix__
 /*
 * @deprecated
 */
@@ -25,31 +63,7 @@
             exit(EXIT_FAILURE); \
         } \
     } while (0)
-
-#ifdef _DEBUG
-#define log_error_on_debug fprintf( \
-                stderr, \
-                "%m was generated in %s on line %d, in %s\n", \
-                __FILE__, \
-                __LINE__, \
-                __FUNCTION__ \
-            )
-#else
-#define log_error_on_debug
 #endif
-
-/**
- * @brief 
- * 
- */
-#define try_routine(predicate, error_value, routine) \
-    do { \
-        errno = 0; \
-        if ((predicate) == (error_value)) { \
-            log_error_on_debug; \
-            goto routine; \
-        } \
-    } while (0)
 
 /**
  * @brief 

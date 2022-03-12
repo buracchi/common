@@ -17,4 +17,4 @@ typedef struct cmn_linked_list_map *cmn_linked_list_map_t;
  * 
  * @return cmn_linked_list_map_t 
  */
-extern cmn_linked_list_map_t cmn_linked_list_map_init();
+extern cmn_linked_list_map_t cmn_linked_list_map_init(void);

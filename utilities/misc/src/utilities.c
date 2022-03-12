@@ -30,7 +30,6 @@ int vasprintf(LPTSTR* str, LPCTSTR format, va_list args){
     return (int)size;
 }
 #elif __unix__
-
 int vasprintf(char **str, const char *format, va_list args) {
     int size;
     char *buff;
@@ -48,7 +47,6 @@ int vasprintf(char **str, const char *format, va_list args) {
     *str = buff;
     return size;
 }
-
 #endif
 
 #ifdef _WIN32
@@ -61,7 +59,6 @@ int asprintf(LPTSTR* str, LPCTSTR format, ...){
     return (int)size;
 }
 #elif __unix__
-
 int asprintf(char **str, const char *format, ...) {
     int size;
     va_list args;
@@ -70,7 +67,6 @@ int asprintf(char **str, const char *format, ...) {
     va_end(args);
     return size;
 }
-
 #endif
 
 int strtoi(const char *str, int *result) {
@@ -114,7 +110,15 @@ FAIL:
     return 1;
 }
 
-bool is_directory(const char *pathname) {
+#ifdef _WIN32
+extern bool is_directory(const char* pathname) {
+    DWORD attributes = GetFileAttributesA(pathname);
+    return (attributes != INVALID_FILE_ATTRIBUTES &&
+        (attributes & FILE_ATTRIBUTE_DIRECTORY));
+}
+#elif __unix__
+extern bool is_directory(const char* pathname) {
     struct stat dir_stat;
     return (!stat(pathname, &dir_stat) && S_ISDIR(dir_stat.st_mode));
 }
+#endif
