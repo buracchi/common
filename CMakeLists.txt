@@ -48,11 +48,6 @@ if (LIBCOMMON_ENABLE_TEST_COVERAGE)
     target_compile_options(coverage_config INTERFACE -O0 -g --coverage)
     target_link_options(coverage_config INTERFACE --coverage)
 endif ()
-if(LIBCOMMON_INSTALL)
-    install(TARGETS coverage_config EXPORT coverage_config-targets)
-    install(EXPORT coverage_config-targets
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
-endif()
 
 # Subprojects
 

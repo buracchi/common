@@ -17,7 +17,7 @@ if (LIBCOMMON_BUILD_TESTS)
 endif ()
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS statemachine
+    install(TARGETS statemachine coverage_config
         EXPORT statemachine-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

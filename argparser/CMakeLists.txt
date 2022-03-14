@@ -21,7 +21,7 @@ if (LIBCOMMON_BUILD_TESTS)
 endif ()
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS argparser
+    install(TARGETS argparser coverage_config
         EXPORT argparser-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

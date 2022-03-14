@@ -15,7 +15,7 @@ if (LIBCOMMON_BUILD_TESTS)
 endif ()
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS iterators
+    install(TARGETS iterators coverage_config
         EXPORT iterators-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
