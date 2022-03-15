@@ -1,6 +1,5 @@
 add_library(iterators "src/iterator.c")
 
-target_compile_definitions(iterators PRIVATE ITERATORS_VERSION=1)
 target_include_directories(iterators PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")

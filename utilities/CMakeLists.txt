@@ -2,11 +2,6 @@ add_subdirectory(misc)
 add_subdirectory(try)
 
 add_library(utilities INTERFACE)
-
-add_library(${LIBCOMMON_NAMESPACE}::utilities ALIAS utilities)
-
-target_compile_definitions(utilities INTERFACE UTILITIES_VERSION=1)
-
 target_link_libraries(utilities INTERFACE utilities-misc)
 target_link_libraries(utilities INTERFACE utilities-try)
 
