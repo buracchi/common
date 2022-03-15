@@ -102,9 +102,9 @@ static struct cmn_argparser_argument *match_arg(cmn_argparser_t this, int argc, 
         if (is_arg_used) {
             continue;
         }
-        if (match_positional && (*arg)->name
-            || match_optional && (*arg)->flag && streq(args + 1, (*arg)->flag)
-            || match_long_flag && (*arg)->long_flag && streq(args + 2, (*arg)->long_flag)) {
+        if ((match_positional && (*arg)->name)
+            || (match_optional && (*arg)->flag && streq(args + 1, (*arg)->flag))
+            || (match_long_flag && (*arg)->long_flag && streq(args + 2, (*arg)->long_flag))) {
             return *arg;
         }
     }

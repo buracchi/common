@@ -11,8 +11,10 @@ include(CMakePackageConfigHelpers)
 
 project ("libcommon" VERSION 0.1)
 
-set(PROJECT_EXPORT_NAME "buracchi-${PROJECT_NAME}")
-set(PROJECT_NAMESPACE "buracchi::${PROJECT_NAME}")
+set(LIBCOMMON_EXPORT_NAME "buracchi-${PROJECT_NAME}")
+set(LIBCOMMON_NAMESPACE "buracchi::${PROJECT_NAME}")
+set(LIBCOMMON_LIBRARY_PREFIX "libburacchi-${PROJECT_NAME}-")
+set(LIBCOMMON_INCLUDEDIR "buracchi/${PROJECT_NAME}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -66,12 +68,12 @@ add_subdirectory("utilities")
 if(LIBCOMMON_INSTALL)
     configure_package_config_file(
         "${PROJECT_SOURCE_DIR}/.cmake/config.cmake.in"
-        "${PROJECT_BINARY_DIR}/${PROJECT_EXPORT_NAME}-config.cmake"
+        "${PROJECT_BINARY_DIR}/${LIBCOMMON_EXPORT_NAME}-config.cmake"
         INSTALL_DESTINATION
-        "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
+        "${CMAKE_INSTALL_DATAROOTDIR}/${LIBCOMMON_EXPORT_NAME}")
     
     install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_EXPORT_NAME}-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${LIBCOMMON_EXPORT_NAME}-config.cmake"
         DESTINATION
-        "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
+        "${CMAKE_INSTALL_DATAROOTDIR}/${LIBCOMMON_EXPORT_NAME}")
 endif()

@@ -2,7 +2,7 @@
 add_library(networking-communication-manager "src/communication_manager.c")
 target_include_directories(networking-communication-manager PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/utilities>")
+                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 target_link_libraries(networking-communication-manager PUBLIC networking-request-handler)
 target_link_libraries(networking-communication-manager PRIVATE networking-socket2)
 target_link_libraries(networking-communication-manager PRIVATE nproto-ipv4)
@@ -15,6 +15,7 @@ endif()
 target_link_libraries(networking-communication-manager PRIVATE concurrency-tpool)
 target_link_libraries(networking-communication-manager PRIVATE utilities-misc)
 target_link_libraries(networking-communication-manager PRIVATE utilities-try)
+set_target_properties(networking-communication-manager PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 
 if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")

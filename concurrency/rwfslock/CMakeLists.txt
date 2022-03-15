@@ -7,6 +7,7 @@ target_link_libraries(concurrency-rwfslock PRIVATE pthread)
 target_link_libraries(concurrency-rwfslock PRIVATE utilities-misc)
 target_link_libraries(concurrency-rwfslock PRIVATE utilities-try)
 target_link_libraries(concurrency-rwfslock INTERFACE coverage_config)
+set_target_properties(concurrency-rwfslock PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 
 if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")

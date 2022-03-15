@@ -7,6 +7,7 @@ target_link_libraries(concurrency-tpool PRIVATE pthread)
 target_link_libraries(concurrency-tpool PRIVATE utilities-misc)
 target_link_libraries(concurrency-tpool PRIVATE utilities-try)
 target_link_libraries(concurrency-tpool INTERFACE coverage_config)
+set_target_properties(concurrency-tpool PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 
 if (LIBCOMMON_BUILD_TESTS)
     add_subdirectory("test")

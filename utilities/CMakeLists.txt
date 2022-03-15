@@ -3,7 +3,7 @@ add_subdirectory(try)
 
 add_library(utilities INTERFACE)
 
-add_library(${PROJECT_NAMESPACE}::utilities ALIAS utilities)
+add_library(${LIBCOMMON_NAMESPACE}::utilities ALIAS utilities)
 
 target_compile_definitions(utilities INTERFACE UTILITIES_VERSION=1)
 
@@ -21,11 +21,11 @@ if(LIBCOMMON_INSTALL)
     install(DIRECTORY
             "${CMAKE_CURRENT_SOURCE_DIR}/try/include/"
             "${CMAKE_CURRENT_SOURCE_DIR}/misc/include/"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/utilities"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${LIBCOMMON_INCLUDEDIR}/utilities"
         FILES_MATCHING PATTERN "*.h*")
 
     install(EXPORT utilities-targets
-        FILE ${PROJECT_EXPORT_NAME}-utilities-targets.cmake
-        NAMESPACE ${PROJECT_NAMESPACE}::
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_EXPORT_NAME}")
+        FILE ${LIBCOMMON_EXPORT_NAME}-utilities-targets.cmake
+        NAMESPACE ${LIBCOMMON_NAMESPACE}::
+        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/${LIBCOMMON_EXPORT_NAME}")
 endif()

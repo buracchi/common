@@ -3,7 +3,10 @@
   "description": "Collection of common libraries.",
   "version": "0.1",
   "dependencies": [
-    "libevent"
+    {
+      "name": "libevent",
+      "platform": "!windows"
+    }
   ],
   "features": {
     "tests": {
