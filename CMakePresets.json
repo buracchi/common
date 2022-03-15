@@ -68,8 +68,8 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-        //"CMAKE_C_FLAGS": "-Wall -Wextra -pedantic -fms-extensions -fsanitize=address -fsanitize=address"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS": "-Wall -Wextra -pedantic -fms-extensions -fsanitize=address"
       }
     },
     {
