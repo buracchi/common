@@ -7,7 +7,7 @@ target_link_libraries(utilities INTERFACE utilities-try)
 set_target_properties(utilities PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS utilities utilities-try utilities-misc coverage_config
+    install(TARGETS utilities utilities-try utilities-misc
         EXPORT utilities-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

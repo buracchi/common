@@ -7,7 +7,7 @@ target_include_directories(argparser PUBLIC
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 target_link_libraries(argparser PUBLIC containers)
 target_link_libraries(argparser PRIVATE utilities)
-target_link_libraries(argparser INTERFACE coverage_config)
+target_link_libraries(argparser INTERFACE $<BUILD_INTERFACE:coverage_config>)
 set_target_properties(argparser PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 
 if (LIBCOMMON_BUILD_TESTS)
@@ -15,7 +15,7 @@ if (LIBCOMMON_BUILD_TESTS)
 endif ()
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS argparser coverage_config
+    install(TARGETS argparser
         EXPORT argparser-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

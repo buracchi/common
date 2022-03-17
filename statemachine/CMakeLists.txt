@@ -3,7 +3,7 @@ target_include_directories(statemachine PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 target_link_libraries(statemachine PRIVATE utilities)
-target_link_libraries(statemachine INTERFACE coverage_config)
+target_link_libraries(statemachine INTERFACE $<BUILD_INTERFACE:coverage_config>)
 set_target_properties(statemachine PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 
 if (LIBCOMMON_BUILD_TESTS)
@@ -11,7 +11,7 @@ if (LIBCOMMON_BUILD_TESTS)
 endif ()
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS statemachine coverage_config
+    install(TARGETS statemachine
         EXPORT statemachine-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

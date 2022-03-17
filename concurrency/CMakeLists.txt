@@ -6,7 +6,7 @@ target_link_libraries(concurrency INTERFACE concurrency-rwfslock)
 target_link_libraries(concurrency INTERFACE concurrency-tpool)
 
 if(LIBCOMMON_INSTALL)
-    install(TARGETS concurrency concurrency-rwfslock concurrency-tpool coverage_config
+    install(TARGETS concurrency concurrency-rwfslock concurrency-tpool
         EXPORT concurrency-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

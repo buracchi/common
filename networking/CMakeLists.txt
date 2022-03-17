@@ -18,7 +18,6 @@ if(LIBCOMMON_INSTALL)
             nproto-unix
             tproto-tcp
             networking-request-handler
-            coverage_config
         EXPORT networking-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
