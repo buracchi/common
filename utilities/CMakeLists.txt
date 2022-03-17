@@ -1,7 +1,7 @@
 add_subdirectory(misc)
 add_subdirectory(try)
 
-add_library(utilities $<TARGET_OBJECTS:utilities-misc>)
+add_library(utilities STATIC $<TARGET_OBJECTS:utilities-misc>)
 target_link_libraries(utilities PUBLIC utilities-misc)
 target_link_libraries(utilities INTERFACE utilities-try)
 set_target_properties(utilities PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})

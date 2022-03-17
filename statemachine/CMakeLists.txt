@@ -1,4 +1,4 @@
-add_library(statemachine "src/statemachine.c")
+add_library(statemachine STATIC "src/statemachine.c")
 target_include_directories(statemachine PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")

@@ -1,4 +1,4 @@
-add_library(containers
+add_library(containers STATIC
     $<TARGET_OBJECTS:containers-list>
     $<TARGET_OBJECTS:containers-stack>
     $<TARGET_OBJECTS:containers-queue>

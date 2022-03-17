@@ -1,4 +1,4 @@
-add_library(iterators "src/iterator.c")
+add_library(iterators STATIC "src/iterator.c")
 
 target_include_directories(iterators PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

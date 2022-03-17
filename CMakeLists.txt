@@ -3,7 +3,6 @@
 option(LIBCOMMON_BUILD_TESTS "Build test programs" ON)
 option(LIBCOMMON_INSTALL "Generate installation target" ON)
 option(LIBCOMMON_ENABLE_TEST_COVERAGE "Enable coverage reporting" OFF)
-option(BUILD_SHARED_LIBS OFF)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/vcpkg.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/gtest.cmake")
