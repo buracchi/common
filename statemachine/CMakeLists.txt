@@ -2,7 +2,7 @@ add_library(statemachine "src/statemachine.c")
 target_include_directories(statemachine PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-target_link_libraries(statemachine PRIVATE utilities-try)
+target_link_libraries(statemachine PRIVATE utilities)
 target_link_libraries(statemachine INTERFACE coverage_config)
 set_target_properties(statemachine PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 

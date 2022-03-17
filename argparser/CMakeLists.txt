@@ -5,11 +5,8 @@ add_library(argparser
 target_include_directories(argparser PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-target_link_libraries(argparser PUBLIC containers-map)
-target_link_libraries(argparser PRIVATE containers-linked-list)
-target_link_libraries(argparser PRIVATE containers-linked-list-map)
-target_link_libraries(argparser PRIVATE utilities-misc)
-target_link_libraries(argparser PRIVATE utilities-try)
+target_link_libraries(argparser PUBLIC containers)
+target_link_libraries(argparser PRIVATE utilities)
 target_link_libraries(argparser INTERFACE coverage_config)
 set_target_properties(argparser PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
 

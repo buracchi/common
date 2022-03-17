@@ -23,46 +23,37 @@
     } while (0)
 
 #ifdef _DEBUG
-    #ifdef _WIN32
     #define log_error_on_debug fprintf( \
                     stderr, \
                     "%s was generated in %s on line %d, in %s\n", \
                     strerror(errno), \
                     __FILE__, \
                     __LINE__, \
-                    __FUNCTION__ \
+                    __func__ \
                 );
-    #elif __unix__
-    #define log_error_on_debug fprintf( \
-                    stderr, \
-                    "%m was generated in %s on line %d, in %s\n", \
-                    __FILE__, \
-                    __LINE__, \
-                    __FUNCTION__ \
-                );
-    #endif
 #else
     #define log_error_on_debug
 #endif
 
 #ifdef __unix__
-/*
-* @deprecated
-*/
-#define try_default(predicate, error_value) \
-    do { \
-        errno = 0; \
-        if ((predicate) == (error_value)) { \
-            fprintf( \
-                stderr, \
-                "%m was generated in %s on line %d, in %s\n", \
-                __FILE__, \
-                __LINE__, \
-                __FUNCTION__ \
-            ); \
-            exit(EXIT_FAILURE); \
-        } \
-    } while (0)
+    /*
+    * @deprecated
+    */
+    #define try_default(predicate, error_value) \
+        do { \
+            errno = 0; \
+            if ((predicate) == (error_value)) { \
+                fprintf( \
+                    stderr, \
+                    "%s was generated in %s on line %d, in %s\n", \
+                    strerror(errno), \
+                    __FILE__, \
+                    __LINE__, \
+                    __func__ \
+                ); \
+                exit(EXIT_FAILURE); \
+            } \
+        } while (0)
 #endif
 
 /**
