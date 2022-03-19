@@ -1,7 +1,7 @@
 #include "main-mock.h"
 
-#include "argparser.h"
-#include "map.h"
+#include <buracchi/common/argparser/argparser.h>
+#include <buracchi/common/containers/map.h>
 
 const char *mock_main(int argc, const char **argv) {
     const char *result;

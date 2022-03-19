@@ -1,4 +1,4 @@
-#include "communication_manager.h"
+#include <buracchi/common/networking/communication_manager.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,13 +8,13 @@
 #include <event2/event.h>
 #include <event2/thread.h>
 
-#include "request_handler.h"
-#include "socket2.h"
-#include "nproto/nproto_service_ipv4.h"
-#include "tproto/tproto_service_tcp.h"
-#include "tpool.h"
-#include "try.h"
-#include "utilities.h"
+#include <buracchi/common/networking/request_handler.h>
+#include <buracchi/common/networking/socket2.h>
+#include <buracchi/common/networking/nproto/nproto_service_ipv4.h>
+#include <buracchi/common/networking/tproto/tproto_service_tcp.h>
+#include <buracchi/common/concurrency/tpool.h>
+#include <buracchi/common/utilities/utilities.h>
+#include <buracchi/common/utilities/try.h>
 
 #define BACKLOG 4096
 

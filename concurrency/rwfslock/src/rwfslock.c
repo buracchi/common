@@ -1,13 +1,13 @@
-#include "rwfslock.h"
+#include <buracchi/common/concurrency/rwfslock.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <pthread.h>
 
-#include "map/linked_list_map.h"
-#include "try.h"
-#include "utilities.h"
+#include <buracchi/common/containers/map/linked_list_map.h>
+#include <buracchi/common/utilities/utilities.h>
+#include <buracchi/common/utilities/try.h>
 
 struct cmn_rwfslock {
     cmn_map_t map;

@@ -1,4 +1,4 @@
-#include "argparser.h"
+#include <buracchi/common/argparser/argparser.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -6,9 +6,10 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "list/linked_list.h"
+#include <buracchi/common/containers/list/linked_list.h>
+#include <buracchi/common/utilities/utilities.h>
+
 #include "struct_argparser.h"
-#include "utilities.h"
 
 static int get_messages(cmn_list_t optionals, char **usage, char **description,
                         int (*get_usage)(struct cmn_argparser_argument *arg, char **str, char *str_vararg),

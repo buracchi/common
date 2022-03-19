@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "tpool.h"
+#include <buracchi/common/concurrency/tpool.h>
 }
 
 #include <mutex>

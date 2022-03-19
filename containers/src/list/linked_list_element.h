@@ -1,7 +1,7 @@
 #pragma once
 
-#include "list/linked_list.h"
-#include "types/list/linked_list.h"
+#include <buracchi/common/containers/list/linked_list.h>
+#include <buracchi/common/containers/types/list/linked_list.h>
 
 extern struct list_element *list_element_init(void *data, struct list_element *next);
 

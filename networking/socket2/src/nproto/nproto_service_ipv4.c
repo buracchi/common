@@ -3,10 +3,10 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
-#include "types/nproto/nproto_service_ipv4.h"
-#include "types/socket2.h"
-#include "try.h"
-#include "utilities.h"
+#include <buracchi/common/networking/types/nproto/nproto_service_ipv4.h>
+#include <buracchi/common/networking/types/socket2.h>
+#include <buracchi/common/utilities/utilities.h>
+#include <buracchi/common/utilities/try.h>
 
 static int set_address(cmn_nproto_service_t service, cmn_socket2_t socket, const char *url);
 

@@ -1,15 +1,13 @@
-#include "map.h"
-#include "map/linked_list_map.h"
+#include <buracchi/common/containers/map/linked_list_map.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-#include "list.h"
-#include "types/map.h"
-#include "types/map/linked_list_map.h"
-#include "utilities.h"
-#include "try.h"
+#include <buracchi/common/containers/list.h>
+#include <buracchi/common/containers/types/map/linked_list_map.h>
+#include <buracchi/common/utilities/utilities.h>
+#include <buracchi/common/utilities/try.h>
 
 #define KEY first
 #define VALUE second

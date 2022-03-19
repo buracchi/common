@@ -1,5 +1,5 @@
-#include "queue.h"
-#include "types/queue.h"
+#include <buracchi/common/containers/queue.h>
+#include <buracchi/common/containers/types/queue.h>
 
 #include <stdbool.h>
 #include <stdlib.h>

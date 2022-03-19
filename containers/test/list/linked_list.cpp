@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "list.h"
-#include "list/linked_list.h"
+#include <buracchi/common/containers/list/linked_list.h>
 }
 
 TEST(cmn_linked_list, empty_after_initialization) {

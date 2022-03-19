@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "socket2.h"
-#include "nproto/nproto_service_ipv4.h"
-#include "tproto/tproto_service_tcp.h"
+#include <buracchi/common/networking/socket2.h>
+#include <buracchi/common/networking/nproto/nproto_service_ipv4.h>
+#include <buracchi/common/networking/tproto/tproto_service_tcp.h>
 }
 
 #include <thread>

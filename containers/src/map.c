@@ -1,11 +1,9 @@
-#include "map.h"
-#include "types/map.h"
+#include <buracchi/common/containers/map.h>
+#include <buracchi/common/containers/types/map.h>
 
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-#include "iterator.h"
 
 extern inline int cmn_map_destroy(cmn_map_t map) {
     int ret = map->__ops_vptr->destroy(map);

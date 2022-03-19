@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "map/linked_list_map.h"
+#include <buracchi/common/containers/map/linked_list_map.h>
 }
 
 TEST(cmn_linked_list_map, empty_after_initialization) {

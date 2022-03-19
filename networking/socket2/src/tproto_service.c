@@ -1,8 +1,8 @@
-#include "tproto_service.h"
+#include <buracchi/common/networking/tproto_service.h>
 
 #include <stdint.h>
 
-#include "types/tproto_service.h"
+#include <buracchi/common/networking/types/tproto_service.h>
 
 extern inline int cmn_tproto_service_accept(cmn_tproto_service_t this, cmn_socket2_t socket, struct sockaddr *addr,
                                             socklen_t *addr_len) {

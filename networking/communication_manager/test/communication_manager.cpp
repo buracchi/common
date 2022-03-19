@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "communication_manager.h"
-#include "nproto/nproto_service_ipv4.h"
-#include "tproto/tproto_service_tcp.h"
-#include "types/request_handler.h"
-#include "try.h"
+#include <buracchi/common/networking/communication_manager.h>
+#include <buracchi/common/networking/nproto/nproto_service_ipv4.h>
+#include <buracchi/common/networking/tproto/tproto_service_tcp.h>
+#include <buracchi/common/networking/types/request_handler.h>
+#include <buracchi/common/utilities/try.h>
 }
 
 #include <cstdint>

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "list.h"
-#include "iterator.h"
+#include <buracchi/common/containers/list.h>
+#include <buracchi/common/iterators/iterator.h>
 
-#include "types/list/linked_list.h"
+#include <buracchi/common/containers/types/list/linked_list.h>
 #include "linked_list_element.h"
 
 extern struct linked_list_iterator *

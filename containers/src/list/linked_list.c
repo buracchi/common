@@ -1,14 +1,14 @@
-#include "list/linked_list.h"
+#include <buracchi/common/containers/list/linked_list.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-#include "iterator.h"
-#include "types/list/linked_list.h"
+#include <buracchi/common/containers/types/list/linked_list.h>
+#include <buracchi/common/utilities/try.h>
+
 #include "linked_list_element.h"
 #include "linked_list_iterator.h"
-#include "try.h"
 
 static struct cmn_list_vtbl *get_list_vtbl(void);
 

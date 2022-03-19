@@ -3,9 +3,9 @@
 #include <errno.h>
 #include <sys/un.h>
 
-#include "types/nproto/nproto_service_unix.h"
-#include "types/socket2.h"
-#include "try.h"
+#include <buracchi/common/networking/types/nproto/nproto_service_unix.h>
+#include <buracchi/common/networking/types/socket2.h>
+#include <buracchi/common/utilities/try.h>
 
 static int set_address(cmn_nproto_service_t service, cmn_socket2_t socket, const char *url);
 

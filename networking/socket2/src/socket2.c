@@ -1,4 +1,4 @@
-#include "socket2.h"
+#include <buracchi/common/networking/socket2.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,8 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "types/socket2.h"
-#include "try.h"
+#include <buracchi/common/networking/types/socket2.h>
+#include <buracchi/common/utilities/try.h>
 
 #ifdef __unix__
 

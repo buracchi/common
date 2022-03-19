@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "queue.h"
-#include "queue/double_linked_list_stack_queue.h"
+#include <buracchi/common/containers/queue/double_linked_list_stack_queue.h>
 }
 
 TEST(cmn_double_linked_list_stack_queue, empty_after_initialization) {

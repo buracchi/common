@@ -16,7 +16,7 @@ if(LIBCOMMON_INSTALL)
     install(DIRECTORY
             "${CMAKE_CURRENT_SOURCE_DIR}/rwfslock/include/"
             "${CMAKE_CURRENT_SOURCE_DIR}/tpool/include/"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${LIBCOMMON_INCLUDEDIR}/concurrency"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         FILES_MATCHING PATTERN "*.h*")
 
     install(EXPORT concurrency-targets

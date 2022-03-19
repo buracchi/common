@@ -1,9 +1,9 @@
-#include "tproto_service.h"
+#include <buracchi/common/networking/tproto_service.h>
 
 #include <unistd.h>
 
-#include "types/tproto/tproto_service_tcp.h"
-#include "types/socket2.h"
+#include <buracchi/common/networking/types/tproto/tproto_service_tcp.h>
+#include <buracchi/common/networking/types/socket2.h>
 
 static int _accept(cmn_tproto_service_t service, cmn_socket2_t socket, struct sockaddr *addr, socklen_t *addr_len);
 

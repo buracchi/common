@@ -1,7 +1,7 @@
 #pragma once
 
-#include "argparser.h"
-#include "map/linked_list_map.h"
+#include <buracchi/common/argparser/argparser.h>
+#include <buracchi/common/containers/map/linked_list_map.h>
 
 struct cmn_argparser {
     char *program_name;

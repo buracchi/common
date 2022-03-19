@@ -1,9 +1,9 @@
-#include "statemachine.h"
+#include <buracchi/common/statemachine/statemachine.h>
 
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "try.h"
+#include <buracchi/common/utilities/try.h>
 
 extern cmn_statemachine_t cmn_statemachine_init(struct cmn_statemachine_state *initial_state,
                                                 struct cmn_statemachine_transition *transitions, size_t transitions_number) {

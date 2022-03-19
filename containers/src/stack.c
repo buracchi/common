@@ -1,5 +1,5 @@
-#include "stack.h"
-#include "types/stack.h"
+#include <buracchi/common/containers/stack.h>
+#include <buracchi/common/containers/types/stack.h>
 
 #include <stddef.h>
 #include <stdbool.h>

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "rwfslock.h"
+#include <buracchi/common/concurrency/rwfslock.h>
 }
 
 #include <thread>

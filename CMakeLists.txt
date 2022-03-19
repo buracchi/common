@@ -9,12 +9,11 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/gtest.cmake")
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-project ("libcommon" VERSION 0.1)
+project ("common" VERSION 0.1)
 
 set(LIBCOMMON_EXPORT_NAME "buracchi-${PROJECT_NAME}")
 set(LIBCOMMON_NAMESPACE "buracchi::${PROJECT_NAME}")
 set(LIBCOMMON_LIBRARY_PREFIX "libburacchi-${PROJECT_NAME}-")
-set(LIBCOMMON_INCLUDEDIR "buracchi/${PROJECT_NAME}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)

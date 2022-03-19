@@ -1,4 +1,4 @@
-#include "tpool.h"
+#include <buracchi/common/concurrency/tpool.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -6,9 +6,8 @@
 #include <threads.h>
 #include <semaphore.h>
 
-#include "queue/double_linked_list_stack_queue.h"
-#include "try.h"
-
+#include <buracchi/common/containers/queue/double_linked_list_stack_queue.h>
+#include <buracchi/common/utilities/try.h>
 
 struct work {
     void *(*routine)(void *);

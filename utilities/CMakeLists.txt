@@ -17,7 +17,7 @@ if(LIBCOMMON_INSTALL)
     install(DIRECTORY
             "${CMAKE_CURRENT_SOURCE_DIR}/try/include/"
             "${CMAKE_CURRENT_SOURCE_DIR}/misc/include/"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${LIBCOMMON_INCLUDEDIR}/utilities"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         FILES_MATCHING PATTERN "*.h*")
 
     install(EXPORT utilities-targets

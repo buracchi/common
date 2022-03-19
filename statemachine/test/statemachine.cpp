@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "statemachine.h"
+#include <buracchi/common/statemachine/statemachine.h>
 }
 
 //          +----------+     EV1/x++    +----------+

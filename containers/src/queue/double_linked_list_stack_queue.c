@@ -1,13 +1,11 @@
-#include "queue.h"
-#include "queue/double_linked_list_stack_queue.h"
+#include <buracchi/common/containers/queue/double_linked_list_stack_queue.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "stack.h"
-#include "types/queue.h"
-#include "types/queue/double_linked_list_stack_queue.h"
-#include "try.h"
+#include <buracchi/common/containers/stack.h>
+#include <buracchi/common/containers/types/queue/double_linked_list_stack_queue.h>
+#include <buracchi/common/utilities/try.h>
 
 static struct cmn_queue_vtbl *get_queue_vtbl(void);
 

@@ -1,13 +1,11 @@
-#include "stack.h"
-#include "stack/linked_list_stack.h"
+#include <buracchi/common/containers/stack/linked_list_stack.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "list.h"
-#include "types/stack.h"
-#include "types/stack/linked_list_stack.h"
-#include "try.h"
+#include <buracchi/common/containers/list.h>
+#include <buracchi/common/containers/types/stack/linked_list_stack.h>
+#include <buracchi/common/utilities/try.h>
 
 static struct cmn_stack_vtbl *get_stack_vtbl(void);
 
