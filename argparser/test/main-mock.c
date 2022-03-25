@@ -4,7 +4,7 @@
 #include <buracchi/common/containers/map.h>
 
 const char *mock_main(int argc, const char **argv) {
-    const char *result;
+    const char *result = NULL;
     cmn_map_t option_map;
     cmn_argparser_t argparser;
     struct cmn_argparser_argument args[] = {

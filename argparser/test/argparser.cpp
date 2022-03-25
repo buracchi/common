@@ -5,7 +5,7 @@ extern "C" {
 }
 
 TEST(cmn_argparser, test) {
-    int argc = 4;
-    const char *argv[] = {"pname", "test", "-f", "11", nullptr};
-    ASSERT_EQ(argv[1], mock_main(argc, argv));
+	int argc = 4;
+	const char* argv[] = { "pname", "test", "-f", "11", nullptr };
+	ASSERT_EQ(argv[1], mock_main(argc, argv));
 }

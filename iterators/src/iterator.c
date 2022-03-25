@@ -4,11 +4,7 @@
 #include <stdlib.h>
 
 extern inline int cmn_iterator_destroy(cmn_iterator_t iterator) {
-    int ret = iterator->__ops_vptr->destroy(iterator);
-    if (!ret) {
-        free(iterator);
-    }
-    return ret;
+    return iterator->__ops_vptr->destroy(iterator);
 }
 
 extern inline void *cmn_iterator_data(cmn_iterator_t iterator) {

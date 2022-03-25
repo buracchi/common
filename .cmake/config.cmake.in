@@ -1,8 +1,8 @@
 @PACKAGE_INIT@
 
-set(_supported_components utilities iterators containers statemachine)
+set(_supported_components utilities iterators containers statemachine argparser)
 if (${UNIX})
-    list(APPEND _supported_components argparser concurrency networking)
+    list(APPEND _supported_components concurrency networking)
 endif ()
 
 list(LENGTH ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS _required_components)
