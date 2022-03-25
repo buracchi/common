@@ -1,4 +1,4 @@
-add_library(concurrency-rwfslock "src/rwfslock.c")
+add_library(concurrency-rwfslock STATIC "src/rwfslock.c")
 target_include_directories(concurrency-rwfslock PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/utilities>")
