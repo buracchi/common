@@ -1,4 +1,4 @@
-add_library(argparser
+add_library(argparser STATIC
     "src/argparser.c"
     "src/parser.c"
     "src/usage.c")
