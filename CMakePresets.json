@@ -27,8 +27,8 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_FLAGS_DEBUG": "/std:c17 /Wall",
-        "CMAKE_CXX_FLAGS_DEBUG": "/Wall"
+        "CMAKE_C_FLAGS_DEBUG": "/std:c17 /Wall /Zi",
+        "CMAKE_CXX_FLAGS_DEBUG": "/Wall /Zi"
       }
     },
     {

@@ -24,8 +24,14 @@ typedef struct cmn_pair {
 
 extern int asprintf(char** str, const char* format, ...);
 
+/*
+* @deprecated
+*/
 extern int strtoi(const char *str, int *result);
 
+/*
+* @deprecated
+*/
 extern int str_to_uint16(const char *str, uint16_t *result);
 
 extern bool is_directory(const char *pathname);
