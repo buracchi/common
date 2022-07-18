@@ -10,6 +10,6 @@ add_executable(
         test_argparser
         "argparser.cpp"
 )
-target_link_libraries(test_argparser PRIVATE GTest::GTest GTest::Main)
+target_link_libraries(test_argparser PRIVATE GTest::gtest GTest::gtest_main)
 target_link_libraries(test_argparser PRIVATE main-mock)
 gtest_add_tests(TARGET test_argparser)

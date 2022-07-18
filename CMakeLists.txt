@@ -1,21 +1,21 @@
-﻿cmake_minimum_required (VERSION 3.16)
+﻿cmake_minimum_required (VERSION 3.21)
 
 option(LIBCOMMON_BUILD_TESTS "Build test programs" ON)
 option(LIBCOMMON_INSTALL "Generate installation target" ON)
 option(LIBCOMMON_ENABLE_TEST_COVERAGE "Enable coverage reporting" OFF)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/vcpkg.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/.cmake/gtest.cmake")
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
+if (LIBCOMMON_INSTALL)
+    include(GNUInstallDirs)
+    include(CMakePackageConfigHelpers)
+endif ()
+if (LIBCOMMON_BUILD_TESTS)
+    list(APPEND VCPKG_MANIFEST_FEATURES "tests")
+    include(GoogleTest)
+endif ()
 
 project ("common" VERSION 0.1)
 
-set(LIBCOMMON_EXPORT_NAME "buracchi-${PROJECT_NAME}")
-set(LIBCOMMON_NAMESPACE "buracchi::${PROJECT_NAME}")
-set(LIBCOMMON_LIBRARY_PREFIX "libburacchi-${PROJECT_NAME}-")
-
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -35,10 +35,7 @@ endif()
 
 if (LIBCOMMON_BUILD_TESTS)
     enable_testing()
-    find_package(GTest REQUIRED)
-    # Notice that GTest::GTest and GTest::Main are deprecated since CMake 3.20 
-    # and should be replaced with GTest::gtest and GTest::gtest_main but this
-    # will make CMake 3.16.3 fails.
+    find_package(GTest CONFIG REQUIRED)
 endif ()
 
 # Code Coverage Configuration
@@ -50,23 +47,15 @@ if (LIBCOMMON_ENABLE_TEST_COVERAGE)
     target_link_options(coverage_config INTERFACE --coverage)
 endif ()
 
-# Subprojects
-
-if (${UNIX})
-    add_subdirectory("concurrency")
-    add_subdirectory("networking")
-endif(${UNIX})
-add_subdirectory("argparser")
-add_subdirectory("containers")
-add_subdirectory("iterators")
-add_subdirectory("statemachine")
-add_subdirectory("utilities")
-
 # Configure CMake find_package() config files
 
 if(LIBCOMMON_INSTALL)
+    set(LIBCOMMON_EXPORT_NAME "buracchi-${PROJECT_NAME}")
+    set(LIBCOMMON_NAMESPACE "buracchi::${PROJECT_NAME}")
+    set(LIBCOMMON_LIBRARY_PREFIX "libburacchi-${PROJECT_NAME}-")
+
     configure_package_config_file(
-        "${PROJECT_SOURCE_DIR}/.cmake/config.cmake.in"
+        "${PROJECT_SOURCE_DIR}/config.cmake.in"
         "${PROJECT_BINARY_DIR}/${LIBCOMMON_EXPORT_NAME}-config.cmake"
         INSTALL_DESTINATION
         "${CMAKE_INSTALL_DATAROOTDIR}/${LIBCOMMON_EXPORT_NAME}")
@@ -76,3 +65,16 @@ if(LIBCOMMON_INSTALL)
         DESTINATION
         "${CMAKE_INSTALL_DATAROOTDIR}/${LIBCOMMON_EXPORT_NAME}")
 endif()
+
+# Subprojects
+
+if (${UNIX})
+    add_subdirectory("concurrency")
+    add_subdirectory("networking")
+endif(${UNIX})
+add_subdirectory("argparser")
+add_subdirectory("containers")
+add_subdirectory("logger")
+add_subdirectory("iterators")
+add_subdirectory("statemachine")
+add_subdirectory("utilities")

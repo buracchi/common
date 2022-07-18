@@ -1,6 +1,6 @@
 @PACKAGE_INIT@
 
-set(_supported_components utilities iterators containers statemachine argparser)
+set(_supported_components utilities iterators containers logger argparser statemachine)
 if (${UNIX})
     list(APPEND _supported_components concurrency networking)
 endif ()
