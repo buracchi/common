@@ -4,14 +4,14 @@
 #include <limits.h>
 
 enum cmn_logger_log_level {
-    CMN_LOGGER_LOG_LEVEL_OFF = 0,           // No events will be logged.
-    CMN_LOGGER_LOG_LEVEL_FATAL = 1,         // A fatal event that will prevent the application from continuing.
-    CMN_LOGGER_LOG_LEVEL_ERROR = 2,         // An error in the application, possibly recoverable.
-    CMN_LOGGER_LOG_LEVEL_WARN = 3,          // An event that might possible lead to an error.
-    CMN_LOGGER_LOG_LEVEL_INFO = 4,          // An event for informational purposes.
-    CMN_LOGGER_LOG_LEVEL_DEBUG = 5,         // A general debugging event.
-    CMN_LOGGER_LOG_LEVEL_TRACE = 6,         // A fine-grained debug message, typically capturing the flow through the application.
-    CMN_LOGGER_LOG_LEVEL_ALL = INT_MAX      // All events should be logged.
+	CMN_LOGGER_LOG_LEVEL_OFF = 0,           // No events will be logged.
+	CMN_LOGGER_LOG_LEVEL_FATAL = 1,         // A fatal event that will prevent the application from continuing.
+	CMN_LOGGER_LOG_LEVEL_ERROR = 2,         // An error in the application, possibly recoverable.
+	CMN_LOGGER_LOG_LEVEL_WARN = 3,          // An event that might possible lead to an error.
+	CMN_LOGGER_LOG_LEVEL_INFO = 4,          // An event for informational purposes.
+	CMN_LOGGER_LOG_LEVEL_DEBUG = 5,         // A general debugging event.
+	CMN_LOGGER_LOG_LEVEL_TRACE = 6,         // A fine-grained debug message, typically capturing the flow through the application.
+	CMN_LOGGER_LOG_LEVEL_ALL = INT_MAX      // All events should be logged.
 };
 
 #define cmn_logger_log_trace(...) cmn_logger_log(CMN_LOGGER_LOG_LEVEL_TRACE, __FILE__, __LINE__, __VA_ARGS__)

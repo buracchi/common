@@ -58,12 +58,12 @@ static struct logger {
 };
 
 static const char* level_strings[] = {
-	[CMN_LOGGER_LOG_LEVEL_FATAL] =	"FATAL",
-	[CMN_LOGGER_LOG_LEVEL_ERROR] =	"ERROR",
-	[CMN_LOGGER_LOG_LEVEL_WARN] =	"WARN",
-	[CMN_LOGGER_LOG_LEVEL_INFO] =	"INFO",
-	[CMN_LOGGER_LOG_LEVEL_DEBUG] =	"DEBUG",
-	[CMN_LOGGER_LOG_LEVEL_TRACE] =	"TRACE"
+	[CMN_LOGGER_LOG_LEVEL_FATAL] = "FATAL",
+	[CMN_LOGGER_LOG_LEVEL_ERROR] = "ERROR",
+	[CMN_LOGGER_LOG_LEVEL_WARN] = "WARN",
+	[CMN_LOGGER_LOG_LEVEL_INFO] = "INFO",
+	[CMN_LOGGER_LOG_LEVEL_DEBUG] = "DEBUG",
+	[CMN_LOGGER_LOG_LEVEL_TRACE] = "TRACE"
 };
 
 #ifdef CMN_LOGGER_USE_COLOR
@@ -97,7 +97,7 @@ static inline struct logger* get_logger() {
 	if (logger.mutex == NULL) {
 		mtx_t mtx;
 		while (mtx_init(&mtx, mtx_plain) != thrd_success);
-		mtx_lock(&mtx);
+		while (mtx_lock(&mtx) != thrd_success);
 		if (atomic_compare_exchange_strong(&logger.mutex, &(mtx_t*){ NULL }, &mutex)) {
 			memcpy(logger.mutex, &mtx, sizeof(mtx_t));
 			logger.config.default_level = CMN_LOGGER_LOG_LEVEL_ALL;
