@@ -1,7 +1,7 @@
 add_library(concurrency-rwfslock "src/rwfslock.c")
 target_include_directories(concurrency-rwfslock PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/utilities>")
+                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 target_link_libraries(concurrency-rwfslock PRIVATE containers)
 target_link_libraries(concurrency-rwfslock PRIVATE pthread)
 target_link_libraries(concurrency-rwfslock PRIVATE utilities)
