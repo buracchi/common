@@ -1,6 +1,7 @@
 ﻿find_package(Libevent CONFIG REQUIRED)
 
 add_library(networking-communication-manager
+    OBJECT
     "src/communication_manager.c"
     "src/request_handler.c")
 target_include_directories(networking-communication-manager PUBLIC
