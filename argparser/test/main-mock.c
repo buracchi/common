@@ -12,8 +12,7 @@ const char *mock_main(int argc, const char **argv) {
             {.flag = "f", .long_flag="foo", .is_required=true, .help="set the ammount of foo data"},
             {.long_flag="set-bar", .action=CMN_ARGPARSER_ACTION_STORE_TRUE, .default_value=false, .help="set the bar switch"}
     };
-    argparser = cmn_argparser_init(argv[0], "An example program.");
-    cmn_argparser_set_arguments(argparser, args, 3);
+    argparser = cmn_argparser_init(argv[0], "An example program.", &args);
     option_map = cmn_argparser_parse(argparser, argc, argv);
     cmn_map_at(option_map, (void *) "arg", (void **) &result);
     cmn_argparser_destroy(argparser);

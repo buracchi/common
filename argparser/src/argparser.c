@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <buracchi/common/containers/map/linked_list_map.h>
 #include <buracchi/common/utilities/try.h>
 
 #include "struct_argparser.h"
@@ -20,11 +21,12 @@ static struct cmn_argparser_argument help_arg = {
 static int lexicographical_comparison(void* arg1, void* arg2, bool* result) {
     const char* _s1 = (const char*)arg1;
     const char* _s2 = (const char*)arg2;
-    while (*_s1 && *_s2 && *(_s1++) == *(_s2++)) {}
+    while (*_s1 && *_s2 && *(_s1++) == *(_s2++));
     *result = *_s1 == *_s2;
     return 0;
 }
-extern cmn_argparser_t cmn_argparser_init(const char *pname, const char *pdesc) {
+
+extern cmn_argparser_t _cmn_argparser_init(const char* pname, const char* pdesc, struct cmn_argparser_argument *arguments, size_t arguments_number) {
     cmn_argparser_t this;
     try(this = malloc(sizeof *this), NULL, fail);
     try(this->program_name = malloc(strlen(pname) + 1), NULL, fail2);
@@ -33,6 +35,14 @@ extern cmn_argparser_t cmn_argparser_init(const char *pname, const char *pdesc) 
     cmn_map_set_key_comparer(this->map, &lexicographical_comparison);
     strcpy(this->program_name, pname);
     strcpy(this->program_description, pdesc);
+    this->args_number = arguments_number + 1;
+    try(this->args = malloc(sizeof * this->args * this->args_number), NULL, fail4);
+    memcpy(&(this->args[0]), &help_arg, sizeof * this->args);
+    for (size_t i = 1; i < this->args_number; i++) {
+        memcpy(&(this->args[i]), arguments++, sizeof * this->args);
+    }
+    // TODO: Check and throw error if: There are conflicts, ...
+    format_usage(this);
     return this;
 fail4:
     free(this->program_description);
@@ -52,21 +62,6 @@ extern int cmn_argparser_destroy(cmn_argparser_t this) {
     free(this->usage);
     free(this->usage_details);
     free(this);
-    return 0;
-fail:
-    return 1;
-}
-
-extern int cmn_argparser_set_arguments(cmn_argparser_t this, struct cmn_argparser_argument *arguments, size_t number) {
-    size_t size = number + 2;
-    try(this->args = malloc(sizeof *this->args * size), NULL, fail);
-    this->args[0] = &help_arg;
-    for (size_t i = 1; i < number + 1; i++) {
-        this->args[i] = arguments++;
-    }
-    this->args[size - 1] = NULL;
-    // TODO: Check and throw error if: There are conflicts, ...
-    format_usage(this);
     return 0;
 fail:
     return 1;

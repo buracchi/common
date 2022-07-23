@@ -8,76 +8,73 @@
 
 #include <buracchi/common/containers/list/linked_list.h>
 #include <buracchi/common/utilities/utilities.h>
+#include "buracchi/common/utilities/try.h"
 
 #include "struct_argparser.h"
 
 static int parse_arg_n(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array, int n);
-
+	struct cmn_argparser_argument** argv_argument_links, int n);
 static struct cmn_argparser_argument* match_arg(cmn_argparser_t this, int argc, const char* args,
-	struct cmn_argparser_argument** used_arg_array);
-
+	struct cmn_argparser_argument** argv_argument_links);
+static int parse_store_action_arg(cmn_argparser_t this, int argc, const char** argv,
+	struct cmn_argparser_argument** argv_argument_links, int n,
+	struct cmn_argparser_argument* argument);
 static int handle_unrecognized_elements(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array);
-
+	struct cmn_argparser_argument** argv_argument_links);
 static int handle_required_missing_elements(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array);
-
+	struct cmn_argparser_argument** argv_argument_links);
 static int handle_optional_missing_elements(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array);
+	struct cmn_argparser_argument** argv_argument_links);
 
 extern cmn_map_t cmn_argparser_parse(cmn_argparser_t this, int argc, const char** argv) {
-	struct cmn_argparser_argument** used_argv_array;
-	used_argv_array = malloc(sizeof * used_argv_array * argc);
-	memset(used_argv_array, 0, argc * sizeof * used_argv_array);
+	struct cmn_argparser_argument** argv_argument_links = NULL;
+	try(argv_argument_links = malloc(sizeof * argv_argument_links * argc), NULL, fail);
+	memset(argv_argument_links, 0, argc * sizeof * argv_argument_links);
 	for (int i = 1; i < argc; i++) {
-		if (parse_arg_n(this, argc, argv, used_argv_array, i)) {
+		if (parse_arg_n(this, argc, argv, argv_argument_links, i)) {
 			break;
 		}
 	}
-	handle_unrecognized_elements(this, argc, argv, used_argv_array);
-	handle_required_missing_elements(this, argc, argv, used_argv_array);
-	handle_optional_missing_elements(this, argc, argv, used_argv_array);
-	free(used_argv_array);
+	handle_unrecognized_elements(this, argc, argv, argv_argument_links);
+	handle_required_missing_elements(this, argc, argv, argv_argument_links);
+	handle_optional_missing_elements(this, argc, argv, argv_argument_links);
+	free(argv_argument_links);
 	return this->map;
+fail:
+	return NULL;
 }
 
 static int parse_arg_n(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array, int n) {
-	// TODO: handle al cases
+	struct cmn_argparser_argument** argv_argument_links, int n) {
 	struct cmn_argparser_argument* matching_arg;
-	matching_arg = match_arg(this, argc, argv[n], used_argv_array);
+	matching_arg = match_arg(this, argc, argv[n], argv_argument_links);
 	if (matching_arg) {
-		bool is_positional = matching_arg->name;
-		bool have_flag = matching_arg->flag;
 		switch (matching_arg->action) {
 		case CMN_ARGPARSER_ACTION_HELP:
 			fprintf(stderr, "%s\n%s", this->usage, this->usage_details);
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 		case CMN_ARGPARSER_ACTION_STORE:
-			switch (matching_arg->action_nargs) {
-			case CMN_ARGPARSER_ACTION_NARGS_SINGLE:
-				if (is_positional) {
-					cmn_map_insert(this->map, (void*)matching_arg->name, (void*)argv[n], NULL);
-					used_argv_array[n] = matching_arg;
-				}
-				else {
-					if (n == argc - 1) {
-						return 1;
-					}
-					if (have_flag) {
-						cmn_map_insert(this->map, (void*)matching_arg->flag, (void*)argv[n + 1], NULL);
-					}
-					else {
-						cmn_map_insert(this->map, (void*)matching_arg->long_flag, (void*)argv[n + 1], NULL);
-					}
-					used_argv_array[n] = matching_arg;
-					used_argv_array[n + 1] = matching_arg;
-				}
-				break;
-			default:
-				break;
-			}
+			return parse_store_action_arg(this, argc, argv, argv_argument_links, n, matching_arg);
+		case CMN_ARGPARSER_ACTION_STORE_CONST:
+			// TODO
+			break;
+		case CMN_ARGPARSER_ACTION_STORE_TRUE:
+			// TODO
+			break;
+		case CMN_ARGPARSER_ACTION_STORE_FALSE:
+			// TODO
+			break;
+		case CMN_ARGPARSER_ACTION_APPEND:
+			// TODO
+			break;
+		case CMN_ARGPARSER_ACTION_APPEND_CONST:
+			// TODO
+			break;
+		case CMN_ARGPARSER_ACTION_COUNT:
+			// TODO
+			break;
+		case CMN_ARGPARSER_ACTION_EXTEND:
+			// TODO
 			break;
 		default:
 			break;
@@ -87,35 +84,35 @@ static int parse_arg_n(cmn_argparser_t this, int argc, const char** argv,
 }
 
 static struct cmn_argparser_argument* match_arg(cmn_argparser_t this, int argc, const char* args,
-	struct cmn_argparser_argument** used_arg_array) {
+	struct cmn_argparser_argument** argv_argument_links) {
 	bool match_positional = (args[0] != '-');
 	bool match_optional = !match_positional && args[1];
 	bool match_long_flag = match_optional && (args[1] == '-') && args[2];
-	for (struct cmn_argparser_argument** arg = this->args; *arg; arg++) {
-		bool is_arg_used = false;
+	for (size_t i = 0; i < this->args_number; i++) {
+		bool is_argument_parsed = false;
 		for (int j = 1; j < argc; j++) {
-			if (used_arg_array[j] == *arg) {
-				is_arg_used = true;
+			if (argv_argument_links[j] == &(this->args[i])) {
+				is_argument_parsed = true;
 				break;
 			}
 		}
-		if (is_arg_used) {
+		if (is_argument_parsed) {
 			continue;
 		}
-		if ((match_positional && (*arg)->name)
-			|| (match_optional && (*arg)->flag && streq(args + 1, (*arg)->flag))
-			|| (match_long_flag && (*arg)->long_flag && streq(args + 2, (*arg)->long_flag))) {
-			return *arg;
+		if ((match_positional && this->args[i].name)
+			|| (match_optional && this->args[i].flag && streq(args + 1, this->args[i].flag))
+			|| (match_long_flag && this->args[i].long_flag && streq(args + 2, this->args[i].long_flag))) {
+			return &(this->args[i]);
 		}
 	}
 	return NULL;
 }
 
 static int handle_unrecognized_elements(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array) {
+	struct cmn_argparser_argument** argv_argument_links) {
 	cmn_list_t error_arg_list = (cmn_list_t)cmn_linked_list_init();
 	for (int i = 1; i < argc; i++) {
-		if (!used_argv_array[i]) {
+		if (!argv_argument_links[i]) {
 			cmn_list_push_back(error_arg_list, (void*)argv[i]);
 		}
 	}
@@ -132,21 +129,21 @@ static int handle_unrecognized_elements(cmn_argparser_t this, int argc, const ch
 }
 
 static int handle_required_missing_elements(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array) {
+	struct cmn_argparser_argument** argv_argument_links) {
 	cmn_iterator_t iterator;
 	cmn_list_t missing_required_arg_list = (cmn_list_t)cmn_linked_list_init();
 	cmn_list_t required_arg_list = (cmn_list_t)cmn_linked_list_init();
-	for (struct cmn_argparser_argument** arg = this->args; *arg; arg++) {
+	for (size_t i = 0; i < this->args_number; i++) {
 		// TODO: the check is incomplete
-		if ((*arg)->name || (*arg)->is_required) {
-			cmn_list_push_back(required_arg_list, (void*)*arg);
+		if (this->args[i].name || this->args[i].is_required) {
+			cmn_list_push_back(required_arg_list, (void*)&(this->args[i]));
 		}
 	}
 	for (iterator = cmn_list_begin(required_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
 		struct cmn_argparser_argument* element = cmn_iterator_data(iterator);
 		bool is_present = false;
 		for (int i = 1; i < argc; i++) {
-			if (used_argv_array[i] == element) {
+			if (argv_argument_links[i] == element) {
 				is_present = true;
 				break;
 			}
@@ -185,20 +182,20 @@ static int handle_required_missing_elements(cmn_argparser_t this, int argc, cons
 }
 
 static int handle_optional_missing_elements(cmn_argparser_t this, int argc, const char** argv,
-	struct cmn_argparser_argument** used_argv_array) {
+	struct cmn_argparser_argument** argv_argument_links) {
 	cmn_iterator_t iterator;
 	cmn_list_t missing_optional_arg_list = (cmn_list_t)cmn_linked_list_init();
 	cmn_list_t optional_arg_list = (cmn_list_t)cmn_linked_list_init();
-	for (struct cmn_argparser_argument** arg = this->args; *arg; arg++) {
-		if (!(*arg)->name && !(*arg)->is_required) {
-			cmn_list_push_back(optional_arg_list, (void*)*arg);
+	for (size_t i = 0; i < this->args_number; i++) {
+		if (!this->args[i].name && !this->args[i].is_required) {
+			cmn_list_push_back(optional_arg_list, (void*)&(this->args[i]));
 		}
 	}
 	for (iterator = cmn_list_begin(optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
 		struct cmn_argparser_argument* element = cmn_iterator_data(iterator);
 		bool is_present = false;
 		for (int i = 1; i < argc; i++) {
-			if (used_argv_array[i] == element) {
+			if (argv_argument_links[i] == element) {
 				is_present = true;
 				break;
 			}
@@ -228,4 +225,48 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
 	}
 	cmn_iterator_destroy(iterator);
 	cmn_list_destroy(missing_optional_arg_list);
+}
+
+
+static int parse_store_action_arg(cmn_argparser_t this, int argc, const char** argv,
+	struct cmn_argparser_argument** argv_argument_links, int n,
+	struct cmn_argparser_argument* argument) {
+	bool is_positional = argument->name;
+	bool have_flag = argument->flag;
+	switch (argument->action_nargs) {
+	case CMN_ARGPARSER_ACTION_NARGS_SINGLE:
+		if (is_positional) {
+			cmn_map_insert(this->map, (void*)argument->name, (void*)argv[n], NULL);
+			argv_argument_links[n] = argument;
+		}
+		else {
+			if (n == argc - 1) {
+				return 1;
+			}
+			if (have_flag) {
+				cmn_map_insert(this->map, (void*)argument->flag, (void*)argv[n + 1], NULL);
+			}
+			else {
+				cmn_map_insert(this->map, (void*)argument->long_flag, (void*)argv[n + 1], NULL);
+			}
+			argv_argument_links[n] = argument;
+			argv_argument_links[n + 1] = argument;
+		}
+		break;
+	case CMN_ARGPARSER_ACTION_NARGS_OPTIONAL:
+		// TODO
+		break;
+	case CMN_ARGPARSER_ACTION_NARGS_LIST_OF_N:
+		// TODO
+		break;
+	case CMN_ARGPARSER_ACTION_NARGS_LIST:
+		// TODO
+		break;
+	case CMN_ARGPARSER_ACTION_NARGS_LIST_OPTIONAL:
+		// TODO
+		break;
+	default:
+		break;
+	}
+	return 0;
 }

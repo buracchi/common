@@ -44,17 +44,12 @@ extern int format_usage(cmn_argparser_t this) {
 	char* positionals_description;
 	cmn_list_t optionals = (cmn_list_t)cmn_linked_list_init();
 	cmn_list_t positionals = (cmn_list_t)cmn_linked_list_init();
-	for (struct cmn_argparser_argument** arg = this->args; *arg; arg++) {
-		if ((*arg)->name) {
-			cmn_list_push_back(positionals, (void*)*arg);
-		}
-		else {
-			cmn_list_push_back(optionals, (void*)*arg);
-		}
+	for (size_t i = 0; i < this->args_number; i++) {
+		cmn_list_t list = this->args[i].name ? positionals : optionals;
+		cmn_list_push_back(list, &this->args[i]);
 	}
 	get_messages(optionals, &optionals_usage, &optionals_description, get_optionals_usage, get_optionals_descritpion);
-	get_messages(positionals, &positionals_usage, &positionals_description, get_positionals_usage,
-		get_positionals_description);
+	get_messages(positionals, &positionals_usage, &positionals_description, get_positionals_usage, get_positionals_description);
 	ret = asprintf(&this->usage, "%s%s%s%s", prefix, this->program_name, optionals_usage ? optionals_usage : "",
 		positionals_usage ? positionals_usage : "");
 	ret = asprintf(&this->usage_details, "\n%s\n%s%s", this->program_description,
@@ -193,7 +188,7 @@ static char* get_narg_list_n(char* vararg, size_t n) {
 	char* result;
 	size_t size = strlen(vararg) * n + (n - 1) + 1;
 	result = malloc(size);
-	for (int i = 0; i < n; i++) {
+	for (size_t i = 0; i < n; i++) {
 		strcpy(result + ((strlen(vararg) + 1) * i), vararg);
 		result[strlen(vararg) * (i + 1) + i] = ' ';
 	}

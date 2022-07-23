@@ -1,9 +1,10 @@
+#ifndef BURACCHI_COMMON_ARGPARSER_H_INCLUDED
+#define BURACCHI_COMMON_ARGPARSER_H_INCLUDED
 /** @file
  *
  * @brief Argparser interface.
  * @details This file represent the public interface of the Argparser module.
  */
-#pragma once
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -88,7 +89,7 @@ enum cmn_argparser_action {
  * @var cmn_argparser_action::CMN_ARGPARSER_ACTION_NARGS_LIST
  *      @brief special cases of @ref CMN_ARGPARSER_ACTION_STORE_CONST
  *
- * @var cmn_argparser_action::CMN_ARGPARSER_ACTION_NARGS_LIST
+ * @var cmn_argparser_action::CMN_ARGPARSER_ACTION_NARGS_LIST_OPTIONAL
  *      @brief special cases of @ref CMN_ARGPARSER_ACTION_STORE_CONST
  *      @details the parsing won't fail if no argument is provided.
  *
@@ -203,9 +204,14 @@ struct cmn_argparser_argument {
  *
  * @param pname
  * @param pdesc
+ * @param arguments
+ * @param arguments_number
  * @return cmn_argparser_t
  */
-extern cmn_argparser_t cmn_argparser_init(const char* pname, const char* pdesc);
+extern cmn_argparser_t _cmn_argparser_init(const char* pname, const char* pdesc, struct cmn_argparser_argument* arguments, size_t arguments_number);
+
+#define cmn_argparser_init(pname, pdesc, arguments) \
+	_cmn_argparser_init((pname), (pdesc), (arguments), sizeof *(arguments) / sizeof(struct cmn_argparser_argument));
 
 /**
  * @brief
@@ -219,18 +225,10 @@ extern int cmn_argparser_destroy(cmn_argparser_t argparser);
  * @brief
  *
  * @param argparser
- * @param arguments
- * @param number
- * @return int
- */
-extern int cmn_argparser_set_arguments(cmn_argparser_t argparser, struct cmn_argparser_argument* arguments, size_t number);
-
-/**
- * @brief
- *
- * @param argparser
  * @param argc
  * @param argv
  * @return cmn_map_t
  */
 extern cmn_map_t cmn_argparser_parse(cmn_argparser_t argparser, int argc, const char** argv);
+
+#endif // BURACCHI_COMMON_ARGPARSER_H_INCLUDED
