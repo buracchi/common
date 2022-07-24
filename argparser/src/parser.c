@@ -16,9 +16,10 @@ static int parse_arg_n(cmn_argparser_t this, int argc, const char** argv,
 	struct cmn_argparser_argument** argv_argument_links, int n);
 static struct cmn_argparser_argument* match_arg(cmn_argparser_t this, int argc, const char* args,
 	struct cmn_argparser_argument** argv_argument_links);
-static int parse_store_action_arg(cmn_argparser_t this, int argc, const char** argv,
+static int parse_action_store(cmn_argparser_t this, int argc, const char** argv,
 	struct cmn_argparser_argument** argv_argument_links, int n,
 	struct cmn_argparser_argument* argument);
+extern int parse_action_help(cmn_argparser_t this, int argc, const char** argv);
 static int handle_unrecognized_elements(cmn_argparser_t this, int argc, const char** argv,
 	struct cmn_argparser_argument** argv_argument_links);
 static int handle_required_missing_elements(cmn_argparser_t this, int argc, const char** argv,
@@ -51,10 +52,9 @@ static int parse_arg_n(cmn_argparser_t this, int argc, const char** argv,
 	if (matching_arg) {
 		switch (matching_arg->action) {
 		case CMN_ARGPARSER_ACTION_HELP:
-			fprintf(stderr, "%s\n%s", this->usage, this->usage_details);
-			exit(EXIT_SUCCESS);
+			return parse_action_help(this, argc, argv);
 		case CMN_ARGPARSER_ACTION_STORE:
-			return parse_store_action_arg(this, argc, argv, argv_argument_links, n, matching_arg);
+			return parse_action_store(this, argc, argv, argv_argument_links, n, matching_arg);
 		case CMN_ARGPARSER_ACTION_STORE_CONST:
 			// TODO
 			break;
@@ -88,10 +88,10 @@ static struct cmn_argparser_argument* match_arg(cmn_argparser_t this, int argc, 
 	bool match_positional = (args[0] != '-');
 	bool match_optional = !match_positional && args[1];
 	bool match_long_flag = match_optional && (args[1] == '-') && args[2];
-	for (size_t i = 0; i < this->args_number; i++) {
+	for (size_t i = 0; i < this->arguments_number; i++) {
 		bool is_argument_parsed = false;
 		for (int j = 1; j < argc; j++) {
-			if (argv_argument_links[j] == &(this->args[i])) {
+			if (argv_argument_links[j] == &(this->arguments[i])) {
 				is_argument_parsed = true;
 				break;
 			}
@@ -99,10 +99,10 @@ static struct cmn_argparser_argument* match_arg(cmn_argparser_t this, int argc, 
 		if (is_argument_parsed) {
 			continue;
 		}
-		if ((match_positional && this->args[i].name)
-			|| (match_optional && this->args[i].flag && streq(args + 1, this->args[i].flag))
-			|| (match_long_flag && this->args[i].long_flag && streq(args + 2, this->args[i].long_flag))) {
-			return &(this->args[i]);
+		if ((match_positional && this->arguments[i].name)
+			|| (match_optional && this->arguments[i].flag && streq(args + 1, this->arguments[i].flag))
+			|| (match_long_flag && this->arguments[i].long_flag && streq(args + 2, this->arguments[i].long_flag))) {
+			return &(this->arguments[i]);
 		}
 	}
 	return NULL;
@@ -133,10 +133,10 @@ static int handle_required_missing_elements(cmn_argparser_t this, int argc, cons
 	cmn_iterator_t iterator;
 	cmn_list_t missing_required_arg_list = (cmn_list_t)cmn_linked_list_init();
 	cmn_list_t required_arg_list = (cmn_list_t)cmn_linked_list_init();
-	for (size_t i = 0; i < this->args_number; i++) {
+	for (size_t i = 0; i < this->arguments_number; i++) {
 		// TODO: the check is incomplete
-		if (this->args[i].name || this->args[i].is_required) {
-			cmn_list_push_back(required_arg_list, (void*)&(this->args[i]));
+		if (this->arguments[i].name || this->arguments[i].is_required) {
+			cmn_list_push_back(required_arg_list, (void*)&(this->arguments[i]));
 		}
 	}
 	for (iterator = cmn_list_begin(required_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
@@ -186,9 +186,9 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
 	cmn_iterator_t iterator;
 	cmn_list_t missing_optional_arg_list = (cmn_list_t)cmn_linked_list_init();
 	cmn_list_t optional_arg_list = (cmn_list_t)cmn_linked_list_init();
-	for (size_t i = 0; i < this->args_number; i++) {
-		if (!this->args[i].name && !this->args[i].is_required) {
-			cmn_list_push_back(optional_arg_list, (void*)&(this->args[i]));
+	for (size_t i = 0; i < this->arguments_number; i++) {
+		if (!this->arguments[i].name && !this->arguments[i].is_required) {
+			cmn_list_push_back(optional_arg_list, (void*)&(this->arguments[i]));
 		}
 	}
 	for (iterator = cmn_list_begin(optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
@@ -228,7 +228,7 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
 }
 
 
-static int parse_store_action_arg(cmn_argparser_t this, int argc, const char** argv,
+static int parse_action_store(cmn_argparser_t this, int argc, const char** argv,
 	struct cmn_argparser_argument** argv_argument_links, int n,
 	struct cmn_argparser_argument* argument) {
 	bool is_positional = argument->name;

@@ -5,10 +5,10 @@
 
 struct cmn_argparser {
 	char* program_name;
-	char* program_description;
 	char* usage;
-	char* usage_details;
-	struct cmn_argparser_argument* args;
-	size_t args_number;
+	char* description;
+	bool add_help;
+	size_t arguments_number;
+	struct cmn_argparser_argument* arguments;
 	cmn_map_t map;
 };

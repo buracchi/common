@@ -5,54 +5,67 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <libgen.h>
+#include <stdio.h>
 
 #include <buracchi/common/containers/list/linked_list.h>
 #include <buracchi/common/utilities/utilities.h>
 
 #include "struct_argparser.h"
 
+extern int parse_action_help(cmn_argparser_t this, int argc, const char** argv);
+static int set_help_message(char** help_message, cmn_argparser_t this, int argc, const char** argv);
 static int get_messages(cmn_list_t optionals, char** usage, char** description,
 	int (*get_usage)(struct cmn_argparser_argument* arg, char** str, char* str_vararg),
 	int (*get_descritpion)(struct cmn_argparser_argument* arg, char** str, char* str_vararg));
-
 static int get_optionals_usage(struct cmn_argparser_argument* arg, char** str, char* str_vararg);
-
 static int get_optionals_descritpion(struct cmn_argparser_argument* arg, char** str, char* str_vararg);
-
 static int get_positionals_usage(struct cmn_argparser_argument* arg, char** str, char* str_vararg);
-
 static int get_positionals_description(struct cmn_argparser_argument* arg, char** str, char* str_vararg);
-
 static char* get_positional_args_string(struct cmn_argparser_argument* arg);
-
 static char* get_flag_vararg(struct cmn_argparser_argument* arg);
-
 static char* get_narg_optional(char* vararg);
-
 static char* get_narg_list_n(char* vararg, size_t n);
-
 static char* get_narg_list(char* vararg);
-
 static char* get_narg_list_optional(char* vararg);
 
-extern int format_usage(cmn_argparser_t this) {
+extern int parse_action_help(cmn_argparser_t this, int argc, const char** argv) {
+	char* help_message = NULL;
+	set_help_message(&help_message, this, argc, argv);
+	fprintf(stderr, "%s", help_message);
+	free(help_message);
+	exit(EXIT_SUCCESS);
+	return 0;
+}
+
+static int set_help_message(char** help_message, cmn_argparser_t this, int argc, const char** argv) {
 	int ret;
-	char* prefix = "usage: ";
+	char const* prefix = "usage: ";
 	char* optionals_usage;
 	char* positionals_usage;
 	char* optionals_description;
 	char* positionals_description;
+	char* path = malloc(strlen(argv[0]));
+	strcpy(path, argv[0]);
 	cmn_list_t optionals = (cmn_list_t)cmn_linked_list_init();
 	cmn_list_t positionals = (cmn_list_t)cmn_linked_list_init();
-	for (size_t i = 0; i < this->args_number; i++) {
-		cmn_list_t list = this->args[i].name ? positionals : optionals;
-		cmn_list_push_back(list, &this->args[i]);
+	for (size_t i = 0; i < this->arguments_number; i++) {
+		cmn_list_t list = this->arguments[i].name ? positionals : optionals;
+		cmn_list_push_back(list, &this->arguments[i]);
 	}
 	get_messages(optionals, &optionals_usage, &optionals_description, get_optionals_usage, get_optionals_descritpion);
 	get_messages(positionals, &positionals_usage, &positionals_description, get_positionals_usage, get_positionals_description);
-	ret = asprintf(&this->usage, "%s%s%s%s", prefix, this->program_name, optionals_usage ? optionals_usage : "",
-		positionals_usage ? positionals_usage : "");
-	ret = asprintf(&this->usage_details, "\n%s\n%s%s", this->program_description,
+	asprintf(&this->usage,
+		"%s%s%s%s",
+		prefix,
+		this->program_name ? this->program_name : basename(path),
+		optionals_usage ? optionals_usage : "",
+		positionals_usage ? positionals_usage : ""
+	);
+	ret = asprintf(help_message,
+		"%s\n\n%s\n%s%s",
+		this->usage,
+		this->description,
 		positionals_description ? positionals_description : "",
 		optionals_description ? optionals_description : "");
 	free(optionals_usage);
