@@ -27,7 +27,13 @@ static int handle_required_missing_elements(cmn_argparser_t this, int argc, cons
 static int handle_optional_missing_elements(cmn_argparser_t this, int argc, const char** argv,
 	struct cmn_argparser_argument** argv_argument_links);
 
-extern cmn_map_t cmn_argparser_parse(cmn_argparser_t this, int argc, const char** argv) {
+/* TODO:
+ * While parsing the command line, cmn_argparser_parse() checks for a variety of errors,
+ * including ambiguous options, invalid types, invalid options, wrong number of positional
+ * arguments, etc. When it encounters such an error, it exits and prints the error along
+ * with a usage message if exit_on_error is set to true.
+*/
+extern int cmn_argparser_parse(cmn_argparser_t this, int argc, const char** argv) {
 	struct cmn_argparser_argument** argv_argument_links = NULL;
 	try(argv_argument_links = malloc(sizeof * argv_argument_links * argc), NULL, fail);
 	memset(argv_argument_links, 0, argc * sizeof * argv_argument_links);
@@ -40,9 +46,9 @@ extern cmn_map_t cmn_argparser_parse(cmn_argparser_t this, int argc, const char*
 	handle_required_missing_elements(this, argc, argv, argv_argument_links);
 	handle_optional_missing_elements(this, argc, argv, argv_argument_links);
 	free(argv_argument_links);
-	return this->map;
+	return 0;
 fail:
-	return NULL;
+	return 1;
 }
 
 static int parse_arg_n(cmn_argparser_t this, int argc, const char** argv,
@@ -209,18 +215,12 @@ static int handle_optional_missing_elements(cmn_argparser_t this, int argc, cons
 	if (!cmn_list_is_empty(missing_optional_arg_list)) {
 		for (iterator = cmn_list_begin(missing_optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
 			struct cmn_argparser_argument* element = cmn_iterator_data(iterator);
-			bool is_positional = element->name;
-			bool have_flag = element->flag;
-			cmn_map_insert(
-				this->map,
-				is_positional ?
-				(void*)element->name :
-				have_flag ?
-				(void*)element->flag :
-				(void*)element->long_flag,
-				(void*)element->default_value,
-				NULL
-			);
+			if (element->action == CMN_ARGPARSER_ACTION_STORE) {
+				if (element->type == CMN_ARGPARSER_CSTR) {
+					*(element->result) = malloc(strlen((char*)element->default_value) + 1);
+					strcpy((char*)*(element->result), (char*)element->default_value);
+				}
+			}
 		}
 	}
 	cmn_iterator_destroy(iterator);
@@ -236,18 +236,19 @@ static int parse_action_store(cmn_argparser_t this, int argc, const char** argv,
 	switch (argument->action_nargs) {
 	case CMN_ARGPARSER_ACTION_NARGS_SINGLE:
 		if (is_positional) {
-			cmn_map_insert(this->map, (void*)argument->name, (void*)argv[n], NULL);
+			if (argument->type == CMN_ARGPARSER_CSTR) {
+				*(argument->result) = malloc(strlen(argv[n]) + 1);
+				strcpy((char*)*(argument->result), argv[n]);
+			}
 			argv_argument_links[n] = argument;
 		}
 		else {
 			if (n == argc - 1) {
 				return 1;
 			}
-			if (have_flag) {
-				cmn_map_insert(this->map, (void*)argument->flag, (void*)argv[n + 1], NULL);
-			}
-			else {
-				cmn_map_insert(this->map, (void*)argument->long_flag, (void*)argv[n + 1], NULL);
+			if (argument->type == CMN_ARGPARSER_CSTR) {
+				*(argument->result) = malloc(strlen(argv[n + 1]) + 1);
+				strcpy((char*)*(argument->result), argv[n + 1]);
 			}
 			argv_argument_links[n] = argument;
 			argv_argument_links[n + 1] = argument;

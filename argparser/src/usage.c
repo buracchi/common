@@ -35,7 +35,6 @@ extern int parse_action_help(cmn_argparser_t this, int argc, const char** argv) 
 	fprintf(stderr, "%s", help_message);
 	free(help_message);
 	exit(EXIT_SUCCESS);
-	return 0;
 }
 
 static int set_help_message(char** help_message, cmn_argparser_t this, int argc, const char** argv) {

@@ -14,8 +14,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include <buracchi/common/containers/map.h>
-
 typedef struct cmn_argparser* cmn_argparser_t;
 
 /**
@@ -130,6 +128,10 @@ enum cmn_argparser_action_nargs {
 	CMN_ARGPARSER_ACTION_NARGS_LIST_OPTIONAL,
 };
 
+enum cmn_argparser_type {
+	CMN_ARGPARSER_CSTR
+};
+
 /**
  * @struct cmn_argparser_argument
  *
@@ -213,11 +215,13 @@ enum cmn_argparser_action_nargs {
  *       characters to make sure the string is a valid attribute name.
  */
 struct cmn_argparser_argument {
+	bool active;
+	void** result;
+	enum cmn_argparser_action action;
 	const char* name;
 	const char* flag;
 	const char* long_flag;
 	bool is_required;
-	enum cmn_argparser_action action;
 	enum cmn_argparser_action_nargs action_nargs;
 	size_t nargs_list_size;
 	void* const_value;
@@ -225,7 +229,10 @@ struct cmn_argparser_argument {
 	char** choices;
 	const char* help;
 	const char* destination;
+	enum cmn_argparser_type type;
 };
+
+#define CMN_ARGPARSER_ARGUMENT(...) (struct cmn_argparser_argument)__VA_ARGS__
 
 /**
  * @brief Initialize an argument parser object.
@@ -235,7 +242,7 @@ struct cmn_argparser_argument {
 extern cmn_argparser_t cmn_argparser_init();
 
 /**
- * @brief
+ * @brief Free memory associated to an argument parser object.
  *
  * @param argparser
  * @return int
@@ -283,20 +290,14 @@ extern int cmn_argparser_set_usage(cmn_argparser_t argparser, const char* usage)
  */
 extern int cmn_argparser_set_description(cmn_argparser_t argparser, const char* description);
 
+extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparser, char** result, struct cmn_argparser_argument argument);
+#define cmn_argparser_add_argument_action_store(argparser, result, argument) _Generic((result), \
+				    char**: cmn_argparser_add_argument_action_store_cstr)((argparser), (result), (argument))
+#define cmn_argparser_add_argument cmn_argparser_add_argument_action_store
+
 extern int cmn_argparser_add_arguments_with_size(cmn_argparser_t argparser, const struct cmn_argparser_argument* arguments, size_t arguments_number);
 
-#define cmn_argparser_add_arguments(argparser, arguments) \
-	cmn_argparser_add_arguments_with_size((argparser), (arguments), sizeof *(arguments) / sizeof(struct cmn_argparser_argument));
-
-/**
- * @brief
- *
- * @param argparser
- * @param argc
- * @param argv
- * @return cmn_map_t
- */
-extern cmn_map_t cmn_argparser_parse(cmn_argparser_t argparser, int argc, const char** argv);
+extern int cmn_argparser_parse(cmn_argparser_t argparser, int argc, const char** argv);
 
 /**
  * TODO:
