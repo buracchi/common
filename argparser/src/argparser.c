@@ -38,8 +38,6 @@ extern int cmn_argparser_destroy(cmn_argparser_t this) {
 	free(this->usage);
 	free(this);
 	return 0;
-fail:
-	return 1;
 }
 
 extern int cmn_argparser_set_program_name(cmn_argparser_t argparser, const char* program_name) {
@@ -90,9 +88,9 @@ extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparse
 	argument.action = CMN_ARGPARSER_ACTION_STORE;
 	argument.type = CMN_ARGPARSER_CSTR;
 	argument.result = (void**)result;
-	struct cmn_argparser_argument* arguments_reallocated_address;
-	try(arguments_reallocated_address = realloc(argparser->arguments, sizeof * argparser->arguments * argparser->arguments_number), NULL, fail);
-	argparser->arguments = arguments_reallocated_address;
+	struct cmn_argparser_argument* reallocated_address;
+	try(reallocated_address = realloc(argparser->arguments, sizeof * argparser->arguments * argparser->arguments_number), NULL, fail);
+	argparser->arguments = reallocated_address;
 	memcpy(&(argparser->arguments[argparser->arguments_number - 1]), &argument, sizeof * argparser->arguments);
 	return 0;
 fail:

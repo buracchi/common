@@ -87,7 +87,7 @@ enum cmn_argparser_action {
 	CMN_ARGPARSER_ACTION_VERSION,
 	CMN_ARGPARSER_ACTION_HELP,
 	CMN_ARGPARSER_ACTION_EXTEND,
-	CMN_ARGPARSER_BOOLEAN_OPTIONAL
+	CMN_ARGPARSER_ACTION_BOOLEAN_OPTIONAL
 };
 
 /**
@@ -294,8 +294,6 @@ extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparse
 #define cmn_argparser_add_argument_action_store(argparser, result, argument) _Generic((result), \
 				    char**: cmn_argparser_add_argument_action_store_cstr)((argparser), (result), (argument))
 #define cmn_argparser_add_argument cmn_argparser_add_argument_action_store
-
-extern int cmn_argparser_add_arguments_with_size(cmn_argparser_t argparser, const struct cmn_argparser_argument* arguments, size_t arguments_number);
 
 extern int cmn_argparser_parse(cmn_argparser_t argparser, int argc, const char** argv);
 
