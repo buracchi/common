@@ -112,8 +112,8 @@
       "displayName": "x64 Debug",
       "inherits": [ "linux-default", "x64-debug" ],
       "cacheVariables": {
-        "CMAKE_C_FLAGS_DEBUG": "-Wall -Wextra -pedantic -g3",
-        "CMAKE_CXX_FLAGS_DEBUG": "-std=c++20 -Wall -Wextra -fms-extensions -pedantic"
+        "CMAKE_C_FLAGS_DEBUG": "-Wall -Wextra -pedantic -fms-extensions -g3 -ggdb3",
+        "CMAKE_CXX_FLAGS_DEBUG": "-std=c++20 -Wall -Wextra -pedantic -g3 -ggdb3"
       }
     },
     {

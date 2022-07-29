@@ -2,8 +2,7 @@
 
 add_library(networking-communication-manager
     OBJECT
-    "src/communication_manager.c"
-    "src/request_handler.c")
+    "src/communication_manager.c")
 target_include_directories(networking-communication-manager PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
