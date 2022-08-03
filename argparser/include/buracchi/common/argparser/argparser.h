@@ -13,8 +13,13 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 
-typedef struct cmn_argparser* cmn_argparser_t;
+// TODO: replace ', ##__VA_ARGS__' with '__VA_OPT__(,)' when the world will be a better place, when the compilers
+//       vendors will also care about us and the C standard committee will stop doing whatever they are doing.
+
+typedef struct cmn_argparser *cmn_argparser_t;
 
 /**
  * @enum cmn_argparser_action
@@ -129,7 +134,12 @@ enum cmn_argparser_action_nargs {
 };
 
 enum cmn_argparser_type {
-	CMN_ARGPARSER_CSTR
+	CMN_ARGPARSER_TYPE_BOOL,
+	CMN_ARGPARSER_TYPE_CSTR,
+	CMN_ARGPARSER_TYPE_INT,
+	CMN_ARGPARSER_TYPE_LONG,
+	CMN_ARGPARSER_TYPE_USHORT,
+	CMN_ARGPARSER_TYPE_UINT,
 };
 
 /**
@@ -152,7 +162,7 @@ enum cmn_argparser_type {
  *      @details If name is not NULL this field will be ignored during parsing.
  *
  * @var cmn_argparser_argument::is_required
- *      @brief Specify if an option is required, @ref cmn_argparser_parse will
+ *      @brief Specify if an option is required, @ref cmn_argparser_parse_args will
  *       report an error if that option is not present at the command line.
  *      @details If name is not NULL this field will be ignored during parsing.
  *       The default value of this field is false.
@@ -162,7 +172,7 @@ enum cmn_argparser_type {
  *      @details Argparser objects associate command-line arguments with
  *       actions. These actions can do just about anything with the command-line
  *       arguments associated with them, though most actions simply add a value
- *       into the map returned by \ref cmn_argparser_parse().
+ *       into the map returned by \ref cmn_argparser_parse_args().
  *       The default action is @ref CMN_ARGPARSER_ACTION_STORE.
  *
  * @var cmn_argparser_argument::action_nargs
@@ -195,7 +205,7 @@ enum cmn_argparser_type {
  *
  * @var cmn_argparser_argument::choices
  *      @brief Specify a NULL terminated array of acceptable values, @ref
- *       cmn_argparser_parse will report an error if the argument was not one
+ *       cmn_argparser_parse_args will report an error if the argument was not one
  *       of the acceptable values.
  *
  * @var cmn_argparser_argument::help
@@ -216,19 +226,19 @@ enum cmn_argparser_type {
  */
 struct cmn_argparser_argument {
 	bool active;
-	void** result;
+	void **result;
 	enum cmn_argparser_action action;
-	const char* name;
-	const char* flag;
-	const char* long_flag;
+	const char *name;
+	const char *flag;
+	const char *long_flag;
 	bool is_required;
 	enum cmn_argparser_action_nargs action_nargs;
 	size_t nargs_list_size;
-	void* const_value;
-	void* default_value;
-	char** choices;
-	const char* help;
-	const char* destination;
+	void *const_value;
+	void *default_value;
+	char **choices;
+	const char *help;
+	const char *destination;
 	enum cmn_argparser_type type;
 };
 
@@ -239,7 +249,7 @@ struct cmn_argparser_argument {
  *
  * @return An initialized cmn_argparser object
  */
-extern cmn_argparser_t cmn_argparser_init();
+extern cmn_argparser_t cmn_argparser_init(int sys_argc, char *const *sys_argv);
 
 /**
  * @brief Free memory associated to an argument parser object.
@@ -262,7 +272,7 @@ extern int cmn_argparser_destroy(cmn_argparser_t argparser);
  * @param argparser the argument parser object.
  * @param program_name The name of the program (default: basename(argv[0])).
  */
-extern int cmn_argparser_set_program_name(cmn_argparser_t argparser, const char* program_name);
+extern int cmn_argparser_set_program_name(cmn_argparser_t argparser, char const *program_name);
 
 /**
  * @brief Set the argument parser object usage message.
@@ -275,7 +285,7 @@ extern int cmn_argparser_set_program_name(cmn_argparser_t argparser, const char*
  * @param argparser the argument parser object.
  * @param usage The string describing the program usage.
  */
-extern int cmn_argparser_set_usage(cmn_argparser_t argparser, const char* usage);
+extern int cmn_argparser_set_usage(cmn_argparser_t argparser, const char *usage);
 
 /**
  * @brief Set the Text to display before the argument help.
@@ -288,14 +298,117 @@ extern int cmn_argparser_set_usage(cmn_argparser_t argparser, const char* usage)
  * @param argparser the argument parser object.
  * @param description The string to display before the argument help.
  */
-extern int cmn_argparser_set_description(cmn_argparser_t argparser, const char* description);
+extern int cmn_argparser_set_description(cmn_argparser_t argparser, const char *description);
 
-extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparser, char** result, struct cmn_argparser_argument argument);
-#define cmn_argparser_add_argument_action_store(argparser, result, argument) _Generic((result), \
-				    char**: cmn_argparser_add_argument_action_store_cstr)((argparser), (result), (argument))
+extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparser, char **result,
+                                                        struct cmn_argparser_argument argument);
+
+extern int cmn_argparser_add_argument_action_store_int(cmn_argparser_t argparser, int *result,
+                                                       struct cmn_argparser_argument argument);
+
+extern int cmn_argparser_add_argument_action_store_long(cmn_argparser_t argparser, long int *result,
+                                                        struct cmn_argparser_argument argument);
+
+extern int cmn_argparser_add_argument_action_store_ushort(cmn_argparser_t argparser, unsigned short int *result,
+                                                          struct cmn_argparser_argument argument);
+
+extern int cmn_argparser_add_argument_action_store_uint(cmn_argparser_t argparser, unsigned int *result,
+                                                        struct cmn_argparser_argument argument);
+
+#define cmn_argparser_add_argument_action_store(argparser, result, argument) _Generic((result),                     \
+                    char**: cmn_argparser_add_argument_action_store_cstr,                                           \
+                    int*: cmn_argparser_add_argument_action_store_int,                                              \
+                    long int*: cmn_argparser_add_argument_action_store_long,                                        \
+                    unsigned short int*: cmn_argparser_add_argument_action_store_ushort,                            \
+                    unsigned int*: cmn_argparser_add_argument_action_store_uint)((argparser), (result), (argument))
+
 #define cmn_argparser_add_argument cmn_argparser_add_argument_action_store
 
-extern int cmn_argparser_parse(cmn_argparser_t argparser, int argc, const char** argv);
+extern int cmn_argparser_add_argument_action_store_true(cmn_argparser_t argparser, bool *result,
+                                                        struct cmn_argparser_argument argument);
+
+extern int cmn_argparser_add_argument_action_store_false(cmn_argparser_t argparser, bool *result,
+                                                         struct cmn_argparser_argument argument);
+
+#define cmn_argparser_parse_argsN(N3, N2, N1, N, ...) cmn_argparser_parse_args##N
+
+extern int cmn_argparser_parse_args1(cmn_argparser_t argparser);
+
+#define cmn_argparser_parse_args2(argparser, args) \
+    cmn_argparser_parse_args3((argparser), (args), (sizeof(args) / sizeof(char*)))
+
+extern int cmn_argparser_parse_args3(cmn_argparser_t argparser, char *args[const], size_t args_size);
+
+/**
+ * @brief Convert argument strings to objects.
+ *
+ * @details Previous calls to cmn_argparser_add_argument() determine exactly what objects are created and how they
+ * are assigned.
+ *
+ * @param argparaser
+ * @param args (optional) if unspecified it will be used the sys_argc and sys_argv param specified in the
+ * 			   cmn_argparser_init() call.
+ * @param args_size (optional) if unspecified it will be used the sizeof operator to infer the args elements number.
+ *
+ * @returns 0 on success, 1 otherwise.
+ */
+#define cmn_argparser_parse_args(argparaser, ...) \
+    cmn_argparser_parse_argsN(argparaser, ##__VA_ARGS__, 3, 2, 1, 0)(argparaser, ##__VA_ARGS__)
+
+/**
+ * Printing help
+ *
+ * In most typical applications, cmn_argparser_parse_args() will take care of formatting and printing any usage or
+ * error messages
+ * However, several formatting functions are available
+ */
+
+#define cmn_argparser_print_usageN(N2, N1, N, ...) cmn_argparser_print_usage##N
+
+#define cmn_argparser_print_usage1(argparser) \
+    cmn_argparser_print_usage2(argparser, stdout)
+
+extern int cmn_argparser_print_usage2(cmn_argparser_t argparser, FILE *file);
+
+/**
+ * @brief Print a brief description of how the ArgumentParser should be invoked on the command line.
+ * If file is unspecified stdout is assumed.
+ *
+ * @param argparser
+ * @param file
+ */
+#define cmn_argparser_print_usage(argparaser, ...) \
+    cmn_argparser_print_usageN(argparaser, ##__VA_ARGS__, 2, 1, 0)(argparaser, ##__VA_ARGS__)
+
+#define cmn_argparser_print_helpN(N2, N1, N, ...) cmn_argparser_print_help##N
+
+#define cmn_argparser_print_help1(argparser) \
+    cmn_argparser_print_help2(argparser, stdout)
+
+extern int cmn_argparser_print_help2(cmn_argparser_t argparser, FILE *file);
+
+/**
+ * @brief Print a help message, including the program usage and information about the arguments registered with the
+ * ArgumentParser.
+ * If file is unspecified stdout is assumed.
+ *
+ * @param argparser
+ * @param file
+ */
+#define cmn_argparser_print_help(argparaser, ...) \
+    cmn_argparser_print_helpN(argparaser, ##__VA_ARGS__, 2, 1, 0)(argparaser, ##__VA_ARGS__)
+
+/**
+ * @brief Return a string containing a brief description of how the ArgumentParser should be invoked on the
+ * command line.
+ */
+extern char *cmn_argparser_format_usage(cmn_argparser_t argparser);
+
+/**
+ * @brief Return a string containing a help message, including the program usage and information about the arguments
+ * registered with the ArgumentParser.
+ */
+extern char *cmn_argparser_format_help(cmn_argparser_t argparser);
 
 /**
  * TODO:

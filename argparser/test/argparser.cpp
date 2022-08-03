@@ -4,10 +4,29 @@ extern "C" {
 #include "main-mock.h"
 }
 
-#include <string>
+#include <array>
 
 TEST(cmn_argparser, test) {
-	int argc = 4;
-	const char* argv[] = { "./test_program", "test", "-f", "11", nullptr };
-	ASSERT_EQ(std::string(argv[1]), std::string(mock_main(argc, argv)));
+	auto args = std::to_array({"./test_program", "test", "-f", "11"});
+	ASSERT_EQ(mock_main(args.size(), const_cast<char **>(args.data())), 0);
+}
+
+TEST(cmn_argparser, parse_array_of_string) {
+	auto args = std::to_array({"./test_program"});
+	ASSERT_EQ(test_parse_array_of_strings(args.size(), const_cast<char **>(args.data())), 0);
+}
+
+TEST(cmn_argparser, action_store_type_uint) {
+	auto args = std::to_array({"./test_program"});
+	ASSERT_EQ(test_action_store_type_uint(args.size(), const_cast<char **>(args.data())), 0);
+}
+
+TEST(cmn_argparser, action_store_true) {
+	auto args = std::to_array({"./test_program"});
+	ASSERT_EQ(test_action_store_true(args.size(), const_cast<char **>(args.data())), 0);
+}
+
+TEST(cmn_argparser, action_store_false) {
+	auto args = std::to_array({"./test_program"});
+	ASSERT_EQ(test_action_store_false(args.size(), const_cast<char **>(args.data())), 0);
 }
