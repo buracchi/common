@@ -13,6 +13,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -228,21 +229,19 @@ struct cmn_argparser_argument {
 	bool active;
 	void **result;
 	enum cmn_argparser_action action;
-	const char *name;
-	const char *flag;
-	const char *long_flag;
+	char const *name;
+	char const *flag;
+	char const *long_flag;
 	bool is_required;
 	enum cmn_argparser_action_nargs action_nargs;
 	size_t nargs_list_size;
 	void *const_value;
 	void *default_value;
 	char **choices;
-	const char *help;
-	const char *destination;
+	char const *help;
+	char const *destination;
 	enum cmn_argparser_type type;
 };
-
-#define CMN_ARGPARSER_ARGUMENT(...) (struct cmn_argparser_argument)__VA_ARGS__
 
 /**
  * @brief Initialize an argument parser object.
@@ -257,7 +256,7 @@ extern cmn_argparser_t cmn_argparser_init(int sys_argc, char *const *sys_argv);
  * @param argparser
  * @return int
  */
-extern int cmn_argparser_destroy(cmn_argparser_t argparser);
+extern void cmn_argparser_destroy(cmn_argparser_t argparser);
 
 /**
  * @brief Set the argument parser object program name.
@@ -272,7 +271,7 @@ extern int cmn_argparser_destroy(cmn_argparser_t argparser);
  * @param argparser the argument parser object.
  * @param program_name The name of the program (default: basename(argv[0])).
  */
-extern int cmn_argparser_set_program_name(cmn_argparser_t argparser, char const *program_name);
+extern void cmn_argparser_set_program_name(cmn_argparser_t argparser, char const *program_name);
 
 /**
  * @brief Set the argument parser object usage message.
@@ -285,7 +284,7 @@ extern int cmn_argparser_set_program_name(cmn_argparser_t argparser, char const 
  * @param argparser the argument parser object.
  * @param usage The string describing the program usage.
  */
-extern int cmn_argparser_set_usage(cmn_argparser_t argparser, const char *usage);
+extern void cmn_argparser_set_usage(cmn_argparser_t argparser, char const *usage);
 
 /**
  * @brief Set the Text to display before the argument help.
@@ -298,44 +297,53 @@ extern int cmn_argparser_set_usage(cmn_argparser_t argparser, const char *usage)
  * @param argparser the argument parser object.
  * @param description The string to display before the argument help.
  */
-extern int cmn_argparser_set_description(cmn_argparser_t argparser, const char *description);
+extern void cmn_argparser_set_description(cmn_argparser_t argparser, char const *description);
 
-extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparser, char **result,
+extern int cmn_argparser_add_argument_action_store_cstr(cmn_argparser_t argparser,
+                                                        char **result,
                                                         struct cmn_argparser_argument argument);
 
-extern int cmn_argparser_add_argument_action_store_int(cmn_argparser_t argparser, int *result,
+extern int cmn_argparser_add_argument_action_store_int(cmn_argparser_t argparser,
+                                                       int *result,
                                                        struct cmn_argparser_argument argument);
 
-extern int cmn_argparser_add_argument_action_store_long(cmn_argparser_t argparser, long int *result,
+extern int cmn_argparser_add_argument_action_store_long(cmn_argparser_t argparser,
+                                                        long int *result,
                                                         struct cmn_argparser_argument argument);
 
-extern int cmn_argparser_add_argument_action_store_ushort(cmn_argparser_t argparser, unsigned short int *result,
+extern int cmn_argparser_add_argument_action_store_ushort(cmn_argparser_t argparser,
+                                                          unsigned short int *result,
                                                           struct cmn_argparser_argument argument);
 
-extern int cmn_argparser_add_argument_action_store_uint(cmn_argparser_t argparser, unsigned int *result,
+extern int cmn_argparser_add_argument_action_store_uint(cmn_argparser_t argparser,
+                                                        unsigned int *result,
                                                         struct cmn_argparser_argument argument);
 
-#define cmn_argparser_add_argument_action_store(argparser, result, argument) _Generic((result),                     \
+#define cmn_argparser_add_argument_action_store(argparser, result, ...)        \
+	_Generic((result),                          \
                     char**: cmn_argparser_add_argument_action_store_cstr,                                           \
                     int*: cmn_argparser_add_argument_action_store_int,                                              \
                     long int*: cmn_argparser_add_argument_action_store_long,                                        \
                     unsigned short int*: cmn_argparser_add_argument_action_store_ushort,                            \
-                    unsigned int*: cmn_argparser_add_argument_action_store_uint)((argparser), (result), (argument))
+                    unsigned int*: cmn_argparser_add_argument_action_store_uint)((argparser), (result), (struct cmn_argparser_argument)__VA_ARGS__)
 
 #define cmn_argparser_add_argument cmn_argparser_add_argument_action_store
 
-extern int cmn_argparser_add_argument_action_store_true(cmn_argparser_t argparser, bool *result,
+extern int cmn_argparser_add_argument_action_store_true(cmn_argparser_t argparser,
+                                                        bool *result,
                                                         struct cmn_argparser_argument argument);
 
-extern int cmn_argparser_add_argument_action_store_false(cmn_argparser_t argparser, bool *result,
+extern int cmn_argparser_add_argument_action_store_false(cmn_argparser_t argparser,
+                                                         bool *result,
                                                          struct cmn_argparser_argument argument);
 
-#define cmn_argparser_parse_argsN(N3, N2, N1, N, ...) cmn_argparser_parse_args##N
+#define cmn_argparser_parse_argsN(N3, N2, N1, N, ...)                          \
+	cmn_argparser_parse_args##N
 
 extern int cmn_argparser_parse_args1(cmn_argparser_t argparser);
 
-#define cmn_argparser_parse_args2(argparser, args) \
-    cmn_argparser_parse_args3((argparser), (args), (sizeof(args) / sizeof(char*)))
+#define cmn_argparser_parse_args2(argparser, args)                             \
+	cmn_argparser_parse_args3((argparser), (args), (sizeof(args) / sizeof(char *)))
 
 extern int cmn_argparser_parse_args3(cmn_argparser_t argparser, char *args[const], size_t args_size);
 
@@ -409,6 +417,63 @@ extern char *cmn_argparser_format_usage(cmn_argparser_t argparser);
  * registered with the ArgumentParser.
  */
 extern char *cmn_argparser_format_help(cmn_argparser_t argparser);
+
+/*******************************************************************************
+ * 				Other utilities				       *
+ ******************************************************************************/
+/*******************************************************************************
+ * 				  Sub-commands				       *
+ ******************************************************************************/
+/**
+ * Many programs split up their functionality into a number of sub-commands,
+ * for example, the svn program can invoke sub-commands like svn checkout,
+ * svn update, and svn commit.
+ * Splitting up functionality this way can be a particularly good idea when a
+ * program performs several different functions which require different kinds
+ * of command-line arguments.
+ * ArgumentParser supports the creation of such sub-commands with the
+ * add_subparsers() method.
+ * The add_subparsers() method is normally called with no arguments and returns
+ * a special action object.
+ * This object has a single method, add_parser(), which takes a command name
+ * and any ArgumentParser constructor arguments, and returns an ArgumentParser
+ * object that can be modified as usual.
+ */
+
+struct cmn_argparser_subparsers_options {
+	char const *title; /* title for the sub-parser group in help output; by
+	                default “subcommands” if description is provided,
+	                otherwise uses title for positional arguments */
+	char const *description; /* description for the sub-parser group in help
+	                      output, by default None */
+	char const *prog; /* usage information that will be displayed with
+	                     sub-command help, by default the name of the
+	                     program and any positional arguments before the
+	                     subparser argument */
+	bool required; /* Whether a subcommand must be provided, by default False */
+	char const *help;    /* help for sub-parser group in help output, by
+	                        default None */
+	char const *metavar; /* string presenting available sub-commands in
+	                        help; by default it is None and presents
+	                        sub-commands in form {cmd1, cmd2, ..}; */
+};
+
+extern void cmn_argparser_set_subparsers_options(cmn_argparser_t argparser,
+                                                 struct cmn_argparser_subparsers_options options);
+
+/**
+ *
+ * @param argparser
+ * @param selection_result pointer to a variable storing the user subcommand
+ * selection
+ * @param command_name
+ * @param help default None
+ * @return
+ */
+extern cmn_argparser_t cmn_argparser_add_subparser(cmn_argparser_t argparser,
+                                                   char const **selection_result,
+                                                   char const *command_name,
+                                                   char const *help);
 
 /**
  * TODO:

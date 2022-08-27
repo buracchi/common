@@ -1,8 +1,5 @@
 #include <buracchi/common/argparser/argparser.h>
 
-#include <ctype.h>
-#include <libgen.h>
-#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -10,55 +7,143 @@
 #include <string.h>
 
 #include "buracchi/common/utilities/try.h"
-#include <buracchi/common/containers/list/linked_list.h>
 #include <buracchi/common/utilities/strto.h>
 #include <buracchi/common/utilities/utilities.h>
 
 #include "struct_argparser.h"
+#include "utils.h"
 
-static int parse_arg_n(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links, size_t n);
+static int parse_arg_n(cmn_argparser_t this,
+                       size_t argc,
+                       char *const *argv,
+                       struct cmn_argparser_argument **argv_argument_links,
+                       size_t n);
 
-static struct cmn_argparser_argument *match_arg(cmn_argparser_t this, size_t argc, char const *args, struct cmn_argparser_argument **argv_argument_links);
+static struct cmn_argparser_argument *match_arg(cmn_argparser_t this,
+                                                size_t argc,
+                                                char const *args,
+                                                struct cmn_argparser_argument **argv_argument_links);
 
-static int parse_action_store(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links, size_t n, struct cmn_argparser_argument *argument);
+static int parse_action_store(cmn_argparser_t this,
+                              size_t argc,
+                              char *const *argv,
+                              struct cmn_argparser_argument **argv_argument_links,
+                              size_t n,
+                              struct cmn_argparser_argument *argument);
 
-static int parse_action_store_const(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links, size_t n, struct cmn_argparser_argument *argument);
+static int parse_action_store_const(cmn_argparser_t this,
+                                    size_t argc,
+                                    char *const *argv,
+                                    struct cmn_argparser_argument **argv_argument_links,
+                                    size_t n,
+                                    struct cmn_argparser_argument *argument);
 
 static int parse_action_help(cmn_argparser_t argparser);
 
-static int handle_unrecognized_elements(cmn_argparser_t argparser, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links);
+static int handle_unrecognized_elements(cmn_argparser_t argparser,
+                                        size_t argc,
+                                        char *const *argv,
+                                        struct cmn_argparser_argument **argv_argument_links);
 
-static int handle_required_missing_elements(cmn_argparser_t argparser, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links);
+static int handle_required_missing_elements(cmn_argparser_t argparser,
+                                            size_t argc,
+                                            struct cmn_argparser_argument **argv_argument_links,
+                                            bool subcommand_parsed);
 
-static int handle_optional_missing_elements(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links);
+static int handle_optional_missing_elements(cmn_argparser_t this,
+                                            size_t argc,
+                                            struct cmn_argparser_argument **argv_argument_links);
 
-static void convert_result(cmn_argparser_t argparser, struct cmn_argparser_argument *argument, char const *arg);
-
-extern int print_usage(cmn_argparser_t argparser);
+static void convert_result(cmn_argparser_t argparser,
+                           struct cmn_argparser_argument *argument,
+                           char const *arg);
 
 extern int cmn_argparser_parse_args1(cmn_argparser_t argparser) {
-	return (cmn_argparser_parse_args3(argparser, (char **)argparser->sys_argv + 1, argparser->sys_argc - 1));
+	return (cmn_argparser_parse_args3(argparser,
+	                                  (char **)argparser->sys_argv + 1,
+	                                  argparser->sys_argc - 1));
 }
 
 extern int cmn_argparser_parse_args3(cmn_argparser_t argparser, char *args[const], size_t args_size) {
-	struct cmn_argparser_argument **argv_argument_links = NULL;
-	try(argv_argument_links = malloc(args_size * sizeof(struct cmn_argparser_argument *)), NULL, fail);
-	memset(argv_argument_links, 0, args_size * sizeof(struct cmn_argparser_argument *));
+	struct cmn_argparser_argument **arg_argument_relationships = NULL;
+	size_t positional_params_number = 0;
+	size_t positional_params_left;
+	bool subcommand_parsed = false;
+	try(arg_argument_relationships = malloc(args_size * sizeof *arg_argument_relationships),
+	    NULL,
+	    fail);
 	for (size_t i = 0; i < args_size; i++) {
-		if (parse_arg_n(argparser, args_size, args, argv_argument_links, i)) {
-			break;
+		arg_argument_relationships[i] = NULL;
+	}
+	for (size_t i = 0; i < argparser->arguments_number; i++) {
+		if (argparser->arguments[i].name) {
+			positional_params_number++;
 		}
 	}
-	handle_unrecognized_elements(argparser, args_size, args, argv_argument_links);
-	handle_required_missing_elements(argparser, args_size, args, argv_argument_links);
-	handle_optional_missing_elements(argparser, args_size, args, argv_argument_links);
-	free(argv_argument_links);
+	positional_params_left = positional_params_number;
+	for (size_t i = 0; i < args_size; i++) {
+		bool is_arg_parsed = arg_argument_relationships[i];
+		if (is_arg_parsed) {
+			continue;
+		}
+		if (positional_params_left == 0) {
+			for (size_t j = 0; j < argparser->subparsers_number; j++) {
+				if (!strcmp(args[i], argparser->subparsers[j].command_name)) {
+					*(argparser->subparsers[j].selection_result) =
+						args[i];
+					cmn_argparser_parse_args3(
+						argparser->subparsers[j].parser,
+						args + i + 1,
+						args_size - i - 1);
+					args_size = i;
+					subcommand_parsed = true;
+					goto end;
+				}
+			}
+		}
+		if (parse_arg_n(argparser, args_size, args, arg_argument_relationships, i)) {
+			break;
+		}
+		if (arg_argument_relationships[i] &&
+		    arg_argument_relationships[i]->name) {
+			positional_params_left--;
+		}
+		if (positional_params_left == 0 && arg_argument_relationships[i] == NULL) {
+			cmn_argparser_print_usage(argparser);
+			printf("%s: error: argument {",
+			       argparser->program_name ?
+			               argparser->program_name :
+			               basename(argparser->sys_argv[0]));
+			for (size_t j = 0; j < argparser->subparsers_number; j++) {
+				printf("%s%s",
+				       argparser->subparsers[j].command_name,
+				       (j < argparser->subparsers_number - 1) ? "," : "");
+			}
+			printf("}: invalid choice: '%s' (choose from ", args[i]);
+			for (size_t j = 0; j < argparser->subparsers_number; j++) {
+				printf("'%s'%s",
+				       argparser->subparsers[j].command_name,
+				       (j < argparser->subparsers_number - 1) ? "," : "");
+			}
+			printf(")\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+end:
+	handle_unrecognized_elements(argparser, args_size, args, arg_argument_relationships);
+	handle_required_missing_elements(argparser, args_size, arg_argument_relationships, subcommand_parsed);
+	handle_optional_missing_elements(argparser, args_size, arg_argument_relationships);
+	free(arg_argument_relationships);
 	return 0;
 fail:
 	return 1;
 }
 
-static int parse_arg_n(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links, size_t n) {
+static int parse_arg_n(cmn_argparser_t this,
+                       size_t argc,
+                       char *const *argv,
+                       struct cmn_argparser_argument **argv_argument_links,
+                       size_t n) {
 	struct cmn_argparser_argument *matching_arg;
 	matching_arg = match_arg(this, argc, argv[n], argv_argument_links);
 	if (matching_arg) {
@@ -88,7 +173,10 @@ static int parse_arg_n(cmn_argparser_t this, size_t argc, char *const *argv, str
 	return 0;
 }
 
-static struct cmn_argparser_argument *match_arg(cmn_argparser_t this, size_t argc, char const *args, struct cmn_argparser_argument **argv_argument_links) {
+static struct cmn_argparser_argument *match_arg(cmn_argparser_t this,
+                                                size_t argc,
+                                                char const *args,
+                                                struct cmn_argparser_argument **argv_argument_links) {
 	bool match_positional = (args[0] != '-');
 	bool match_optional = !match_positional && args[1];
 	bool match_long_flag = match_optional && (args[1] == '-') && args[2];
@@ -114,144 +202,176 @@ static struct cmn_argparser_argument *match_arg(cmn_argparser_t this, size_t arg
 	return NULL;
 }
 
-static int handle_unrecognized_elements(cmn_argparser_t argparser, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links) {
-	cmn_list_t error_arg_list = (cmn_list_t)cmn_linked_list_init();
+static int handle_unrecognized_elements(cmn_argparser_t argparser,
+                                        size_t argc,
+                                        char *const *argv,
+                                        struct cmn_argparser_argument **argv_argument_links) {
+	bool all_arguments_recognized = true;
 	for (size_t i = 0; i < argc; i++) {
-		if (!argv_argument_links[i]) {
-			cmn_list_push_back(error_arg_list, (void *)argv[i]);
+		if (argv_argument_links[i] == NULL) {
+			all_arguments_recognized = false;
+			break;
 		}
 	}
-	if (!cmn_list_is_empty(error_arg_list)) {
-		char *program_name;
-		if (argparser->program_name) {
-			program_name = argparser->program_name;
-		}
-		else {
-			char *path = malloc(strlen(argparser->sys_argv[0]) + 1);
-			strcpy(path, argparser->sys_argv[0]);
-			program_name = basename(path);
-		}
-		cmn_argparser_print_usage(argparser);
-		fprintf(stdout, "%s: %s", program_name, "error: unrecognized arguments: ");
-		for (cmn_iterator_t i = cmn_list_begin(error_arg_list); !cmn_iterator_end(i); cmn_iterator_next(i)) {
-			fprintf(stdout, "%s ", (char const *)cmn_iterator_data(i));
-		}
-		fprintf(stdout, "\n");
-		exit(EXIT_FAILURE);
+	if (all_arguments_recognized) {
+		return 0;
 	}
-	cmn_list_destroy(error_arg_list);
+	cmn_argparser_print_usage(argparser);
+	printf("%s: error: unrecognized arguments: ",
+	       argparser->program_name ? argparser->program_name :
+	                                 basename(argparser->sys_argv[0]));
+	for (size_t i = 0; i < argc; i++) {
+		if (argv_argument_links[i] == NULL) {
+			printf("%s ", argv[i]);
+		}
+	}
+	printf("\n");
+	exit(EXIT_FAILURE);
+	return 0;
 }
 
-static int handle_required_missing_elements(cmn_argparser_t argparser, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links) {
-	cmn_iterator_t iterator;
-	cmn_list_t missing_required_arg_list = (cmn_list_t)cmn_linked_list_init();
-	cmn_list_t required_arg_list = (cmn_list_t)cmn_linked_list_init();
-	for (size_t i = 0; i < argparser->arguments_number; i++) {
-		// TODO: the check is incomplete
-		if (argparser->arguments[i].name || argparser->arguments[i].is_required) {
-			cmn_list_push_back(required_arg_list,
-			                   (void *)&(argparser->arguments[i]));
-		}
+static int handle_required_missing_elements(cmn_argparser_t argparser,
+                                            size_t argc,
+                                            struct cmn_argparser_argument **argv_argument_links,
+                                            bool subcommand_parsed) {
+	bool exists_missing_required_arg = false;
+	bool is_first_missing_arg = true;
+	if (argparser->subparsers_options.required && !subcommand_parsed) {
+		exists_missing_required_arg = true;
 	}
-	for (iterator = cmn_list_begin(required_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
-		struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
-		bool is_present = false;
-		for (size_t i = 0; i < argc; i++) {
-			if (argv_argument_links[i] == element) {
-				is_present = true;
-				break;
+	else {
+		for (size_t i = 0; i < argparser->arguments_number; i++) {
+			struct cmn_argparser_argument *argument;
+			bool is_arg_parsed = false;
+			argument = &(argparser->arguments[i]);
+			if (!argument->name && !argument->is_required) {
+				continue;
 			}
-		}
-		if (!is_present) {
-			cmn_list_push_back(missing_required_arg_list, (void *)element);
-		}
-	}
-	cmn_iterator_destroy(iterator);
-	cmn_list_destroy(required_arg_list);
-	if (!cmn_list_is_empty(missing_required_arg_list)) {
-		char *program_name;
-		if (argparser->program_name) {
-			program_name = argparser->program_name;
-		}
-		else {
-			char *path = malloc(strlen(argparser->sys_argv[0]) + 1);
-			strcpy(path, argparser->sys_argv[0]);
-			program_name = basename(path);
-		}
-		cmn_argparser_print_usage(argparser);
-		fprintf(stdout, "%s: %s", program_name, "error: the following arguments are required: ");
-		for (iterator = cmn_list_begin(missing_required_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
-			struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
-			char const *element_name;
-			if (element->name) {
-				element_name = element->name;
-			}
-			else {
-				asprintf((char **)&element_name,
-				         "%s%s%s%s%s",
-				         element->flag ? "-" : "",
-				         element->flag ? element->flag : ""
-				         , element->flag && element->long_flag ? "/" : "",
-				         element->long_flag ? "--" : "",
-				         element->long_flag ? element->long_flag : "");
-			}
-			fprintf(stdout, "%s ", element_name);
-		}
-		fprintf(stdout, "\n");
-		exit(EXIT_FAILURE);
-	}
-	cmn_list_destroy(missing_required_arg_list);
-}
-
-static int handle_optional_missing_elements(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links) {
-	cmn_iterator_t iterator;
-	cmn_list_t missing_optional_arg_list = (cmn_list_t)cmn_linked_list_init();
-	cmn_list_t optional_arg_list = (cmn_list_t)cmn_linked_list_init();
-	for (size_t i = 0; i < this->arguments_number; i++) {
-		if (!this->arguments[i].name && !this->arguments[i].is_required) {
-			cmn_list_push_back(optional_arg_list, (void *)&(this->arguments[i]));
-		}
-	}
-	for (iterator = cmn_list_begin(optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
-		struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
-		bool is_present = false;
-		for (size_t i = 0; i < argc; i++) {
-			if (argv_argument_links[i] == element) {
-				is_present = true;
-				break;
-			}
-		}
-		if (!is_present) {
-			cmn_list_push_back(missing_optional_arg_list, (void *)element);
-		}
-	}
-	cmn_iterator_destroy(iterator);
-	cmn_list_destroy(optional_arg_list);
-	if (!cmn_list_is_empty(missing_optional_arg_list)) {
-		for (iterator = cmn_list_begin(missing_optional_arg_list); !cmn_iterator_end(iterator); cmn_iterator_next(iterator)) {
-			struct cmn_argparser_argument *element = cmn_iterator_data(iterator);
-			if (element->action == CMN_ARGPARSER_ACTION_STORE) {
-				if (element->type == CMN_ARGPARSER_TYPE_CSTR) {
-					*(element->result) =
-						malloc(strlen((char *)element->default_value) + 1);
-					strcpy((char *)*(element->result),
-					       (char *)element->default_value);
+			for (size_t j = 0; j < argc; j++) {
+				if (argument == argv_argument_links[j]) {
+					is_arg_parsed = true;
+					break;
 				}
 			}
+			if (is_arg_parsed) {
+				continue;
+			}
+			exists_missing_required_arg = true;
+			break;
 		}
 	}
-	cmn_iterator_destroy(iterator);
-	cmn_list_destroy(missing_optional_arg_list);
+	if (!exists_missing_required_arg) {
+		return 0;
+	}
+	cmn_argparser_print_usage(argparser);
+	printf("%s: error: the following arguments are required: ",
+	       argparser->program_name ? argparser->program_name :
+	                                 basename(argparser->sys_argv[0]));
+	for (size_t i = 0; i < argparser->arguments_number; i++) {
+		struct cmn_argparser_argument *argument;
+		bool is_arg_parsed = false;
+		argument = &(argparser->arguments[i]);
+		if (!argument->name && !argument->is_required) {
+			continue;
+		}
+		for (size_t j = 0; j < argc; j++) {
+			if (argument == argv_argument_links[j]) {
+				is_arg_parsed = true;
+				break;
+			}
+		}
+		if (is_arg_parsed) {
+			continue;
+		}
+		if (!argument->name) {
+			printf("%s", is_first_missing_arg ? "" : ", ");
+			printf("%s%s%s%s%s",
+			       argument->flag ? "-" : "",
+			       argument->flag ? argument->flag : "",
+			       argument->flag && argument->long_flag ? "/" : "",
+			       argument->long_flag ? "--" : "",
+			       argument->long_flag ? argument->long_flag : "");
+			is_first_missing_arg = false;
+		}
+	}
+	for (size_t i = 0; i < argparser->arguments_number; i++) {
+		struct cmn_argparser_argument *argument;
+		bool is_arg_parsed = false;
+		argument = &(argparser->arguments[i]);
+		if (!argument->name && !argument->is_required) {
+			continue;
+		}
+		for (size_t j = 0; j < argc; j++) {
+			if (argument == argv_argument_links[j]) {
+				is_arg_parsed = true;
+				break;
+			}
+		}
+		if (is_arg_parsed) {
+			continue;
+		}
+		if (argument->name) {
+			printf("%s", is_first_missing_arg ? "" : ", ");
+			printf("%s", argument->name);
+			is_first_missing_arg = false;
+		}
+	}
+	if (argparser->subparsers_options.required && !subcommand_parsed) {
+		printf("%s{", is_first_missing_arg ? "" : ", ");
+		for (size_t i = 0; i < argparser->subparsers_number; i++) {
+			printf("%s%s",
+			       argparser->subparsers[i].command_name,
+			       (i < argparser->subparsers_number - 1) ? "," : "");
+		}
+		printf("}");
+	}
+	printf("\n");
+	exit(EXIT_FAILURE);
+	return 0;
+}
+
+static int handle_optional_missing_elements(cmn_argparser_t this,
+                                            size_t argc,
+                                            struct cmn_argparser_argument **argv_argument_links) {
+	for (size_t i = 0; i < this->arguments_number; i++) {
+		struct cmn_argparser_argument *argument;
+		bool is_arg_parsed = false;
+		argument = &(this->arguments[i]);
+		if (argument->name || argument->is_required) {
+			continue;
+		}
+		for (size_t j = 0; j < argc; j++) {
+			if (argument == argv_argument_links[j]) {
+				is_arg_parsed = true;
+				break;
+			}
+		}
+		if (is_arg_parsed) {
+			continue;
+		}
+		// TODO: handle all cases
+		if (argument->action == CMN_ARGPARSER_ACTION_STORE) {
+			if (argument->type == CMN_ARGPARSER_TYPE_CSTR) {
+				*(argument->result) = argument->default_value;
+			}
+		}
+	}
+	return 0;
 }
 
 static int parse_action_help(cmn_argparser_t argparser) {
 	cmn_argparser_print_help(argparser);
 	exit(EXIT_SUCCESS);
+	return 0;
 }
 
-static int parse_action_store(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links, size_t n, struct cmn_argparser_argument *argument) {
+static int parse_action_store(cmn_argparser_t this,
+                              size_t argc,
+                              char *const *argv,
+                              struct cmn_argparser_argument **argv_argument_links,
+                              size_t n,
+                              struct cmn_argparser_argument *argument) {
 	bool is_positional = argument->name;
-	bool have_flag = argument->flag;
 	switch (argument->action_nargs) {
 	case CMN_ARGPARSER_ACTION_NARGS_SINGLE:
 		{
@@ -270,8 +390,7 @@ static int parse_action_store(cmn_argparser_t this, size_t argc, char *const *ar
 				// TODO
 				break;
 			case CMN_ARGPARSER_TYPE_CSTR:
-				*(argument->result) = malloc(strlen(arg) + 1);
-				strcpy((char *)*(argument->result), arg);
+				*(argument->result) = arg;
 				break;
 			case CMN_ARGPARSER_TYPE_INT:
 			case CMN_ARGPARSER_TYPE_LONG:
@@ -307,9 +426,13 @@ static int parse_action_store(cmn_argparser_t this, size_t argc, char *const *ar
 	return 0;
 }
 
-static int parse_action_store_const(cmn_argparser_t this, size_t argc, char *const *argv, struct cmn_argparser_argument **argv_argument_links, size_t n, struct cmn_argparser_argument *argument) {
+static int parse_action_store_const(cmn_argparser_t this,
+                                    size_t argc,
+                                    char *const *argv,
+                                    struct cmn_argparser_argument **argv_argument_links,
+                                    size_t n,
+                                    struct cmn_argparser_argument *argument) {
 	bool is_positional = argument->name;
-	bool have_flag = argument->flag;
 	switch (argument->action_nargs) {
 	case CMN_ARGPARSER_ACTION_NARGS_SINGLE:
 		if (is_positional) {
@@ -340,9 +463,11 @@ static int parse_action_store_const(cmn_argparser_t this, size_t argc, char *con
 	return 0;
 }
 
-static void convert_result(cmn_argparser_t argparser, struct cmn_argparser_argument *argument, char const *arg) {
-	static char const
-		*type_names[] = { [CMN_ARGPARSER_TYPE_UINT] = "unsigned int", [CMN_ARGPARSER_TYPE_USHORT] = "unsigned short", [CMN_ARGPARSER_TYPE_LONG] = "long" };
+static void convert_result(cmn_argparser_t argparser,
+                           struct cmn_argparser_argument *argument,
+                           char const *arg) {
+	static char const *
+		type_names[] = { [CMN_ARGPARSER_TYPE_UINT] = "unsigned int", [CMN_ARGPARSER_TYPE_USHORT] = "unsigned short", [CMN_ARGPARSER_TYPE_LONG] = "long" };
 	enum cmn_strto_error ret;
 	char const *type_name;
 	char const *arg_name;
@@ -365,16 +490,6 @@ static void convert_result(cmn_argparser_t argparser, struct cmn_argparser_argum
 	type_name = type_names[argument->type];
 	if (ret != CMN_STRTO_SUCCESS) {
 		cmn_argparser_print_usage(argparser);
-		char *path;
-		char *program_name;
-		if (argparser->program_name) {
-			program_name = argparser->program_name;
-		}
-		else {
-			path = malloc(strlen(argparser->sys_argv[0]) + 1);
-			strcpy(path, argparser->sys_argv[0]);
-			program_name = basename(path);
-		}
 		if (argument->name) {
 			arg_name = argument->name;
 		}
@@ -387,7 +502,13 @@ static void convert_result(cmn_argparser_t argparser, struct cmn_argparser_argum
 			         argument->long_flag ? "--" : "",
 			         argument->long_flag ? argument->long_flag : "");
 		}
-		fprintf(stdout, "%s: error: argument %s: invalid %s value: '%s'", program_name, arg_name, type_name, arg);
+		fprintf(stdout,
+		        "%s: error: argument %s: invalid %s value: '%s'",
+		        argparser->program_name ? argparser->program_name :
+		                                  basename(argparser->sys_argv[0]),
+		        arg_name,
+		        type_name,
+		        arg);
 		fflush(stdout);
 		exit(EXIT_FAILURE);
 	}

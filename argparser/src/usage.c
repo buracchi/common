@@ -1,35 +1,22 @@
 #include <buracchi/common/argparser/argparser.h>
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <libgen.h>
-#include <stdio.h>
 
 #include <buracchi/common/utilities/utilities.h>
 
 #include "struct_argparser.h"
+#include "utils.h"
 
-static int get_optionals_usage(struct cmn_argparser_argument const *arg, char **str, char *str_vararg);
-
-static int get_optionals_descritpion(struct cmn_argparser_argument const *arg, char **str, char *str_vararg);
-
-static int get_positionals_usage(char **str, char *str_vararg);
-
-static int get_positionals_description(struct cmn_argparser_argument const *arg, char **str);
-
-static char *get_positional_args_string(struct cmn_argparser_argument const *arg);
-
+static char *get_arg_string(struct cmn_argparser_argument const *arg);
 static char *get_flag_vararg(struct cmn_argparser_argument const *arg);
-
 static char *get_narg_optional(char const *vararg);
-
 static char *get_narg_list_n(char const *vararg, size_t n);
-
 static char *get_narg_list(char const *vararg);
-
 static char *get_narg_list_optional(char const *vararg);
 
 extern int cmn_argparser_print_usage2(cmn_argparser_t argparser, FILE *file) {
@@ -50,42 +37,60 @@ extern int cmn_argparser_print_help2(cmn_argparser_t argparser, FILE *file) {
 
 extern char *cmn_argparser_format_usage(cmn_argparser_t argparser) {
 	char *usage_message;
+	char const *program_name;
 	char *optionals_usage = NULL;
 	char *positionals_usage = NULL;
-	char *path;
-	char *program_name;
+	char *subcommands_usage = NULL;
 	if (argparser->program_name) {
 		program_name = argparser->program_name;
 	}
 	else {
-		path = malloc(strlen(argparser->sys_argv[0]) + 1);
-		strcpy(path, argparser->sys_argv[0]);
-		program_name = basename(path);
+		program_name = basename(argparser->sys_argv[0]);
 	}
 	for (size_t i = 0; i < argparser->arguments_number; i++) {
 		struct cmn_argparser_argument const *parg = &(argparser->arguments[i]);
-		char *str_vararg = get_positional_args_string(parg);
+		char *str_vararg = get_arg_string(parg);
 		char *old_usage;
 		if (parg->name) {
 			old_usage = positionals_usage;
-			get_positionals_usage(&positionals_usage, str_vararg);
+			asprintf(&positionals_usage,
+			         "%s%s ",
+			         positionals_usage ? positionals_usage : "",
+			         str_vararg);
 		}
 		else {
 			old_usage = optionals_usage;
-			get_optionals_usage(parg, &optionals_usage, str_vararg);
+			asprintf(&optionals_usage,
+			         "%s%s%s%s%s%s%s ",
+			         optionals_usage ? optionals_usage : "",
+			         !parg->is_required ? "[" : "",
+			         parg->flag ? "-" : "--",
+			         parg->flag ? parg->flag : parg->long_flag,
+			         str_vararg ? " " : "",
+			         str_vararg ? str_vararg : "",
+			         !parg->is_required ? "]" : "");
 		}
 		free(str_vararg);
 		free(old_usage);
 	}
-	asprintf(&usage_message,
-	         "usage: %s%s%s",
-	         program_name,
-	         optionals_usage ? optionals_usage : "",
-	         positionals_usage ? positionals_usage : ""
-	);
-	if (!argparser->program_name) {
-		free(path);
+	for (size_t i = 0; i < argparser->subparsers_number; i++) {
+		char *old_subcommands_usage;
+		old_subcommands_usage = subcommands_usage;
+		asprintf(&subcommands_usage,
+		         "%s%s%s%s",
+		         old_subcommands_usage ? old_subcommands_usage : "{",
+		         argparser->subparsers[i].command_name,
+		         (i < argparser->subparsers_number - 1) ? "," : "",
+		         (i == argparser->subparsers_number - 1) ? "} ..." : "");
+		free(old_subcommands_usage);
 	}
+	asprintf(&usage_message,
+	         "usage: %s%s%s%s%s",
+	         program_name,
+	         strlen(program_name) != 0 ? " " : "",
+	         optionals_usage ? optionals_usage : "",
+	         positionals_usage ? positionals_usage : "",
+	         subcommands_usage ? subcommands_usage : "");
 	free(optionals_usage);
 	free(positionals_usage);
 	return usage_message;
@@ -96,88 +101,105 @@ extern char *cmn_argparser_format_help(cmn_argparser_t argparser) {
 	char *usage_message;
 	char *optionals_description = NULL;
 	char *positionals_description = NULL;
+	char *subcommands_description = NULL;
 	usage_message = cmn_argparser_format_usage(argparser);
 	for (size_t i = 0; i < argparser->arguments_number; i++) {
 		struct cmn_argparser_argument *parg = &(argparser->arguments[i]);
-		char *str_vararg = get_positional_args_string(parg);
+		char *str_vararg = get_arg_string(parg);
 		char *old_description;
 		if (parg->name) {
 			old_description = positionals_description;
-			get_positionals_description(parg, &positionals_description);
+			asprintf(&positionals_description,
+			         "%s  %s\t\t\t%s\n",
+			         positionals_description ? positionals_description : "",
+			         parg->name,
+			         parg->help ? parg->help : "");
 		}
 		else {
 			old_description = optionals_description;
-			get_optionals_descritpion(parg, &optionals_description, str_vararg);
+			asprintf(&optionals_description,
+			         "%s  %s%s%s%s%s%s%s%s%s\t%s\n",
+			         optionals_description ? optionals_description : "",
+			         parg->flag ? "-" : "",
+			         parg->flag ? parg->flag : "",
+			         str_vararg ? " " : "",
+			         str_vararg ? str_vararg : "",
+			         parg->flag ? ", " : "",
+			         parg->long_flag ? "--" : "",
+			         parg->long_flag ? parg->long_flag : "",
+			         str_vararg ? " " : "",
+			         str_vararg ? str_vararg : "\t",
+			         parg->help ? parg->help : "");
 		}
 		free(str_vararg);
 		free(old_description);
 	}
+	for (size_t i = 0; i < argparser->subparsers_number; i++) {
+		char *old_subcommands_description;
+		old_subcommands_description = subcommands_description;
+		asprintf(&subcommands_description,
+		         "%s%s%s%s",
+		         old_subcommands_description ? old_subcommands_description : "  {",
+		         argparser->subparsers[i].command_name,
+		         (i < argparser->subparsers_number - 1) ? "," : "",
+		         (i == argparser->subparsers_number - 1) ? "}\n" : "");
+		free(old_subcommands_description);
+	}
+	for (size_t i = 0; i < argparser->subparsers_number; i++) {
+		if (argparser->subparsers[i].help) {
+			char *old_subcommands_description;
+			old_subcommands_description = subcommands_description;
+			asprintf(&subcommands_description,
+			         "%s    %s\t\t%s\n",
+			         old_subcommands_description,
+			         argparser->subparsers[i].command_name,
+			         argparser->subparsers[i].help);
+			free(old_subcommands_description);
+		}
+	}
+	if (argparser->subparsers_options.title == NULL &&
+	    argparser->subparsers_options.description) {
+		argparser->subparsers_options.title = "subcommands";
+	}
 	asprintf(&help_message,
-	         "%s\n\n%s\n%s%s",
+	         "%s\n%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 	         usage_message,
-	         argparser->description,
+	         argparser->description ? argparser->description : "",
+	         argparser->description ? "\n" : "",
+	         positionals_description ? "\npositional arguments:\n" : "",
 	         positionals_description ? positionals_description : "",
-	         optionals_description ? optionals_description : "");
+	         subcommands_description && !argparser->subparsers_options.title ?
+	                 subcommands_description :
+	                 "",
+	         optionals_description ? "\noptional arguments:\n" : "",
+	         optionals_description ? optionals_description : "",
+	         argparser->subparsers_options.title ? "\n" : "",
+	         argparser->subparsers_options.title ?
+	                 argparser->subparsers_options.title :
+	                 "",
+	         argparser->subparsers_options.title ? ":\n" : "",
+	         argparser->subparsers_options.description ? "  " : "",
+	         argparser->subparsers_options.description ?
+	                 argparser->subparsers_options.description :
+	                 "",
+	         argparser->subparsers_options.description ? "\n\n" : "",
+	         argparser->subparsers_options.title ? subcommands_description : "");
 	free(usage_message);
 	free(optionals_description);
 	free(positionals_description);
 	return help_message;
 }
 
-static inline int get_optionals_usage(struct cmn_argparser_argument const *arg, char **str, char *str_vararg) {
-	return asprintf(
-			str,
-			"%s %s%s%s%s%s%s",
-			*str ? *str : "",
-			!arg->is_required ? "[" : "",
-			arg->flag ? "-" : "--",
-			arg->flag ? arg->flag : arg->long_flag,
-			str_vararg ? " " : "",
-			str_vararg ? str_vararg : "",
-			!arg->is_required ? "]" : ""
-	);
-}
-
-static inline int get_optionals_descritpion(struct cmn_argparser_argument const *arg, char **str, char *str_vararg) {
-	return asprintf(
-			str,
-			"%s  %s%s%s%s%s%s%s%s%s\t%s\n",
-			*str ? *str : "\noptional arguments:\n",
-			arg->flag ? "-" : "",
-			arg->flag ? arg->flag : "",
-			str_vararg ? " " : "",
-			str_vararg ? str_vararg : "",
-			arg->flag ? ", " : "",
-			arg->long_flag ? "--" : "",
-			arg->long_flag ? arg->long_flag : "",
-			str_vararg ? " " : "",
-			str_vararg ? str_vararg : "\t",
-			arg->help ? arg->help : ""
-	);
-}
-
-static inline int get_positionals_usage(char **str, char *str_vararg) {
-	return asprintf(str, "%s %s", *str ? *str : "", str_vararg);
-}
-
-static inline int get_positionals_description(struct cmn_argparser_argument const *arg, char **str) {
-	return asprintf(str,
-	                "%s  %s\t\t\t%s\n",
-	                *str ? *str : "\npositional arguments:\n",
-	                arg->name,
-	                arg->help ? arg->help : "");
-}
-
-static char *get_positional_args_string(struct cmn_argparser_argument const *arg) {
+static char *get_arg_string(struct cmn_argparser_argument const *arg) {
 	char *vararg;
 	bool is_positional = arg->name;
 	if (is_positional) {
 		asprintf(&vararg, "%s", arg->name);
 	}
 	else {
-		bool needs_arg = (arg->action == CMN_ARGPARSER_ACTION_STORE)
-		                 || (arg->action == CMN_ARGPARSER_ACTION_APPEND)
-		                 || (arg->action == CMN_ARGPARSER_ACTION_EXTEND);
+		bool needs_arg = (arg->action == CMN_ARGPARSER_ACTION_STORE) ||
+		                 (arg->action == CMN_ARGPARSER_ACTION_APPEND) ||
+		                 (arg->action == CMN_ARGPARSER_ACTION_EXTEND);
 		if (!needs_arg) {
 			return NULL;
 		}
@@ -219,10 +241,9 @@ static char *get_narg_optional(char const *vararg) {
 	char *result;
 	size_t size = strlen(vararg) + 3;
 	result = malloc(size);
-	strcpy(result + 1, vararg);
 	result[0] = '[';
-	result[size - 2] = ']';
-	result[size - 1] = 0;
+	strcpy(result + 1, vararg);
+	strcpy(result + size - 2, "]");
 	return result;
 }
 
@@ -240,17 +261,12 @@ static char *get_narg_list_n(char const *vararg, size_t n) {
 
 static char *get_narg_list(char const *vararg) {
 	char *result;
-	size_t size = strlen(vararg) * 2 + 6 + 1;
+	size_t size = strlen(vararg) * 2 + 7;
 	result = malloc(size);
 	strcpy(result, vararg);
-	result[strlen(vararg)] = ' ';
-	result[strlen(vararg) + 1] = '[';
+	strcpy(result + strlen(vararg), " [");
 	strcpy(result + strlen(vararg) + 2, vararg);
-	result[size - 5] = '.';
-	result[size - 4] = '.';
-	result[size - 3] = '.';
-	result[size - 2] = ']';
-	result[size - 1] = 0;
+	strcpy(result + size - 5, "...]");
 	return result;
 }
 

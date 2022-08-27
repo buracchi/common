@@ -1,11 +1,11 @@
 add_library(argparser STATIC
-    "src/argparser.c"
-    "src/parser.c"
-    "src/usage.c")
+            "src/argparser.c"
+            "src/parser.c"
+            "src/usage.c"
+            "src/utils.c")
 target_include_directories(argparser PUBLIC
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-target_link_libraries(argparser PRIVATE containers)
 target_link_libraries(argparser PRIVATE utilities)
 target_link_libraries(argparser INTERFACE $<BUILD_INTERFACE:coverage_config>)
 set_target_properties(argparser PROPERTIES PREFIX ${LIBCOMMON_LIBRARY_PREFIX})
