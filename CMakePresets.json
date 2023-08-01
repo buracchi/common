@@ -58,13 +58,18 @@
       "hidden": true,
       "inherits": "default",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl.exe",
-        "CMAKE_CXX_COMPILER": "cl.exe"
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "intellisenseMode": "windows-clang-x64"
+        }
       }
     },
     {
@@ -95,7 +100,7 @@
       "inherits": [ "windows-default", "x64-debug" ],
       "cacheVariables": {
         "CMAKE_C_FLAGS_DEBUG": "/std:c17 /Zi",
-        "CMAKE_CXX_FLAGS_DEBUG": "/Wall /Zi"
+        "CMAKE_CXX_FLAGS_DEBUG": "/std:c++20 /Wall /Zi"
       }
     },
     {

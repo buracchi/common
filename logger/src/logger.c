@@ -93,28 +93,29 @@ static const char* level_colors[] = {
 
 static inline char* get_date_time(char(*date_time)[20]);
 
-static inline struct logger* get_logger() {
-	if (logger.mutex == NULL) {
-		mtx_t mtx;
-		while (mtx_init(&mtx, mtx_plain) != thrd_success);
-		while (mtx_lock(&mtx) != thrd_success);
-		if (atomic_compare_exchange_strong(&logger.mutex, &(mtx_t*){ NULL }, &mutex)) {
-			memcpy(logger.mutex, &mtx, sizeof(mtx_t));
-			logger.config.default_level = CMN_LOGGER_LOG_LEVEL_ALL;
-			logger.config.file = stderr;
-			logger.config.show_date_time = true;
-			logger.config.show_source_file = false;
-			logger.config.show_level_name = true;
-			logger.config.show_process_id = false;
-			logger.config.show_thread_id = false;
-			while (mtx_unlock(logger.mutex) != thrd_success);
-		}
-		else {
-			mtx_unlock(&mtx);
-			mtx_destroy(&mtx);
-			while (mtx_lock(logger.mutex) != thrd_success);	// wait termination of logger initialization
-			while (mtx_unlock(logger.mutex) != thrd_success);
-		}
+static inline struct logger* get_logger(void) {
+	if (logger.mutex != NULL) {
+		return &logger;
+	}
+	mtx_t mtx;
+	while (mtx_init(&mtx, mtx_plain) != thrd_success);
+	while (mtx_lock(&mtx) != thrd_success);
+	if (atomic_compare_exchange_strong(&logger.mutex, &(mtx_t *){ NULL }, &mutex)) {
+		memcpy(logger.mutex, &mtx, sizeof(mtx_t));
+		logger.config.default_level = CMN_LOGGER_LOG_LEVEL_ALL;
+		logger.config.file = stderr;
+		logger.config.show_date_time = true;
+		logger.config.show_source_file = false;
+		logger.config.show_level_name = true;
+		logger.config.show_process_id = false;
+		logger.config.show_thread_id = false;
+		while (mtx_unlock(logger.mutex) != thrd_success);
+	}
+	else {
+		mtx_unlock(&mtx);
+		mtx_destroy(&mtx);
+		while (mtx_lock(logger.mutex) != thrd_success); // wait termination of logger initialization
+		while (mtx_unlock(logger.mutex) != thrd_success);
 	}
 	return &logger;
 }
