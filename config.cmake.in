@@ -2,7 +2,7 @@
 
 include(CMakeFindDependencyMacro)
 
-set(_supported_components utilities iterators containers logger argparser statemachine)
+set(_supported_components utilities iterators containers logger statemachine)
 if (${UNIX})
     list(APPEND _supported_components concurrency networking)
 endif ()
